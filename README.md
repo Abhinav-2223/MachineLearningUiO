@@ -1,7 +1,7 @@
 # Applied Data Analysis and Machine Learning
 
-This site contains all material relevant for the course on Applied
-Data Analysis and Machine Learning.
+This site contains all material relevant for the courses on Applied
+Data Analysis and Machine Learning. The courses are FYS-STK3155/4155 and FYS5429/9429.
 
 ## Introduction
 
