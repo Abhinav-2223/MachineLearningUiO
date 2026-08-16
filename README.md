@@ -126,18 +126,20 @@ Grading scale: Grades are awarded on a scale from A to F, where A is the best gr
 
 The final number of points is based on the average of all projects (including eventual additional points) and the grade follows the following table:
 
- *  points: A
- *  points: B
- *  points: C
- *  points: D
- *  points: E
+ * 95-100 points: A
+ * 85-94 points: B
+ * 72-84 points: C
+ * 64-71 points: D
+ * 60-63 points: E
  * 0-59 points: F-failed
+
+In addition you can get an extra score for weekly assignments (10 in total and due each Friday). Each weekly assignment counts 1 point. As an example, this means that if your average after three projects is 88 points and you have handed in and gotten approved seven weekly exercises, the total score is 88+7=95, which translates into an A. 
 
 ## Tentative deadllines for projects
 
-* First project, due October 6, counts 1/3 of final grade
-* Second  project, due November 3, counts 1/3 of final grade
-* Third project, due December 8, counts 1/3 of final grade
+* First project, due October 5, counts 1/3 of final grade
+* Second  project, due November 2, counts 1/3 of final grade
+* Third project, due December 7, counts 1/3 of final grade
 * Extra Credit (not mandatory),  weekly exercise assignments, 10 in total (due Fridays), adds one point per exercises set.
 
 
