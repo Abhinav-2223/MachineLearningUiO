@@ -201,6 +201,21 @@
 <li class="toctree-l1"><a class="reference internal" href="chapter6.html">6. Chapter 6: Support Vector Machines</a></li>
 <li class="toctree-l1"><a class="reference internal" href="chapter7.html">7. Chapter 7: Ensemble methods; from simple decision trees to Gradient Boosting</a></li>
 </ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Deep Learning</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="chapter8.html">8. Chapter 8: Neural Networks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="chapter9.html">9. Chapter 9: Neural Networks for Differential Equations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="chapter10.html">10. Chapter 10: Convolutional Neural Networks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="chapter11.html">11. Chapter 11: Recurrent Neural Networks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="chapter12.html">12. Chapter 12: Autoencoders</a></li>
+<li class="toctree-l1"><a class="reference internal" href="chapter13.html">13. Chapter 13: Transformers</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Generative Methods</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="chapter14.html">14. Chapter 14: Boltzmann Machines</a></li>
+<li class="toctree-l1"><a class="reference internal" href="chapter15.html">15. Chapter 15: Variational Autoencoders</a></li>
+<li class="toctree-l1"><a class="reference internal" href="chapter16.html">16. Chapter 16: Diffusion Models and Normalizing Flows</a></li>
+</ul>
 
     </div>
 </nav></div>
@@ -819,6 +834,14 @@ rate</p>
 <p>where <span class="math notranslate nohighlight">\(\kappa\)</span> is the condition number of the Hessian in the sense of
 Eq. (1.77).  The number of iterations needed to reduce the error
 by a fixed factor is therefore proportional to <span class="math notranslate nohighlight">\(\kappa\)</span>.</p>
+<p>Figure fig:etabound confirms both statements numerically.  The
+iteration count falls as <span class="math notranslate nohighlight">\(\eta\)</span> increases, reaches its minimum at the predicted
+<span class="math notranslate nohighlight">\(\eta^{*}=2/(\lambda_{\max}+\lambda_{\min})\)</span>, rises again, and diverges
+exactly at <span class="math notranslate nohighlight">\(2/\lambda_{\max}\)</span>.  There is no margin of safety at the right-hand
+edge: the transition from the fastest convergence available to outright
+divergence occupies a factor of two in <span class="math notranslate nohighlight">\(\eta\)</span>.</p>
+<p><img alt="Iterations required to reach an error of 10-6 against the learning rat" src="_images/learning_rate_bound.png" /></p>
+<p><em>Iterations required to reach an error of <span class="math notranslate nohighlight">\(10^{-6}\)</span> against the learning rate, for a quadratic with eigenvalues <span class="math notranslate nohighlight">\(\{0.05,1,5\}\)</span>.  The optimum lies at <span class="math notranslate nohighlight">\(\eta^{*}\)</span> and the method diverges beyond <span class="math notranslate nohighlight">\(2/\lambda_{\max}\)</span>, as predicted by Eqs. (4.20) and (4.21).</em></p>
 <p>This is the central result of the chapter, and it deserves to be read slowly.
 Gradient descent is not slow because gradients are a bad idea.  It is slow
 because it applies <em>the same</em> <span class="math notranslate nohighlight">\(\eta\)</span> to every eigendirection, while
@@ -858,6 +881,15 @@ quadratic and on exact gradients, and it copes badly with the stochastic,
 non-convex problems of the following chapters – which is why the machine
 learning literature developed a different set of remedies, to which we now
 turn.</p>
+<p>Figure fig:gdpaths shows what the algebra describes.  On an elongated
+quadratic with <span class="math notranslate nohighlight">\(\kappa=12\)</span>, a small learning rate creeps along the valley floor
+without ever crossing it; a learning rate near the stability
+bound (4.20) oscillates across the valley while making slow
+progress along it; and momentum, at the same learning rate, damps the
+oscillation and accelerates the drift, arriving in a fraction of the steps.
+The three panels are the whole of this section and the next in pictures.</p>
+<p><img alt="Gradient descent on a quadratic with kappa12.  Left too small a step. " src="_images/gd_paths_conditioning.png" /></p>
+<p><em>Gradient descent on a quadratic with <span class="math notranslate nohighlight">\(\kappa=12\)</span>.  Left: too small a step.  Centre: a step near the stability bound <span class="math notranslate nohighlight">\(2/\lambda_{\max}\)</span>, oscillating across the narrow direction.  Right: the same step with momentum <span class="math notranslate nohighlight">\(\gamma=0.85\)</span>, which cancels the oscillation and accumulates along the flat direction.</em></p>
 </section>
 <section id="momentum">
 <h2><span class="section-number">4.6. </span>Momentum<a class="headerlink" href="#momentum" title="Link to this heading">#</a></h2>
@@ -919,6 +951,14 @@ quadratic.</p>
 <p><strong>A minimal example.</strong>
 The behaviour is easiest to see on <span class="math notranslate nohighlight">\(f(x)=x^{2}\)</span>, where the exact answer is
 known.</p>
+<p>Figure fig:momentumrate shows what the improvement from <span class="math notranslate nohighlight">\(\kappa\)</span> to
+<span class="math notranslate nohighlight">\(\sqrt{\kappa}\)</span> is worth.  At <span class="math notranslate nohighlight">\(\kappa=10^{2}\)</span> momentum saves an order of
+magnitude in iterations; at <span class="math notranslate nohighlight">\(\kappa=10^{4}\)</span>, two.  Since
+Eq. (4.22) tells us that the least-squares Hessian has the
+condition number of the design matrix <em>squared</em>, condition numbers in
+this range are entirely ordinary, and the saving is not academic.</p>
+<p><img alt="Iterations to fixed accuracy against the condition number, for gradien" src="_images/momentum_rate.png" /></p>
+<p><em>Iterations to fixed accuracy against the condition number, for gradient descent and for momentum with optimal parameters, from the rates (4.21) and (4.26).</em></p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
@@ -1545,6 +1585,15 @@ large, when the gradients are sparse, and when the cost is non-convex –
 which is to say in the neural networks of the following chapters, and not
 here.  Demonstrating a method on a problem it was not designed for is a good
 way to understand what it actually does.</p>
+<p>Figure fig:optimisers plots the same comparison as a function of the
+epoch rather than as a final number, and it makes the second lesson of the
+table unmistakable.  At <span class="math notranslate nohighlight">\(\eta=0.01\)</span> the adaptive methods are slower than plain
+stochastic gradient descent and AdaGrad has effectively stopped; at <span class="math notranslate nohighlight">\(\eta=0.5\)</span>
+the ordering is reversed and AdaGrad is the best of the five.  Nothing about
+the methods has changed between the panels.  Only the number <span class="math notranslate nohighlight">\(\eta\)</span> has, and it
+means something different to each of them.</p>
+<p><img alt="Excess cost against epoch for the five optimisers of Section Implement" src="_images/optimiser_comparison.png" /></p>
+<p><em>Excess cost against epoch for the five optimisers of Section <em>Implementations</em> at two learning rates.  The vertical axis is <span class="math notranslate nohighlight">\(C(\bm{\theta})\)</span> minus its value at the analytical minimum.  The ranking of the methods reverses between the panels.</em></p>
 <div class="tip admonition">
 <p class="admonition-title">Machine learning connection</p>
 <p>The default hyperparameters

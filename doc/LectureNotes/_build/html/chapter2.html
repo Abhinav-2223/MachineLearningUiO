@@ -201,6 +201,21 @@
 <li class="toctree-l1"><a class="reference internal" href="chapter6.html">6. Chapter 6: Support Vector Machines</a></li>
 <li class="toctree-l1"><a class="reference internal" href="chapter7.html">7. Chapter 7: Ensemble methods; from simple decision trees to Gradient Boosting</a></li>
 </ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Deep Learning</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="chapter8.html">8. Chapter 8: Neural Networks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="chapter9.html">9. Chapter 9: Neural Networks for Differential Equations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="chapter10.html">10. Chapter 10: Convolutional Neural Networks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="chapter11.html">11. Chapter 11: Recurrent Neural Networks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="chapter12.html">12. Chapter 12: Autoencoders</a></li>
+<li class="toctree-l1"><a class="reference internal" href="chapter13.html">13. Chapter 13: Transformers</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Generative Methods</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="chapter14.html">14. Chapter 14: Boltzmann Machines</a></li>
+<li class="toctree-l1"><a class="reference internal" href="chapter15.html">15. Chapter 15: Variational Autoencoders</a></li>
+<li class="toctree-l1"><a class="reference internal" href="chapter16.html">16. Chapter 16: Diffusion Models and Normalizing Flows</a></li>
+</ul>
 
     </div>
 </nav></div>
@@ -592,6 +607,8 @@ loss for that assumption.</p>
 </div>
 </div>
 </div>
+<p><img alt="The Gaussian density 2.7 for three parameter pairs.  Changing mu trans" src="_images/gaussian_distributions.png" /></p>
+<p><em>The Gaussian density (2.7) for three parameter pairs.  Changing <span class="math notranslate nohighlight">\(\mu\)</span> translates the curve, changing <span class="math notranslate nohighlight">\(\sigma\)</span> both widens it and lowers its peak, the area remaining unity.</em></p>
 <p><strong>The multivariate Gaussian.</strong></p>
 <p>The generalisation to <span class="math notranslate nohighlight">\(p\)</span> correlated variables collected in a vector
 <span class="math notranslate nohighlight">\(\bm{x}\in\mathbb{R}^{p}\)</span> is</p>
@@ -839,6 +856,17 @@ tails, such as the Cauchy distribution, have no finite <span class="math notrans
 sample means do not become Gaussian at all.  The second is independence.  When
 the values are correlated, Eq. (2.24) <em>underestimates</em> the
 true uncertainty, often by a large factor, and we take this up next.</p>
+<p>Figure fig:clt illustrates both the theorem and its limits.  Averages of
+uniform and of exponential variables become visibly Gaussian by <span class="math notranslate nohighlight">\(m=10\)</span> and are
+indistinguishable from it by <span class="math notranslate nohighlight">\(m=100\)</span>, with the width shrinking as
+<span class="math notranslate nohighlight">\(1/\sqrt{m}\)</span>; note that the exponential is strongly skewed and that the skew
+disappears nonetheless.  The Cauchy distribution behaves entirely differently:
+its average is no better determined for <span class="math notranslate nohighlight">\(m=100\)</span> than for <span class="math notranslate nohighlight">\(m=1\)</span>.  The reason is
+that it has no finite variance, so the hypothesis of the theorem fails, and no
+amount of averaging helps.  It is worth remembering that the central limit
+theorem is a statement with conditions and not a law of nature.</p>
+<p><img alt="The central limit theorem at work, and failing.  Histograms of the ave" src="_images/central_limit_theorem.png" /></p>
+<p><em>The central limit theorem at work, and failing.  Histograms of the average of <span class="math notranslate nohighlight">\(m\)</span> independent draws for three distributions.  Uniform and exponential averages converge to a Gaussian of width <span class="math notranslate nohighlight">\(\sigma/\sqrt{m}\)</span>; Cauchy averages do not converge at all, the distribution of <span class="math notranslate nohighlight">\(\bar{x}\)</span> being independent of <span class="math notranslate nohighlight">\(m\)</span>.</em></p>
 <div class="tip admonition">
 <p class="admonition-title">Machine learning connection</p>
 <p>Equation (2.24) is why a
@@ -1000,6 +1028,15 @@ defines the <em>autocorrelation function</em></p>
 <span class="math notranslate nohighlight">\(\tau&gt;1\)</span>, and the effective number of independent measurements is not <span class="math notranslate nohighlight">\(n\)</span> but
 <span class="math notranslate nohighlight">\(n/\tau\)</span>.  Ignoring this is one of the most common ways of quoting an error
 bar that is too small by an order of magnitude.</p>
+<p>Figure fig:autocorr shows the effect for a first-order autoregressive
+sequence, <span class="math notranslate nohighlight">\(x_{t+1}=\phi x_t+\eta_t\)</span>, which decays as <span class="math notranslate nohighlight">\(\kappa_d=\phi^{d}\)</span> and
+for which the correlation time can be computed exactly,
+<span class="math notranslate nohighlight">\(\tau=(1+\phi)/(1-\phi)\)</span>.  With <span class="math notranslate nohighlight">\(\phi=0.9\)</span> this gives <span class="math notranslate nohighlight">\(\tau=19\)</span>: the
+effective number of independent measurements is one nineteenth of the number
+recorded, and an error bar computed from Eq. (2.24) is too small
+by a factor of <span class="math notranslate nohighlight">\(\sqrt{19}\approx4.4\)</span>.</p>
+<p><img alt="Autocorrelation function 2.35 of an autoregressive sequence with phi0." src="_images/autocorrelation_ar1.png" /></p>
+<p><em>Autocorrelation function (2.35) of an autoregressive sequence with <span class="math notranslate nohighlight">\(\phi=0.9\)</span>, compared with the exact <span class="math notranslate nohighlight">\(\phi^{d}\)</span>.  The measured correlation time agrees with the prediction <span class="math notranslate nohighlight">\((1+\phi)/(1-\phi)\)</span>.</em></p>
 <div class="tip admonition">
 <p class="admonition-title">Machine learning connection</p>
 <p>Correlated samples are the rule rather
@@ -1314,6 +1351,18 @@ out the whole trade-off:</p>
 <p>The resulting figure is the canonical one: the bias falls steeply and
 flattens, the variance is negligible at low degree and grows without bound,
 and their sum has a clear minimum.</p>
+<p>Figure fig:biasvariance is that figure.  Three features are worth
+naming.  The squared bias falls by two orders of magnitude between degrees
+zero and four and then flattens: beyond degree four the polynomial family is
+rich enough to represent the underlying function, and additional flexibility
+buys no reduction in bias.  The variance is negligible at low degree and then
+grows steadily, since a more flexible model chases the noise in whichever
+bootstrap sample it is given.  Their sum, the test error, therefore falls,
+reaches a minimum around degree four or five, and rises thereafter.  Model
+selection is the business of locating that minimum, and
+Section <em>Cross-validation</em> is how it is done without a test set.</p>
+<p><img alt="The bias-variance decomposition 2.47 for a polynomial fit, with the th" src="_images/bias_variance_tradeoff.png" /></p>
+<p><em>The bias-variance decomposition (2.47) for a polynomial fit, with the three terms estimated by the bootstrap.  Bias falls and saturates, variance grows without limit, and the test error has a minimum in between.</em></p>
 <div class="tip admonition">
 <p class="admonition-title">Machine learning connection</p>
 <p>Every regularisation method in this book
@@ -1773,6 +1822,15 @@ time (2.36) and not with the naive
 <span class="math notranslate nohighlight">\(\sigma/\sqrt{n}\)</span> of Eq. (2.24); with the step size above, the
 chain of the code fragment has an autocorrelation time of several steps, so
 the naive error would be too small by a factor of order <span class="math notranslate nohighlight">\(\sqrt{\tau}\)</span>.</p>
+<p>Figure fig:metropolis shows both the chain and its output.  The trace on
+the left makes the correlation visible directly: successive states are small
+perturbations of one another, so the walk wanders rather than jumping
+independently, and this is exactly what the correlation time quantifies.  The
+histogram on the right shows that the stationary distribution is nevertheless
+the intended one, reproducing <span class="math notranslate nohighlight">\(\mathcal{N}(0,1)\)</span> accurately although the
+normalisation of the target was never supplied to the algorithm.</p>
+<p><img alt="Metropolis sampling of an unnormalised standard Gaussian, Eq. 2.59.  L" src="_images/metropolis_sampling.png" /></p>
+<p><em>Metropolis sampling of an unnormalised standard Gaussian, Eq. (2.59).  Left: the first <span class="math notranslate nohighlight">\(600\)</span> states of the chain, showing the correlation between successive samples.  Right: the sampled histogram against the exact density.</em></p>
 <div class="tip admonition">
 <p class="admonition-title">Machine learning connection</p>
 <p>The Metropolis algorithm is the sampling

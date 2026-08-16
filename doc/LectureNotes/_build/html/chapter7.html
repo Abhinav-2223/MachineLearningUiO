@@ -62,6 +62,7 @@
     <script>DOCUMENTATION_OPTIONS.pagename = 'chapter7';</script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="8. Chapter 8: Neural Networks" href="chapter8.html" />
     <link rel="prev" title="6. Chapter 6: Support Vector Machines" href="chapter6.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
@@ -199,6 +200,21 @@
 <li class="toctree-l1"><a class="reference internal" href="chapter5.html">5. Chapter 5: Logistic Regression</a></li>
 <li class="toctree-l1"><a class="reference internal" href="chapter6.html">6. Chapter 6: Support Vector Machines</a></li>
 <li class="toctree-l1 current active"><a class="current reference internal" href="#">7. Chapter 7: Ensemble methods; from simple decision trees to Gradient Boosting</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Deep Learning</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="chapter8.html">8. Chapter 8: Neural Networks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="chapter9.html">9. Chapter 9: Neural Networks for Differential Equations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="chapter10.html">10. Chapter 10: Convolutional Neural Networks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="chapter11.html">11. Chapter 11: Recurrent Neural Networks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="chapter12.html">12. Chapter 12: Autoencoders</a></li>
+<li class="toctree-l1"><a class="reference internal" href="chapter13.html">13. Chapter 13: Transformers</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Generative Methods</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="chapter14.html">14. Chapter 14: Boltzmann Machines</a></li>
+<li class="toctree-l1"><a class="reference internal" href="chapter15.html">15. Chapter 15: Variational Autoencoders</a></li>
+<li class="toctree-l1"><a class="reference internal" href="chapter16.html">16. Chapter 16: Diffusion Models and Normalizing Flows</a></li>
 </ul>
 
     </div>
@@ -581,6 +597,16 @@ strictly concave impurity, the weighted average of the children is strictly
 less than the parent value unless the split is trivial, so these measures
 reward purity even when the majority vote does not change.  Since a pure node
 never needs splitting again, this is the behaviour we want.</p>
+<p>Figure fig:impurity shows the three measures for a two-class node.  The
+misclassification rate is piecewise linear with a corner at <span class="math notranslate nohighlight">\(p=\tfrac12\)</span>; the
+Gini index and the entropy are strictly concave.  Concavity is precisely the
+property that makes a weighted average of two children smaller than the parent
+unless the split is trivial, so the two smooth measures reward a split that
+purifies one branch even when the majority vote in neither branch changes.
+The entropy is drawn also at half scale, where it is seen to track the Gini
+index closely; in practice the two rarely select different splits.</p>
+<p><img alt="The three impurity measures of Eqs. 7.6-7.8 for a node with a fraction" src="_images/impurity_measures.png" /></p>
+<p><em>The three impurity measures of Eqs. (7.6)-(7.8) for a node with a fraction <span class="math notranslate nohighlight">\(p\)</span> of one class.  The misclassification rate is piecewise linear, the Gini index and entropy strictly concave.</em></p>
 </section>
 <section id="the-cart-algorithm">
 <h2><span class="section-number">7.4. </span>The CART algorithm<a class="headerlink" href="#the-cart-algorithm" title="Link to this heading">#</a></h2>
@@ -985,6 +1011,15 @@ data perfectly and generalises <em>worse</em> than the tree of depth five: the
 classic overfitting signature of Section <em>The bias-variance tradeoff</em>, with the
 variance term growing without limit.  Everything in the rest of this chapter
 is a way of controlling it.</p>
+<p>Figure fig:treedepth shows the boundaries behind those numbers.  At
+depth one the tree is a single threshold; at depth three it has the right gross
+shape; at depth five it is close to the truth.  Grown without limit it develops
+narrow rectangular islands around individual training points – visibly fitting
+noise, and the geometric signature of the variance term.  Note also that every
+boundary is a staircase of axis-aligned steps, since a tree can only ask
+questions of the form <span class="math notranslate nohighlight">\(x_j\le t\)</span>.</p>
+<p><img alt="Decision boundaries of a single tree at four depths on the moons data." src="_images/tree_depth_boundary.png" /></p>
+<p><em>Decision boundaries of a single tree at four depths on the moons data.  Growing the tree without limit produces isolated regions around individual points.  All boundaries are unions of axis-aligned rectangles.</em></p>
 </section>
 <section id="strengths-and-weaknesses-of-trees">
 <h2><span class="section-number">7.7. </span>Strengths and weaknesses of trees<a class="headerlink" href="#strengths-and-weaknesses-of-trees" title="Link to this heading">#</a></h2>
@@ -1055,6 +1090,16 @@ is easy to overlook – make <span class="math notranslate nohighlight">\(\rho\)
 attacks <span class="math notranslate nohighlight">\(\sigma^2/B\)</span> by resampling; random forests exist because bagging alone
 leaves <span class="math notranslate nohighlight">\(\rho\)</span> too large; boosting takes an entirely different route, attacking
 the bias instead.</p>
+<p>Figure fig:ensvariance plots Eq. (7.16) for
+several correlations.  For independent members the variance falls as <span class="math notranslate nohighlight">\(1/B\)</span> and
+can be made as small as we please.  For correlated members it falls only until
+it reaches the floor <span class="math notranslate nohighlight">\(\rho\sigma^{2}\)</span>, drawn as a dotted line, and thereafter
+additional trees are wasted effort.  With <span class="math notranslate nohighlight">\(\rho=0.8\)</span> – not unusual for bagged
+trees sharing one dominant predictor – eighty per cent of the variance survives
+however many trees are grown.  That floor is what the random forest is designed
+to lower.</p>
+<p><img alt="The variance of an average of B predictors, Eq. 7.16, for four values " src="_images/ensemble_variance.png" /></p>
+<p><em>The variance of an average of <span class="math notranslate nohighlight">\(B\)</span> predictors, Eq. (7.16), for four values of the pairwise correlation <span class="math notranslate nohighlight">\(\rho\)</span>.  Dotted lines mark the floor <span class="math notranslate nohighlight">\(\rho\sigma^{2}\)</span>, which no number of members can cross.</em></p>
 <p><strong>An aside on voting.</strong>
 For classification there is a complementary argument.  Suppose <span class="math notranslate nohighlight">\(B\)</span> independent
 classifiers are each correct with probability <span class="math notranslate nohighlight">\(p&gt;1/2\)</span> and we take a majority
@@ -1613,6 +1658,16 @@ boosting reduces bias by construction, it <em>can</em> overfit as <span class="m
 which random forests essentially cannot – so the two families need opposite
 habits of mind about how many trees to use.</p>
 </div>
+<p>Figure fig:ensembles shows both families in action.  On the left, both
+bagging and the random forest improve rapidly on the single tree and then
+flatten, exactly as Eq. (7.16) requires, with the
+forest holding a small advantage from its lower <span class="math notranslate nohighlight">\(\rho\)</span>.  On the right,
+AdaBoost’s training error falls steadily towards zero as stumps accumulate
+while the test error flattens after a few dozen: boosting reduces bias without
+limit and will eventually overfit, which is precisely the behaviour bagging does
+not show.</p>
+<p><img alt="Left test accuracy of bagging and of a random forest against the numbe" src="_images/ensembles_and_boosting.png" /></p>
+<p><em>Left: test accuracy of bagging and of a random forest against the number of trees, with the single tree marked.  Right: AdaBoost training and test error against the number of stumps.  The two panels contrast variance reduction with bias reduction.</em></p>
 </section>
 <section id="xgboost-extreme-gradient-boosting">
 <h2><span class="section-number">7.14. </span>XGBoost: extreme gradient boosting<a class="headerlink" href="#xgboost-extreme-gradient-boosting" title="Link to this heading">#</a></h2>
@@ -1938,6 +1993,15 @@ matter.</p>
         <p class="prev-next-subtitle">previous</p>
         <p class="prev-next-title"><span class="section-number">6. </span>Chapter 6: Support Vector Machines</p>
       </div>
+    </a>
+    <a class="right-next"
+       href="chapter8.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title"><span class="section-number">8. </span>Chapter 8: Neural Networks</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
     </a>
 </div>
                 </footer>

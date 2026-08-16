@@ -201,6 +201,21 @@
 <li class="toctree-l1"><a class="reference internal" href="chapter6.html">6. Chapter 6: Support Vector Machines</a></li>
 <li class="toctree-l1"><a class="reference internal" href="chapter7.html">7. Chapter 7: Ensemble methods; from simple decision trees to Gradient Boosting</a></li>
 </ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Deep Learning</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="chapter8.html">8. Chapter 8: Neural Networks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="chapter9.html">9. Chapter 9: Neural Networks for Differential Equations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="chapter10.html">10. Chapter 10: Convolutional Neural Networks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="chapter11.html">11. Chapter 11: Recurrent Neural Networks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="chapter12.html">12. Chapter 12: Autoencoders</a></li>
+<li class="toctree-l1"><a class="reference internal" href="chapter13.html">13. Chapter 13: Transformers</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Generative Methods</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="chapter14.html">14. Chapter 14: Boltzmann Machines</a></li>
+<li class="toctree-l1"><a class="reference internal" href="chapter15.html">15. Chapter 15: Variational Autoencoders</a></li>
+<li class="toctree-l1"><a class="reference internal" href="chapter16.html">16. Chapter 16: Diffusion Models and Normalizing Flows</a></li>
+</ul>
 
     </div>
 </nav></div>
@@ -934,6 +949,16 @@ Eq. (3.25) showed to have the largest variance are the ones
 suppressed.  The effective number of parameters is
 <span class="math notranslate nohighlight">\(\mathrm{df}(\lambda)=\sum_i\sigma_i^{2}/(\sigma_i^{2}+\lambda)\)</span> from
 Eq. (1.132), falling smoothly from <span class="math notranslate nohighlight">\(p\)</span> to zero.</p>
+<p>Figure fig:shrinkage plots the shrinkage factor as a function of the
+singular value, for several penalties.  Each curve is a smooth switch:
+directions with <span class="math notranslate nohighlight">\(\sigma_i^{2}\gg\lambda\)</span> pass through essentially untouched,
+directions with <span class="math notranslate nohighlight">\(\sigma_i^{2}\ll\lambda\)</span> are suppressed almost entirely, and
+the transition is centred on <span class="math notranslate nohighlight">\(\sigma_i=\sqrt{\lambda}\)</span>.  Increasing <span class="math notranslate nohighlight">\(\lambda\)</span>
+slides the switch to the right, discarding progressively more of the spectrum.
+Truncated SVD regression replaces this smooth curve by a step, which is the
+only difference between the two methods.</p>
+<p><img alt="The Ridge shrinkage factor sigmai2sigmai2lambda of Eq. 3.31 against th" src="_images/ridge_shrinkage.png" /></p>
+<p><em>The Ridge shrinkage factor <span class="math notranslate nohighlight">\(\sigma_i^{2}/(\sigma_i^{2}+\lambda)\)</span> of Eq. (3.31) against the singular value, for four penalties.  The transition is centred on <span class="math notranslate nohighlight">\(\sigma_i=\sqrt{\lambda}\)</span>.</em></p>
 <p><strong>An instructive special case.</strong>
 Suppose the design matrix is orthonormal, <span class="math notranslate nohighlight">\(\bm{X}^{T}\bm{X}=\bm{I}\)</span>.  Then
 <span class="math notranslate nohighlight">\(\hat{\bm{\theta}}_{\mathrm{OLS}}=\bm{X}^{T}\bm{y}\)</span> and</p>
@@ -1237,6 +1262,8 @@ eliminated at <span class="math notranslate nohighlight">\(\lambda=4\)</span> an
 three coefficient paths against <span class="math notranslate nohighlight">\(\lambda\)</span> shows the distinction at a glance:
 the Ridge curves approach the axis asymptotically, the Lasso curves reach it
 and stop.</p>
+<p><img alt="Coefficient paths for the toy problem 3.46.  The Ridge coefficients le" src="_images/ridge_lasso_paths.png" /></p>
+<p><em>Coefficient paths for the toy problem (3.46).  The Ridge coefficients (left) follow the analytical result (3.49), shown dotted, and approach zero only asymptotically.  The Lasso coefficients (right) reach zero at the finite thresholds <span class="math notranslate nohighlight">\(\lambda=4\)</span> and <span class="math notranslate nohighlight">\(\lambda=16\)</span> predicted by Eq. (3.42).</em></p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
@@ -1483,6 +1510,8 @@ cannot be captured by a low-order polynomial and is well captured by a
 moderate one.  Adding Gaussian noise gives us a problem with a known truth, a
 known noise level and a tunable complexity – everything needed to see the
 bias-variance trade-off of Section <em>The bias-variance tradeoff</em> in action.</p>
+<p><img alt="The Franke function 3.56 on the unit square left and a contour view wi" src="_images/franke_function.png" /></p>
+<p><em>The Franke function (3.56) on the unit square (left) and a contour view with the <span class="math notranslate nohighlight">\(n=100\)</span> noisy samples used in this section marked (right).  Two peaks, a saddle and a depression make it too rich for a low-order polynomial and well within reach of a moderate one.</em></p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
@@ -1613,6 +1642,15 @@ rounding error.  That failure is one of conditioning rather than of
 statistics, and it is the only one of the three that no amount of clean data
 will cure.  The best model is a property of the data set – its size and its
 noise level – and not of the function being approximated.</p>
+<p>Figure fig:frankeselection presents the whole experiment at a glance.
+The left panel is the test error, on a logarithmic scale so that the seven
+orders of magnitude are visible at all; the right panel counts the coefficients
+the Lasso retains.  Read together they make the argument of this chapter: all
+three methods reach the same floor, set by the irreducible <span class="math notranslate nohighlight">\(\sigma^{2}\)</span>, but
+only the penalised ones stay near it when the complexity is chosen badly, and
+only the Lasso tells us how many terms were needed.</p>
+<p><img alt="Test error against polynomial degree for the three estimators on the F" src="_images/franke_model_selection.png" /></p>
+<p><em>Test error against polynomial degree for the three estimators on the Franke data (left, logarithmic), with the noise floor <span class="math notranslate nohighlight">\(\sigma^{2}=0.04\)</span> marked; and the number of coefficients the Lasso retains against the total number available (right).</em></p>
 <div class="tip admonition">
 <p class="admonition-title">Machine learning connection</p>
 <p>The whole analysis rests on one number

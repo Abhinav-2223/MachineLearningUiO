@@ -201,6 +201,21 @@
 <li class="toctree-l1 current active"><a class="current reference internal" href="#">6. Chapter 6: Support Vector Machines</a></li>
 <li class="toctree-l1"><a class="reference internal" href="chapter7.html">7. Chapter 7: Ensemble methods; from simple decision trees to Gradient Boosting</a></li>
 </ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Deep Learning</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="chapter8.html">8. Chapter 8: Neural Networks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="chapter9.html">9. Chapter 9: Neural Networks for Differential Equations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="chapter10.html">10. Chapter 10: Convolutional Neural Networks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="chapter11.html">11. Chapter 11: Recurrent Neural Networks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="chapter12.html">12. Chapter 12: Autoencoders</a></li>
+<li class="toctree-l1"><a class="reference internal" href="chapter13.html">13. Chapter 13: Transformers</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Generative Methods</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="chapter14.html">14. Chapter 14: Boltzmann Machines</a></li>
+<li class="toctree-l1"><a class="reference internal" href="chapter15.html">15. Chapter 15: Variational Autoencoders</a></li>
+<li class="toctree-l1"><a class="reference internal" href="chapter16.html">16. Chapter 16: Diffusion Models and Normalizing Flows</a></li>
+</ul>
 
     </div>
 </nav></div>
@@ -422,6 +437,16 @@ the margin provides a reinforcement, so that future data points can be
 classified with more confidence: a boundary that passes close to a training
 point will misclassify a new point drawn slightly to the other side of it,
 while a boundary in the middle of a wide corridor has room to spare.</p>
+<p>Figure fig:maxmargin shows the solution for two well-separated classes.
+The solid line is the decision boundary, the dashed lines are the margin
+hyperplanes <span class="math notranslate nohighlight">\(\bm{w}^{T}\bm{x}+b=\pm1\)</span>, and the circled points are those with
+<span class="math notranslate nohighlight">\(\lambda_i&gt;0\)</span>.  Two features are worth noticing in advance of the derivation.
+The circled points lie exactly on the dashed lines, which is the content of the
+complementary slackness condition (6.19); and there are only three of
+them out of sixty, so fifty-seven of the observations could be deleted without
+moving the boundary at all.</p>
+<p><img alt="The maximum-margin hyperplane for two separable classes.  Dashed lines" src="_images/max_margin_support_vectors.png" /></p>
+<p><em>The maximum-margin hyperplane for two separable classes.  Dashed lines are the margin hyperplanes <span class="math notranslate nohighlight">\(\bm{w}^{T}\bm{x}+b=\pm1\)</span>, separated by <span class="math notranslate nohighlight">\(2/\|\bm{w}\|\)</span>; circled points are the support vectors, the only observations entering Eq. (6.16).</em></p>
 <p><strong>The geometry.</strong>
 Following the conventions of Chapter 1, define the function</p>
 <div class="math notranslate nohighlight">
@@ -818,6 +843,14 @@ vectors is a rough upper bound on the leave-one-out error rate, since deleting
 a non-support vector provably changes nothing.  A model in which almost every
 point is a support vector is a model that has learned very little.</p>
 </div>
+<p>Figure fig:softmargin shows the effect of <span class="math notranslate nohighlight">\(C\)</span> on genuinely overlapping
+classes.  At <span class="math notranslate nohighlight">\(C=0.01\)</span> violations are cheap, the margin is wide, and a large
+fraction of the data lies inside it as bound support vectors; at <span class="math notranslate nohighlight">\(C=10\)</span> the
+margin is narrow and supported by fewer points.  The decision boundary itself
+barely moves, which is the usual finding: <span class="math notranslate nohighlight">\(C\)</span> controls the confidence with
+which the boundary is drawn far more than its location.</p>
+<p><img alt="Soft-margin solutions for three values of C on overlapping classes.  C" src="_images/soft_margin_C.png" /></p>
+<p><em>Soft-margin solutions for three values of <span class="math notranslate nohighlight">\(C\)</span> on overlapping classes.  Circled points are support vectors.  Decreasing <span class="math notranslate nohighlight">\(C\)</span> widens the margin and admits more violations, in accordance with the three KKT cases of Section <em>The soft margin</em>.</em></p>
 </section>
 <section id="kernels-and-non-linearity">
 <h2><span class="section-number">6.7. </span>Kernels and non-linearity<a class="headerlink" href="#kernels-and-non-linearity" title="Link to this heading">#</a></h2>
@@ -960,6 +993,16 @@ kernel matrix has <span class="math notranslate nohighlight">\(n^{2}\)</span> en
 <span class="math notranslate nohighlight">\(n\)</span> beyond a few tens of thousands one turns to linear SVMs solved in the
 primal, as in Section <em>The primal view: the hinge loss</em>, or to approximations of the kernel map.</p>
 </div>
+<p>Figure fig:kernels shows the same data separated by three kernels.  The
+linear kernel cannot represent the crescent boundary and misclassifies a large
+fraction; the cubic polynomial and the Gaussian both succeed, the latter
+producing a boundary that follows the data closely.  Note the support vector
+counts printed above each panel: the polynomial kernel achieves the higher
+accuracy with twenty support vectors while the Gaussian needs more than twice
+as many, which by the argument of Section <em>The soft margin</em> suggests the
+polynomial model is the better matched of the two.</p>
+<p><img alt="Decision functions for three kernels on the moons data, all fitted wit" src="_images/kernel_decision_boundaries.png" /></p>
+<p><em>Decision functions for three kernels on the moons data, all fitted with the solver of Section <em>Implementation</em>.  Solid contour: the boundary; dashed: the <span class="math notranslate nohighlight">\(\pm1\)</span> margins; circles: support vectors.  Colour shows the value of Eq. (6.33) before the sign is taken.</em></p>
 </section>
 </section>
 <section id="the-quadratic-programme">
@@ -1476,6 +1519,16 @@ logistic regression has no support vectors.  The hinge loss is exactly zero
 beyond the margin, so points that are comfortably correct exert none at all –
 which is why the SVM does.  This is the same fact we derived from the KKT
 conditions in Section <em>The dual problem</em>, now visible in the loss function itself.</p>
+<p>Figure fig:losses draws the three losses of the table together with the
+misclassification loss they are all trying to approximate.  All three are
+convex upper bounds on the step function, which is what makes them tractable
+surrogates.  They differ in two respects that matter.  Only the hinge loss is
+exactly zero for <span class="math notranslate nohighlight">\(yf&gt;1\)</span>, which produces the support vectors; and the squared
+loss is the only one that <em>increases</em> for large positive margin, penalising
+a point for being classified too well, which is why it is a poor choice for
+classification.</p>
+<p><img alt="The hinge, logistic and squared losses as functions of the margin yf, " src="_images/loss_functions.png" /></p>
+<p><em>The hinge, logistic and squared losses as functions of the margin <span class="math notranslate nohighlight">\(yf\)</span>, with the <span class="math notranslate nohighlight">\(0/1\)</span> misclassification loss they bound.  Only the hinge vanishes identically beyond <span class="math notranslate nohighlight">\(yf=1\)</span>; only the squared loss grows again for large positive margin.</em></p>
 <p><strong>Solving the primal directly.</strong>
 Because Eq. (6.48) is unconstrained, the methods of
 Chapter 4 apply after all.  The hinge is not differentiable at
