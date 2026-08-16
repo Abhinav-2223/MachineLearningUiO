@@ -1,0 +1,1944 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="./" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>3. Chapter 3: Linear Regression &#8212; Applied Data Analysis and Machine Learning</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+
+  
+  <link href="_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/sphinx-book-theme.css?v=eba8b062" />
+    <link rel="stylesheet" type="text/css" href="_static/togglebutton.css?v=13237357" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css?v=6644e6bb" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinx-design.min.css?v=95c83b7e" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+    <script src="_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="_static/doctools.js?v=9a2dae69"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="_static/copybutton.js?v=f281be69"></script>
+    <script src="_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="_static/togglebutton.js?v=4a39c7ea"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="_static/design-tabs.js?v=f930bc37"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'chapter3';</script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="4. Chapter 4: Optimization" href="chapter4.html" />
+    <link rel="prev" title="2. Chapter 2: Elements of Probability Theory and Statistics" href="chapter2.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search this book..."
+         aria-label="Search this book..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="intro.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="_static/logo.png" class="logo__image only-light" alt="Applied Data Analysis and Machine Learning - Home"/>
+    <script>document.write(`<img src="_static/logo.png" class="logo__image only-dark" alt="Applied Data Analysis and Machine Learning - Home"/>`);</script>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="intro.html">
+                    Applied Data Analysis and Machine Learning
+                </a>
+            </li>
+        </ul>
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">About the course</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="schedule.html">Course setting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="teachers.html">Teachers and Grading</a></li>
+<li class="toctree-l1"><a class="reference internal" href="textbooks.html">Textbooks</a></li>
+
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Mathematical and statistical basis with essential computational elements</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="chapter1.html">1. Chapter 1: Linear Algebra for Machine Learning</a></li>
+<li class="toctree-l1"><a class="reference internal" href="chapter2.html">2. Chapter 2: Elements of Probability Theory and Statistics</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Classical methods</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">3. Chapter 3: Linear Regression</a></li>
+<li class="toctree-l1"><a class="reference internal" href="chapter4.html">4. Chapter 4: Optimization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="chapter5.html">5. Chapter 5: Logistic Regression</a></li>
+<li class="toctree-l1"><a class="reference internal" href="chapter6.html">6. Chapter 6: Support Vector Machines</a></li>
+<li class="toctree-l1"><a class="reference internal" href="chapter7.html">7. Chapter 7: Ensemble methods; from simple decision trees to Gradient Boosting</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="_sources/chapter3.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm pst-navbar-icon search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Chapter 3: Linear Regression</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-regression-problem">3.1. The regression problem</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-linear-model-and-the-design-matrix">3.2. The linear model and the design matrix</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#ordinary-least-squares">3.3. Ordinary least squares</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#weighted-least-squares-and-the-chi-2-function">3.4. Weighted least squares and the <span class="math notranslate nohighlight">\(\chi^2\)</span> function</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#measures-of-quality">3.5. Measures of quality</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#deriving-least-squares-from-a-probability-distribution">3.6. Deriving least squares from a probability distribution</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#statistical-properties-of-the-least-squares-estimator">3.7. Statistical properties of the least-squares estimator</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#ridge-regression">3.8. Ridge regression</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-lasso">3.9. The Lasso</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#comparing-the-three-estimators">3.10. Comparing the three estimators</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#a-bayesian-reading">3.11. A Bayesian reading</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#scaling-centring-and-the-intercept">3.12. Scaling, centring and the intercept</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#a-complete-example-the-franke-function">3.13. A complete example: the Franke function</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#summary-and-the-programs">3.14. Summary and the programs</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercises">3.15. Exercises</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#warm-up-exercises">3.15.1. Warm-up exercises</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#project-style-exercise-regression-analysis-of-the-franke-function">3.15.2. Project-style exercise: regression analysis of the Franke function</a></li>
+</ul>
+</li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="chapter-3-linear-regression">
+<h1><span class="section-number">3. </span>Chapter 3: Linear Regression<a class="headerlink" href="#chapter-3-linear-regression" title="Link to this heading">#</a></h1>
+<!-- Macro definitions for MathJax, mirroring book.tex -->
+<div class="math notranslate nohighlight">
+\[
+\newcommand{\bm}[1]{\boldsymbol{#1}}
+\newcommand{\Det}[1]{|\boldsymbol{#1}|}
+\newcommand{\bigO}{\mathcal{O}}
+\newcommand{\var}{\mathrm{Var}}
+\newcommand{\cov}{\mathrm{Cov}}
+\newcommand{\Prob}{\mathrm{Prob}}
+\newcommand{\mean}[1]{\langle #1 \rangle}
+\]</div>
+<p>Linear regression is the oldest method in this book and, for the purposes of
+learning the subject, by far the most valuable.  It is the only family of
+models for which every question we shall want to ask of a machine learning
+method can be answered in closed form: we can write down the optimal
+parameters, their bias, their variance, their sensitivity to the data, and the
+exact effect of regularisation, all with the linear algebra of
+Chapter 1 and the statistics of Chapter 2.
+Everything that follows in this book – logistic regression, neural networks,
+tree ensembles – introduces complications that make one or more of these
+questions intractable.  It is worth understanding thoroughly the one case
+where nothing is hidden.</p>
+<p>The chapter proceeds from the general to the particular.  We set up the linear
+model and derive ordinary least squares from three independent starting points
+– as an optimisation problem, as an orthogonal projection, and as maximum
+likelihood under Gaussian noise – and then examine the statistical properties
+of the resulting estimator.  We then add regularisation, first the <span class="math notranslate nohighlight">\(2\)</span>-norm
+penalty that gives Ridge regression and then the <span class="math notranslate nohighlight">\(1\)</span>-norm penalty that gives
+the Lasso, and show that the two behave very differently for reasons that are
+entirely geometric.  A Bayesian reading unifies all three as maximum-a-posteriori
+estimates under different priors.  We close with the practical questions of
+scaling and the intercept, and with a complete worked analysis of the Franke
+function.</p>
+<section id="the-regression-problem">
+<h2><span class="section-number">3.1. </span>The regression problem<a class="headerlink" href="#the-regression-problem" title="Link to this heading">#</a></h2>
+<p>We are given <span class="math notranslate nohighlight">\(n\)</span> observations of <span class="math notranslate nohighlight">\(p\)</span> features, collected in the design matrix
+<span class="math notranslate nohighlight">\(\bm{X}\in\mathbb{R}^{n\times p}\)</span> of Eq. (1.1), together
+with <span class="math notranslate nohighlight">\(n\)</span> targets <span class="math notranslate nohighlight">\(\bm{y}\in\mathbb{R}^{n}\)</span>.  We assume the targets are
+generated by</p>
+<div class="math notranslate nohighlight">
+\[
+\bm{y} = f(\bm{x}) + \bm{\varepsilon},
+  \qquad \varepsilon_i\sim\mathcal{N}(0,\sigma^{2}),\tag{3.1}
+\]</div>
+<p>with <span class="math notranslate nohighlight">\(f\)</span> an unknown function and <span class="math notranslate nohighlight">\(\bm{\varepsilon}\)</span> independent noise, exactly
+as in Eq. (2.44).  Our task is to construct an approximation
+<span class="math notranslate nohighlight">\(\tilde{\bm{y}}\)</span> to <span class="math notranslate nohighlight">\(f\)</span> from the data.</p>
+<p><strong>What makes a model good?.</strong>
+It is worth being explicit, because the answer is not obvious and the obvious
+answer is wrong.  A good model is <em>not</em> one that reproduces the training
+data accurately; by Section <em>Training error, test error and generalisation</em> that is trivial to
+achieve and tells us nothing.  A good model is one that predicts well on data
+it has not seen, and by the decomposition (2.47) its
+expected error on such data is the sum of a squared bias, a variance and an
+irreducible noise term.  The entire content of this chapter is the management
+of the first two.</p>
+<p>Our approach throughout is <em>frequentist</em>: we treat the parameters
+<span class="math notranslate nohighlight">\(\bm{\theta}\)</span> as fixed but unknown quantities and the data as random, so that
+statements about uncertainty are statements about what would happen if the
+data were collected again.  Section <em>A Bayesian reading</em> shows what the same
+methods look like from a Bayesian viewpoint, in which the parameters are
+random and the data are fixed, and the two readings turn out to produce
+identical formulae from different premises.</p>
+</section>
+<section id="the-linear-model-and-the-design-matrix">
+<h2><span class="section-number">3.2. </span>The linear model and the design matrix<a class="headerlink" href="#the-linear-model-and-the-design-matrix" title="Link to this heading">#</a></h2>
+<p>The model we shall study throughout is linear in the parameters,</p>
+<div class="math notranslate nohighlight">
+\[
+\tilde{\bm{y}} = \bm{X}\bm{\theta},
+  \qquad
+  \tilde{y}_i = \sum_{j=0}^{p-1}x_{ij}\theta_j = \bm{X}_{i,\ast}\bm{\theta},\tag{3.2}
+\]</div>
+<p>with <span class="math notranslate nohighlight">\(\bm{X}_{i,\ast}\)</span> the <span class="math notranslate nohighlight">\(i\)</span>th row.  The word <em>linear</em> refers to the
+parameters and not to the features, and this distinction is the source of most
+of the method’s usefulness.  Nothing prevents the columns of <span class="math notranslate nohighlight">\(\bm{X}\)</span> from
+being non-linear functions of some underlying variable.  If we have a single
+input <span class="math notranslate nohighlight">\(x\)</span> and choose</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\bm{X} =
+  \begin{bmatrix}
+    1 &amp; x_0 &amp; x_0^{2} &amp; \cdots &amp; x_0^{p-1}\\
+    1 &amp; x_1 &amp; x_1^{2} &amp; \cdots &amp; x_1^{p-1}\\
+    \vdots &amp; \vdots &amp; \vdots &amp; \ddots &amp; \vdots\\
+    1 &amp; x_{n-1} &amp; x_{n-1}^{2} &amp; \cdots &amp; x_{n-1}^{p-1}
+  \end{bmatrix},\tag{3.3}
+\end{split}\]</div>
+<p>then Eq. (3.2) is a polynomial fit of degree <span class="math notranslate nohighlight">\(p-1\)</span>, and it
+remains a <em>linear</em> regression problem.  More generally, replacing <span class="math notranslate nohighlight">\(x\)</span> by
+any set of basis functions <span class="math notranslate nohighlight">\(\phi_j(x)\)</span> – polynomials, splines, Fourier modes,
+radial basis functions – gives</p>
+<div class="math notranslate nohighlight">
+\[
+\tilde{y}_i = \sum_{j=0}^{p-1}\theta_j\,\phi_j(x_i),\tag{3.4}
+\]</div>
+<p>which is a <em>basis expansion</em>, and every method of this chapter applies
+verbatim.  The matrix (3.3) is the Vandermonde matrix whose
+appalling conditioning we met in Section <em>Vector and matrix norms</em>; the choice of basis
+is therefore not only a modelling decision but a numerical one, and an
+orthogonal polynomial basis is very much better behaved than the monomials.</p>
+<p>The first column of ones deserves a name.  Its coefficient <span class="math notranslate nohighlight">\(\theta_0\)</span> is the
+<em>intercept</em>, the predicted value when every other feature vanishes, and
+it will require separate treatment when we come to regularisation in
+Section <em>Scaling, centring and the intercept</em>.</p>
+<p><strong>Complexity.</strong>
+The number of columns <span class="math notranslate nohighlight">\(p\)</span> measures the flexibility of the model, and it is the
+knob we turn when tracing out the bias-variance curve of
+Section <em>The bias-variance tradeoff</em>.  For a polynomial in one variable of degree
+<span class="math notranslate nohighlight">\(d\)</span> we have <span class="math notranslate nohighlight">\(p=d+1\)</span>; for a polynomial of degree <span class="math notranslate nohighlight">\(d\)</span> in two variables <span class="math notranslate nohighlight">\(x\)</span> and
+<span class="math notranslate nohighlight">\(y\)</span>, which is the case we shall need for the Franke function, every monomial
+<span class="math notranslate nohighlight">\(x^{a}y^{b}\)</span> with <span class="math notranslate nohighlight">\(a+b\le d\)</span> appears and</p>
+<div class="math notranslate nohighlight">
+\[
+p = \frac{(d+1)(d+2)}{2}.\tag{3.5}
+\]</div>
+<p>A fifth-order fit in two variables therefore has <span class="math notranslate nohighlight">\(21\)</span> parameters, and a
+tenth-order fit has <span class="math notranslate nohighlight">\(66\)</span>: complexity grows quickly, and with it the danger
+that <span class="math notranslate nohighlight">\(p\)</span> approaches or exceeds <span class="math notranslate nohighlight">\(n\)</span>.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="k">def</span> <span class="nf">design_matrix_2d</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">degree</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Design matrix for a two-dimensional polynomial of the given degree.</span>
+
+<span class="sd">    Columns are the monomials x^a y^b with a + b &lt;= degree, ordered by</span>
+<span class="sd">    total degree.  The first column is the intercept.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ravel</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">ravel</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+    <span class="n">columns</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">total</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">degree</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">total</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="n">columns</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">x</span><span class="o">**</span><span class="p">(</span><span class="n">total</span> <span class="o">-</span> <span class="n">b</span><span class="p">)</span> <span class="o">*</span> <span class="n">y</span><span class="o">**</span><span class="n">b</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">column_stack</span><span class="p">(</span><span class="n">columns</span><span class="p">)</span>
+
+
+<span class="c1"># A degree-5 fit in two variables has (5+1)(5+2)/2 = 21 parameters</span>
+<span class="n">X</span> <span class="o">=</span> <span class="n">design_matrix_2d</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="mi">100</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="mi">100</span><span class="p">),</span> <span class="n">degree</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="ordinary-least-squares">
+<h2><span class="section-number">3.3. </span>Ordinary least squares<a class="headerlink" href="#ordinary-least-squares" title="Link to this heading">#</a></h2>
+<p>The cost function of ordinary least squares (OLS) is the mean squared error
+of Eq. (1.34),</p>
+<div class="math notranslate nohighlight">
+\[
+C(\bm{\theta})
+   = \frac{1}{n}\left\|\bm{y}-\bm{X}\bm{\theta}\right\|_2^{2}
+   = \frac{1}{n}\sum_{i=0}^{n-1}\left(y_i-\tilde{y}_i\right)^{2},\tag{3.6}
+\]</div>
+<p>and the optimisation problem is</p>
+<div class="math notranslate nohighlight">
+\[
+\min_{\bm{\theta}\in\mathbb{R}^{p}}
+    \frac{1}{n}\left\|\bm{y}-\bm{X}\bm{\theta}\right\|_2^{2} .\tag{3.7}
+\]</div>
+<p>We derived the solution in Section <em>The mean squared error and its derivative</em>: setting the
+gradient (1.38) to zero gives the normal equations</p>
+<div class="math notranslate nohighlight">
+\[
+\bm{X}^{T}\bm{X}\,\bm{\theta} = \bm{X}^{T}\bm{y},
+  \qquad
+  \hat{\bm{\theta}}_{\mathrm{OLS}}
+   = \left(\bm{X}^{T}\bm{X}\right)^{-1}\bm{X}^{T}\bm{y},\tag{3.8}
+\]</div>
+<p>with Hessian <span class="math notranslate nohighlight">\(2\bm{X}^{T}\bm{X}/n\)</span>, positive semi-definite by
+Eq. (1.44), so that the problem is convex and the stationary
+point is a global minimum – unique precisely when the columns of <span class="math notranslate nohighlight">\(\bm{X}\)</span> are
+linearly independent.</p>
+<p><strong>The geometric reading.</strong>
+Equation (3.8) has an interpretation which is worth as much
+as the algebra.  The vector <span class="math notranslate nohighlight">\(\bm{X}\bm{\theta}\)</span> ranges over the column space of
+<span class="math notranslate nohighlight">\(\bm{X}\)</span> as <span class="math notranslate nohighlight">\(\bm{\theta}\)</span> ranges over <span class="math notranslate nohighlight">\(\mathbb{R}^{p}\)</span>, so
+Eq. (3.7) asks for the point of that subspace closest to
+<span class="math notranslate nohighlight">\(\bm{y}\)</span>.  By Section <em>Orthonormal bases and projections</em> the answer is the orthogonal projection of
+<span class="math notranslate nohighlight">\(\bm{y}\)</span> onto the column space, and the projector is the <em>hat matrix</em></p>
+<div class="math notranslate nohighlight">
+\[
+\bm{H} = \bm{X}\left(\bm{X}^{T}\bm{X}\right)^{-1}\bm{X}^{T},
+  \qquad
+  \tilde{\bm{y}} = \bm{H}\bm{y},\tag{3.9}
+\]</div>
+<p>which is symmetric and idempotent as required by
+Eq. (1.9), with <span class="math notranslate nohighlight">\(\mathrm{Tr}(\bm{H})=p\)</span> by
+Eq. (1.10).  Equivalently, the normal
+equations (3.8) may be read as
+<span class="math notranslate nohighlight">\(\bm{X}^{T}(\bm{y}-\bm{X}\bm{\theta})=\bm{0}\)</span>: at the optimum the residual is
+orthogonal to every column of the design matrix.  The fit has extracted from
+<span class="math notranslate nohighlight">\(\bm{y}\)</span> everything that lies in the span of the features and left the rest
+untouched.</p>
+<p><strong>How to compute it.</strong>
+Equation (3.8) is a statement about <span class="math notranslate nohighlight">\(\hat{\bm{\theta}}\)</span> and
+not an instruction to a computer.  Forming <span class="math notranslate nohighlight">\(\bm{X}^{T}\bm{X}\)</span> squares the
+condition number, Eq. (1.118), and for a polynomial design
+matrix of even modest degree this destroys most of the available precision.
+The stable routes are the QR decomposition (1.12) or the singular
+value decomposition, and through the latter the solution is the pseudoinverse
+of Eq. (1.121),</p>
+<div class="math notranslate nohighlight">
+\[
+\hat{\bm{\theta}}_{\mathrm{OLS}} = \bm{X}^{+}\bm{y}
+   = \sum_{i=0}^{r-1}\frac{\bm{u}_i^{T}\bm{y}}{\sigma_i}\,\bm{v}_i ,\tag{3.10}
+\]</div>
+<p>which additionally handles the rank-deficient case, returning the
+minimum-norm solution when <span class="math notranslate nohighlight">\(p&gt;n\)</span> or when features are exactly collinear.
+Equation (3.10) will be our main analytical tool in this chapter:
+almost everything that follows is a statement about what happens to the
+factors <span class="math notranslate nohighlight">\(1/\sigma_i\)</span>.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="k">def</span> <span class="nf">ols</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Ordinary least squares through the SVD -- never the normal equations.&quot;&quot;&quot;</span>
+    <span class="n">U</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">Vt</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">svd</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">full_matrices</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">Vt</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="p">(</span><span class="n">U</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">y</span> <span class="o">/</span> <span class="n">s</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">ols_normal_equations</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;The textbook formula.  Shown for comparison; do not use it.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">pinv</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">X</span><span class="p">)</span> <span class="o">@</span> <span class="n">X</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">y</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="tip admonition">
+<p class="admonition-title">Machine learning connection</p>
+<p>The two functions above agree to
+machine precision on a well-conditioned design matrix and can disagree in the
+first significant digit on a badly conditioned one.  A simple experiment makes
+the point: fit a polynomial of degree twelve to a hundred points on <span class="math notranslate nohighlight">\([0,1]\)</span>
+using both.  The condition number of the Vandermonde
+matrix (3.3) is then of order <span class="math notranslate nohighlight">\(10^{8}\)</span>, that of
+<span class="math notranslate nohighlight">\(\bm{X}^{T}\bm{X}\)</span> of order <span class="math notranslate nohighlight">\(10^{16}\)</span>, and the second function returns
+coefficients with no correct digits at all while the first is still accurate.
+This is the practical content of Section <em>The singular value decomposition</em>, and it is why
+<code class="docutils literal notranslate"><span class="pre">numpy.linalg.lstsq</span></code> exists.</p>
+</div>
+</section>
+<section id="weighted-least-squares-and-the-chi-2-function">
+<h2><span class="section-number">3.4. </span>Weighted least squares and the <span class="math notranslate nohighlight">\(\chi^2\)</span> function<a class="headerlink" href="#weighted-least-squares-and-the-chi-2-function" title="Link to this heading">#</a></h2>
+<p>The cost function (3.6) treats every observation as equally
+reliable.  In the physical sciences this is rarely true: a measurement is
+normally accompanied by an error estimate, and points known to ten per cent
+should not constrain the fit as strongly as points known to one per cent.
+Introducing the standard deviation <span class="math notranslate nohighlight">\(\sigma_i\)</span> of measurement <span class="math notranslate nohighlight">\(i\)</span>, we define
+the <span class="math notranslate nohighlight">\(\chi^2\)</span> function</p>
+<div class="math notranslate nohighlight">
+\[
+\chi^{2}(\bm{\theta})
+   = \frac{1}{n}\sum_{i=0}^{n-1}
+     \frac{\left(y_i-\tilde{y}_i\right)^{2}}{\sigma_i^{2}}
+   = \frac{1}{n}\left(\bm{y}-\bm{X}\bm{\theta}\right)^{T}
+     \bm{\Sigma}^{-2}
+     \left(\bm{y}-\bm{X}\bm{\theta}\right),\tag{3.11}
+\]</div>
+<p>where <span class="math notranslate nohighlight">\(\bm{\Sigma}\)</span> is the diagonal matrix with entries <span class="math notranslate nohighlight">\(\sigma_i\)</span>.  Each
+residual is measured in units of its own uncertainty, so that the terms of the
+sum are comparable.</p>
+<p>Minimising Eq. (3.11) is the same calculation as before with
+a weight inserted.  Differentiating with the machinery of
+Section <em>Four worked examples</em> gives</p>
+<div class="math notranslate nohighlight">
+\[
+\frac{\partial\chi^{2}}{\partial\bm{\theta}^{T}}
+   = -\frac{2}{n}\bm{X}^{T}\bm{\Sigma}^{-2}
+     \left(\bm{y}-\bm{X}\bm{\theta}\right) = \bm{0},\tag{3.12}
+\]</div>
+<p>and hence the <em>weighted</em> normal equations</p>
+<div class="math notranslate nohighlight">
+\[
+\hat{\bm{\theta}}
+   = \left(\bm{X}^{T}\bm{\Sigma}^{-2}\bm{X}\right)^{-1}
+     \bm{X}^{T}\bm{\Sigma}^{-2}\bm{y} .\tag{3.13}
+\]</div>
+<p>Defining <span class="math notranslate nohighlight">\(\bm{A}=\bm{\Sigma}^{-1}\bm{X}\)</span> and <span class="math notranslate nohighlight">\(\bm{b}=\bm{\Sigma}^{-1}\bm{y}\)</span>
+turns Eq. (3.13) into the ordinary
+solution (3.8) for <span class="math notranslate nohighlight">\(\bm{A}\)</span> and <span class="math notranslate nohighlight">\(\bm{b}\)</span>: weighted least
+squares is unweighted least squares on rescaled data.  Setting all
+<span class="math notranslate nohighlight">\(\sigma_i\)</span> equal recovers OLS, which shows what the unweighted method
+silently assumes – that the noise is <em>homoscedastic</em>, of the same
+variance everywhere.  When it is not, OLS remains unbiased but is no longer
+the estimator of smallest variance, and Eq. (3.13) is.</p>
+</section>
+<section id="measures-of-quality">
+<h2><span class="section-number">3.5. </span>Measures of quality<a class="headerlink" href="#measures-of-quality" title="Link to this heading">#</a></h2>
+<p>Before comparing models we must agree on how to score them.  The mean squared
+error</p>
+<div class="math notranslate nohighlight">
+\[
+\mathrm{MSE}(\bm{y},\tilde{\bm{y}})
+   = \frac{1}{n}\sum_{i=0}^{n-1}\left(y_i-\tilde{y}_i\right)^{2}\tag{3.14}
+\]</div>
+<p>is the quantity we minimise and the natural quantity to report, but it carries
+the squared units of the target and its numerical value therefore says nothing
+on its own.  The <em>coefficient of determination</em></p>
+<div class="math notranslate nohighlight">
+\[
+R^{2}(\bm{y},\tilde{\bm{y}})
+   = 1 - \frac{\sum_{i=0}^{n-1}\left(y_i-\tilde{y}_i\right)^{2}}
+              {\sum_{i=0}^{n-1}\left(y_i-\bar{y}\right)^{2}},
+  \qquad
+  \bar{y}=\frac{1}{n}\sum_{i=0}^{n-1}y_i,\tag{3.15}
+\]</div>
+<p>is dimensionless and compares the model against the best constant prediction:
+<span class="math notranslate nohighlight">\(R^{2}=1\)</span> is a perfect fit, <span class="math notranslate nohighlight">\(R^{2}=0\)</span> means the model does no better than
+predicting the mean, and negative values – entirely possible on test data –
+mean it does worse.  Note that the denominator is <span class="math notranslate nohighlight">\(n\)</span> times the sample
+variance of <span class="math notranslate nohighlight">\(\bm{y}\)</span>, so that <span class="math notranslate nohighlight">\(R^{2}\)</span> is one minus the fraction of variance
+left unexplained.</p>
+<p>Two further measures appear in the sources of this book.  The <em>mean
+absolute error</em></p>
+<div class="math notranslate nohighlight">
+\[
+\mathrm{MAE}(\bm{y},\tilde{\bm{y}})
+   = \frac{1}{n}\sum_{i=0}^{n-1}\left|y_i-\tilde{y}_i\right|\tag{3.16}
+\]</div>
+<p>is the <span class="math notranslate nohighlight">\(1\)</span>-norm counterpart of Eq. (3.14) and is far less sensitive
+to outliers, for the reason discussed in Section <em>Vector and matrix norms</em>: squaring
+gives a point at ten standard deviations a hundred times the weight of one at
+a single standard deviation, whereas the absolute value gives it ten times.
+The <em>relative error</em> <span class="math notranslate nohighlight">\(|y_i-\tilde{y}_i|/|y_i|\)</span> is natural when the targets
+span orders of magnitude, and dangerous when any of them is near zero.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="k">def</span> <span class="nf">mse</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">y_tilde</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">((</span><span class="n">y</span> <span class="o">-</span> <span class="n">y_tilde</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">r2</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">y_tilde</span><span class="p">):</span>
+    <span class="k">return</span> <span class="mf">1.0</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">((</span><span class="n">y</span> <span class="o">-</span> <span class="n">y_tilde</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">((</span><span class="n">y</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">y</span><span class="p">))</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">mae</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">y_tilde</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">y</span> <span class="o">-</span> <span class="n">y_tilde</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>A warning is in order.  All three are meaningful only on data held out from
+fitting.  Computed on the training set, <span class="math notranslate nohighlight">\(R^{2}\)</span> increases monotonically as
+columns are added to <span class="math notranslate nohighlight">\(\bm{X}\)</span> and reaches unity when <span class="math notranslate nohighlight">\(p=n\)</span>, whatever those
+columns contain – including pure noise.  Every number reported in this
+chapter is a test quantity unless we say otherwise.</p>
+</section>
+<section id="deriving-least-squares-from-a-probability-distribution">
+<h2><span class="section-number">3.6. </span>Deriving least squares from a probability distribution<a class="headerlink" href="#deriving-least-squares-from-a-probability-distribution" title="Link to this heading">#</a></h2>
+<p>So far the squared-error cost (3.6) has been an assumption.  We
+now show that it follows from a statement about the noise, which both explains
+where it comes from and makes clear when it is the wrong choice.</p>
+<p>Under the model (3.1), and given that the entries of the
+design matrix are not stochastic, the target <span class="math notranslate nohighlight">\(y_i\)</span> is Gaussian with mean
+<span class="math notranslate nohighlight">\(\bm{X}_{i,\ast}\bm{\theta}\)</span> and variance <span class="math notranslate nohighlight">\(\sigma^{2}\)</span>,</p>
+<div class="math notranslate nohighlight">
+\[
+y_i \sim \mathcal{N}\left(\bm{X}_{i,\ast}\bm{\theta},\,\sigma^{2}\right)
+   = \frac{1}{\sqrt{2\pi\sigma^{2}}}
+     \exp\left[-\frac{\left(y_i-\bm{X}_{i,\ast}\bm{\theta}\right)^{2}}
+                     {2\sigma^{2}}\right],\tag{3.17}
+\]</div>
+<p>which is Eq. (2.39) written out in full.  Reading
+Eq. (3.17) as a function of the parameters rather than of the
+data gives the <em>likelihood</em> of observing <span class="math notranslate nohighlight">\(y_i\)</span> given <span class="math notranslate nohighlight">\(\bm{\theta}\)</span>, and
+since the observations are independent and identically distributed the
+likelihood of the whole data set <span class="math notranslate nohighlight">\(\bm{D}\)</span> is the product</p>
+<div class="math notranslate nohighlight">
+\[
+p(\bm{D}\mid\bm{\theta})
+   = \prod_{i=0}^{n-1}\frac{1}{\sqrt{2\pi\sigma^{2}}}
+     \exp\left[-\frac{\left(y_i-\bm{X}_{i,\ast}\bm{\theta}\right)^{2}}
+                     {2\sigma^{2}}\right],\tag{3.18}
+\]</div>
+<p>where <span class="math notranslate nohighlight">\(\bm{D}\)</span> denotes the domain of events, inputs and targets together; in
+the one-dimensional case
+<span class="math notranslate nohighlight">\(\bm{D}=[(x_0,y_0),(x_1,y_1),\dots,(x_{n-1},y_{n-1})]\)</span>.</p>
+<p><em>Maximum likelihood estimation</em> chooses the parameters making the
+observed data most probable, that is maximising
+Eq. (3.18).  Differentiating a product of <span class="math notranslate nohighlight">\(n\)</span> terms is
+awkward and numerically hazardous, since the product of many small numbers
+underflows.  Because the logarithm is monotonically increasing, maximising the
+likelihood is equivalent to maximising its logarithm, and we prefer to
+minimise the negative of that:</p>
+<div class="math notranslate nohighlight">
+\[
+C(\bm{\theta}) = -\log\prod_{i=0}^{n-1}p(y_i,\bm{X}\mid\bm{\theta})
+                 = -\sum_{i=0}^{n-1}\log p(y_i,\bm{X}\mid\bm{\theta}).\tag{3.19}
+\]</div>
+<p>Inserting Eq. (3.17) the sum evaluates to</p>
+<div class="math notranslate nohighlight">
+\[
+C(\bm{\theta}) = \frac{n}{2}\log\left(2\pi\sigma^{2}\right)
+   + \frac{\left\|\bm{y}-\bm{X}\bm{\theta}\right\|_2^{2}}{2\sigma^{2}} .\tag{3.20}
+\]</div>
+<p>The first term does not involve <span class="math notranslate nohighlight">\(\bm{\theta}\)</span>, and the second is the
+least-squares cost (3.6) up to a positive constant.
+Differentiating therefore returns
+<span class="math notranslate nohighlight">\(\bm{X}^{T}(\bm{y}-\bm{X}\bm{\theta})=\bm{0}\)</span> and</p>
+<div class="math notranslate nohighlight">
+\[
+\hat{\bm{\theta}}_{\mathrm{OLS}}
+   = \left(\bm{X}^{T}\bm{X}\right)^{-1}\bm{X}^{T}\bm{y}\tag{3.21}
+\]</div>
+<p>once more.</p>
+<div class="tip admonition">
+<p class="admonition-title">Machine learning connection</p>
+<p>Equation (3.20) says
+that <em>least squares is maximum likelihood for Gaussian noise</em>, and the
+converse statement is the useful one: a different noise model gives a
+different loss function.  Laplace-distributed noise gives the mean absolute
+error (3.16); Bernoulli-distributed targets give the cross-entropy
+loss of logistic regression; Poisson counts give the Poisson deviance.  When
+we later write down a loss function for a neural network we are, whether or
+not we say so, making an assumption about the distribution of the residuals.
+Choosing the squared error for data with heavy-tailed noise is not a matter of
+taste but an error, and it is why a handful of outliers can dominate a
+least-squares fit.</p>
+</div>
+</section>
+<section id="statistical-properties-of-the-least-squares-estimator">
+<h2><span class="section-number">3.7. </span>Statistical properties of the least-squares estimator<a class="headerlink" href="#statistical-properties-of-the-least-squares-estimator" title="Link to this heading">#</a></h2>
+<p>Because <span class="math notranslate nohighlight">\(\hat{\bm{\theta}}\)</span> is a function of the random targets, it is itself a
+random variable, and Section <em>The statistics of the least-squares estimator</em> established its first two
+moments:</p>
+<div class="math notranslate nohighlight">
+\[
+\mathbb{E}[\hat{\bm{\theta}}_{\mathrm{OLS}}] = \bm{\theta},
+  \qquad
+  \var(\hat{\bm{\theta}}_{\mathrm{OLS}})
+   = \sigma^{2}\left(\bm{X}^{T}\bm{X}\right)^{-1}.\tag{3.22}
+\]</div>
+<p>The estimator is unbiased <em>provided the linear model is correct</em>, and its
+covariance matrix is the inverse Hessian scaled by the noise variance.  Since
+<span class="math notranslate nohighlight">\(\sigma^{2}\)</span> is unknown it is estimated from the residuals,</p>
+<div class="math notranslate nohighlight">
+\[
+\hat{\sigma}^{2}
+   = \frac{\left\|\bm{y}-\bm{X}\hat{\bm{\theta}}\right\|_2^{2}}{n-p},\tag{3.23}
+\]</div>
+<p>the divisor <span class="math notranslate nohighlight">\(n-p\)</span> accounting for the <span class="math notranslate nohighlight">\(p\)</span> degrees of freedom consumed by the
+fit, in the manner of Bessel’s correction (2.28).  The
+standard error of coefficient <span class="math notranslate nohighlight">\(j\)</span> is then
+<span class="math notranslate nohighlight">\(\hat{\sigma}\sqrt{[(\bm{X}^{T}\bm{X})^{-1}]_{jj}}\)</span>, from which a confidence
+interval follows,</p>
+<div class="math notranslate nohighlight">
+\[
+\hat{\theta}_j \pm t_{\alpha/2,\,n-p}\;
+    \hat{\sigma}\sqrt{\left[(\bm{X}^{T}\bm{X})^{-1}\right]_{jj}},\tag{3.24}
+\]</div>
+<p>with <span class="math notranslate nohighlight">\(t\)</span> the appropriate quantile of Student’s distribution, which for
+<span class="math notranslate nohighlight">\(n-p\)</span> large is simply the Gaussian quantile, <span class="math notranslate nohighlight">\(1.96\)</span> for <span class="math notranslate nohighlight">\(95\%\)</span>.</p>
+<p><strong>Reading the variance through the SVD.</strong>
+Substituting Eq. (1.115) into Eq. (3.22) gives</p>
+<div class="math notranslate nohighlight">
+\[
+\var(\hat{\bm{\theta}}_{\mathrm{OLS}})
+   = \sigma^{2}\bm{V}\tilde{\bm{\Sigma}}^{-2}\bm{V}^{T}
+   = \sigma^{2}\sum_{i=0}^{p-1}\frac{\bm{v}_i\bm{v}_i^{T}}{\sigma_i^{2}},\tag{3.25}
+\]</div>
+<p>so the variance along the <span class="math notranslate nohighlight">\(i\)</span>th right singular direction is
+<span class="math notranslate nohighlight">\(\sigma^{2}/\sigma_i^{2}\)</span>.  Together with the
+expansion (3.10) this gives the complete picture of what
+collinearity does.  A direction in feature space along which the data barely
+vary has a small singular value; the coefficient along it is obtained by
+dividing by that small number, and its variance is obtained by dividing by its
+square.  The fit becomes an enormous positive coefficient on one feature
+cancelling an enormous negative one on another, and the pair swings wildly
+when the data are perturbed.  Nothing is wrong with the algebra; the data
+simply do not determine that combination.</p>
+<p><strong>The Gauss-Markov theorem.</strong>
+Among all estimators that are both linear in <span class="math notranslate nohighlight">\(\bm{y}\)</span> and unbiased, OLS has
+the smallest variance.  This is the Gauss-Markov theorem, and it requires only
+that the noise have zero mean, constant variance and be uncorrelated – not
+that it be Gaussian.  The theorem is often quoted as though it settled the
+matter.  It does not, and the reason is
+Eq. (2.27): the mean squared error counts bias and variance
+equally, and Gauss-Markov restricts attention to the unbiased estimators only.
+The moment we admit biased estimators, better ones exist.  The rest of this
+chapter constructs them.</p>
+</section>
+<section id="ridge-regression">
+<h2><span class="section-number">3.8. </span>Ridge regression<a class="headerlink" href="#ridge-regression" title="Link to this heading">#</a></h2>
+<p>Ridge regression adds a penalty on the squared length of the parameter vector,</p>
+<div class="math notranslate nohighlight">
+\[
+\min_{\bm{\theta}\in\mathbb{R}^{p}}
+    \left\{\frac{1}{n}\left\|\bm{y}-\bm{X}\bm{\theta}\right\|_2^{2}
+      + \lambda\left\|\bm{\theta}\right\|_2^{2}\right\},
+  \qquad \lambda\ge0,\tag{3.26}
+\]</div>
+<p>with <span class="math notranslate nohighlight">\(\|\bm{\theta}\|_2^{2}=\sum_j\theta_j^{2}\)</span>.  We derived the solution in
+Eq. (1.42); dropping the factor <span class="math notranslate nohighlight">\(1/n\)</span> so that <span class="math notranslate nohighlight">\(\lambda\)</span> has
+its conventional scaling,</p>
+<div class="math notranslate nohighlight">
+\[
+\boxed{\;
+  \hat{\bm{\theta}}_{\mathrm{Ridge}}
+   = \left(\bm{X}^{T}\bm{X}+\lambda\bm{I}\right)^{-1}\bm{X}^{T}\bm{y} \;}\tag{3.27}
+\]</div>
+<p>with <span class="math notranslate nohighlight">\(\bm{I}\)</span> the <span class="math notranslate nohighlight">\(p\times p\)</span> identity.  Ridge regression is therefore
+ordinary least squares with a modified diagonal, and the modification cures
+the central defect of Eq. (3.8): whatever the rank of
+<span class="math notranslate nohighlight">\(\bm{X}\)</span>, the matrix <span class="math notranslate nohighlight">\(\bm{X}^{T}\bm{X}+\lambda\bm{I}\)</span> has all eigenvalues at
+least <span class="math notranslate nohighlight">\(\lambda\)</span> and is invertible for every <span class="math notranslate nohighlight">\(\lambda&gt;0\)</span>.  The estimator exists
+even when <span class="math notranslate nohighlight">\(p&gt;n\)</span>.</p>
+<p><strong>The constrained form.</strong>
+Equation (3.26) is the Lagrangian form of a constrained
+problem: minimising the squared error subject to</p>
+<div class="math notranslate nohighlight">
+\[
+\sum_{j=0}^{p-1}\theta_j^{2}\le t\tag{3.28}
+\]</div>
+<p>for a finite <span class="math notranslate nohighlight">\(t&gt;0\)</span> gives the same solutions, with a one-to-one decreasing
+correspondence between <span class="math notranslate nohighlight">\(t\)</span> and <span class="math notranslate nohighlight">\(\lambda\)</span>.  The constraint region is a ball in
+parameter space, and this geometric picture is what will distinguish Ridge
+from the Lasso in Section <em>The Lasso</em>.</p>
+<p><strong>Shrinkage, through the SVD.</strong>
+The analytical content of Ridge regression is best seen in the singular basis.
+Section <em>Ridge regression through the singular value decomposition</em> showed that Eq. (3.27) is</p>
+<div class="math notranslate nohighlight">
+\[
+\hat{\bm{\theta}}_{\mathrm{Ridge}}
+   = \sum_{i=0}^{p-1}
+     \frac{\sigma_i}{\sigma_i^{2}+\lambda}
+     \left(\bm{u}_i^{T}\bm{y}\right)\bm{v}_i ,\tag{3.29}
+\]</div>
+<p>to be compared with the OLS expansion (3.10) in which the
+coefficient was <span class="math notranslate nohighlight">\(1/\sigma_i\)</span>.  The fitted values follow from
+Eq. (1.131),</p>
+<div class="math notranslate nohighlight">
+\[
+\tilde{\bm{y}}_{\mathrm{Ridge}}
+   = \sum_{i=0}^{p-1}\bm{u}_i\bm{u}_i^{T}
+     \frac{\sigma_i^{2}}{\sigma_i^{2}+\lambda}\,\bm{y} ,\tag{3.30}
+\]</div>
+<p>whereas for OLS the same expression holds with every factor replaced by one,
+<span class="math notranslate nohighlight">\(\tilde{\bm{y}}_{\mathrm{OLS}}=\bm{U}\bm{U}^{T}\bm{y}\)</span>, which is the hat
+matrix (3.9) in the singular basis.  Since <span class="math notranslate nohighlight">\(\lambda\ge0\)</span>,</p>
+<div class="math notranslate nohighlight">
+\[
+\frac{\sigma_i^{2}}{\sigma_i^{2}+\lambda}\le 1 ,\tag{3.31}
+\]</div>
+<p>so Ridge regression expresses <span class="math notranslate nohighlight">\(\bm{y}\)</span> in the orthonormal basis <span class="math notranslate nohighlight">\(\bm{U}\)</span> and
+then <em>shrinks</em> each coordinate.  Because the singular values are ordered
+descendingly, the shrinkage is mild for the leading directions and severe for
+the trailing ones: precisely the directions whose coefficients
+Eq. (3.25) showed to have the largest variance are the ones
+suppressed.  The effective number of parameters is
+<span class="math notranslate nohighlight">\(\mathrm{df}(\lambda)=\sum_i\sigma_i^{2}/(\sigma_i^{2}+\lambda)\)</span> from
+Eq. (1.132), falling smoothly from <span class="math notranslate nohighlight">\(p\)</span> to zero.</p>
+<p><strong>An instructive special case.</strong>
+Suppose the design matrix is orthonormal, <span class="math notranslate nohighlight">\(\bm{X}^{T}\bm{X}=\bm{I}\)</span>.  Then
+<span class="math notranslate nohighlight">\(\hat{\bm{\theta}}_{\mathrm{OLS}}=\bm{X}^{T}\bm{y}\)</span> and</p>
+<div class="math notranslate nohighlight">
+\[
+\hat{\bm{\theta}}_{\mathrm{Ridge}}
+   = \left(\bm{I}+\lambda\bm{I}\right)^{-1}\bm{X}^{T}\bm{y}
+   = \frac{1}{1+\lambda}\,\hat{\bm{\theta}}_{\mathrm{OLS}} ,\tag{3.32}
+\]</div>
+<p>so every coefficient is scaled by the same factor <span class="math notranslate nohighlight">\(1/(1+\lambda)\)</span> and the
+estimator tends to zero as <span class="math notranslate nohighlight">\(\lambda\to\infty\)</span>.  Ridge shrinks all
+coefficients <em>proportionally</em>; it never sets any of them exactly to zero.
+Remember this when we reach the Lasso.</p>
+<p><strong>Bias and variance.</strong>
+Ridge regression is biased.  Taking the expectation of
+Eq. (3.27) and using
+<span class="math notranslate nohighlight">\(\mathbb{E}[\bm{y}]=\bm{X}\bm{\theta}\)</span>,</p>
+<div class="math notranslate nohighlight">
+\[
+\mathbb{E}\left[\hat{\bm{\theta}}_{\mathrm{Ridge}}\right]
+   = \left(\bm{X}^{T}\bm{X}+\lambda\bm{I}\right)^{-1}
+     \left(\bm{X}^{T}\bm{X}\right)\bm{\theta}
+   \neq \bm{\theta}\tag{3.33}
+\]</div>
+<p>for any <span class="math notranslate nohighlight">\(\lambda&gt;0\)</span>, the bias growing towards <span class="math notranslate nohighlight">\(-\bm{\theta}\)</span> as
+<span class="math notranslate nohighlight">\(\lambda\to\infty\)</span>.  Applying the transformation rule
+<span class="math notranslate nohighlight">\(\var(\bm{A}\bm{y})=\bm{A}\var(\bm{y})\bm{A}^{T}\)</span> to
+Eq. (3.27) gives the variance,</p>
+<div class="math notranslate nohighlight">
+\[
+\var\left(\hat{\bm{\theta}}_{\mathrm{Ridge}}\right)
+   = \sigma^{2}\left[\bm{X}^{T}\bm{X}+\lambda\bm{I}\right]^{-1}
+     \bm{X}^{T}\bm{X}
+     \left\{\left[\bm{X}^{T}\bm{X}+\lambda\bm{I}\right]^{-1}\right\}^{T},\tag{3.34}
+\]</div>
+<p>which vanishes as <span class="math notranslate nohighlight">\(\lambda\to\infty\)</span>.  Subtracting the two variances,</p>
+<div class="math notranslate nohighlight">
+\[
+\var(\hat{\bm{\theta}}_{\mathrm{OLS}})
+  -\var(\hat{\bm{\theta}}_{\mathrm{Ridge}})
+   = \sigma^{2}\left[\bm{X}^{T}\bm{X}+\lambda\bm{I}\right]^{-1}
+     \left[2\lambda\bm{I}
+       +\lambda^{2}\left(\bm{X}^{T}\bm{X}\right)^{-1}\right]
+     \left\{\left[\bm{X}^{T}\bm{X}+\lambda\bm{I}\right]^{-1}\right\}^{T},\tag{3.35}
+\]</div>
+<p>and the middle bracket is non-negative definite for <span class="math notranslate nohighlight">\(\lambda&gt;0\)</span>, hence so is
+the whole product.  The variance of the Ridge estimator is therefore
+<em>always</em> smaller than that of OLS.</p>
+<p>This is the bias-variance trade-off of Section <em>The bias-variance tradeoff</em> in
+closed form.  Increasing <span class="math notranslate nohighlight">\(\lambda\)</span> increases the squared bias and decreases the
+variance, monotonically in both cases; by Eq. (2.27) the
+total error is their sum, and since the variance falls immediately while the
+bias starts at zero with zero derivative, there always exists a
+<span class="math notranslate nohighlight">\(\lambda&gt;0\)</span> giving a smaller mean squared error than OLS.  Gauss-Markov is not
+contradicted – the Ridge estimator is not unbiased, so it was never in the
+competition.</p>
+</section>
+<section id="the-lasso">
+<h2><span class="section-number">3.9. </span>The Lasso<a class="headerlink" href="#the-lasso" title="Link to this heading">#</a></h2>
+<p>Replacing the <span class="math notranslate nohighlight">\(2\)</span>-norm penalty of Eq. (3.26) by a <span class="math notranslate nohighlight">\(1\)</span>-norm
+gives</p>
+<div class="math notranslate nohighlight">
+\[
+\min_{\bm{\theta}\in\mathbb{R}^{p}}
+    \left\{\frac{1}{n}\left\|\bm{y}-\bm{X}\bm{\theta}\right\|_2^{2}
+      + \lambda\left\|\bm{\theta}\right\|_1\right\},
+  \qquad
+  \left\|\bm{\theta}\right\|_1 = \sum_{j=0}^{p-1}\left|\theta_j\right| ,\tag{3.36}
+\]</div>
+<p>which is the Lasso – least absolute shrinkage and selection operator.  The
+change looks slight and its consequences are not: the Lasso sets coefficients
+exactly to zero, and thereby performs variable selection as part of the
+fitting, which Ridge regression by Eq. (3.32) never
+does.</p>
+<p><strong>No closed form.</strong>
+Differentiating Eq. (3.36) requires the derivative of the
+absolute value,</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\frac{d\left|\theta\right|}{d\theta} = \mathrm{sgn}(\theta) =
+  \begin{cases}
+    +1 &amp; \theta&gt;0,\\
+    -1 &amp; \theta&lt;0,
+  \end{cases}\tag{3.37}
+\end{split}\]</div>
+<p>which is undefined at the origin.  Ignoring that difficulty for a moment and
+dropping the <span class="math notranslate nohighlight">\(1/n\)</span>, the stationarity condition reads</p>
+<div class="math notranslate nohighlight">
+\[
+-2\bm{X}^{T}\left(\bm{y}-\bm{X}\bm{\theta}\right)
+    + \lambda\,\mathrm{sgn}(\bm{\theta}) = \bm{0},
+  \qquad\text{that is}\qquad
+  2\bm{X}^{T}\bm{X}\bm{\theta} + \lambda\,\mathrm{sgn}(\bm{\theta})
+   = 2\bm{X}^{T}\bm{y} .\tag{3.38}
+\]</div>
+<p>Because <span class="math notranslate nohighlight">\(\mathrm{sgn}(\bm{\theta})\)</span> depends on the unknown in a
+non-differentiable way, Eq. (3.38) cannot be solved by
+a matrix inversion, and no analogue of Eqs. (3.8) or
+(3.27) exists.  The problem is nonetheless <em>convex</em> –
+a sum of a convex quadratic and a convex norm – so it has a global minimum
+and can be solved reliably; it is the closed form that is lost, not the
+solution.</p>
+<p><strong>The orthonormal case and soft thresholding.</strong>
+The behaviour becomes transparent in the simplest possible design.  Take
+<span class="math notranslate nohighlight">\(\bm{X}=\bm{I}\)</span> with <span class="math notranslate nohighlight">\(n=p\)</span>, so that <span class="math notranslate nohighlight">\(\tilde{\bm{y}}=\bm{\theta}\)</span> and the
+problem decouples completely into <span class="math notranslate nohighlight">\(p\)</span> scalar problems.  For OLS,</p>
+<div class="math notranslate nohighlight">
+\[
+C(\bm{\theta}) = \sum_{i=0}^{p-1}\left(y_i-\theta_i\right)^{2},
+  \qquad
+  \hat{\theta}_i^{\mathrm{OLS}} = y_i .\tag{3.39}
+\]</div>
+<p>For Ridge,</p>
+<div class="math notranslate nohighlight">
+\[
+C(\bm{\theta}) = \sum_{i}\left(y_i-\theta_i\right)^{2}
+                 + \lambda\sum_{i}\theta_i^{2},
+  \qquad
+  \hat{\theta}_i^{\mathrm{Ridge}} = \frac{y_i}{1+\lambda},\tag{3.40}
+\]</div>
+<p>in agreement with Eq. (3.32).  For the Lasso,</p>
+<div class="math notranslate nohighlight">
+\[
+C(\bm{\theta}) = \sum_{i}\left(y_i-\theta_i\right)^{2}
+                 + \lambda\sum_{i}\left|\theta_i\right| ,\tag{3.41}
+\]</div>
+<p>and treating each <span class="math notranslate nohighlight">\(i\)</span> separately, the derivative for <span class="math notranslate nohighlight">\(\theta_i\neq0\)</span> is
+<span class="math notranslate nohighlight">\(-2(y_i-\theta_i)+\lambda\,\mathrm{sgn}(\theta_i)=0\)</span>.  If <span class="math notranslate nohighlight">\(\theta_i&gt;0\)</span> this
+gives <span class="math notranslate nohighlight">\(\theta_i=y_i-\lambda/2\)</span>, which is consistent with <span class="math notranslate nohighlight">\(\theta_i&gt;0\)</span> only
+when <span class="math notranslate nohighlight">\(y_i&gt;\lambda/2\)</span>; if <span class="math notranslate nohighlight">\(\theta_i&lt;0\)</span> it gives <span class="math notranslate nohighlight">\(\theta_i=y_i+\lambda/2\)</span>,
+consistent only when <span class="math notranslate nohighlight">\(y_i&lt;-\lambda/2\)</span>.  For <span class="math notranslate nohighlight">\(|y_i|\le\lambda/2\)</span> neither branch
+is consistent and the minimum lies at the kink <span class="math notranslate nohighlight">\(\theta_i=0\)</span>.  Collecting,</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\boxed{\;
+  \hat{\theta}_i^{\mathrm{Lasso}} =
+  \begin{cases}
+    y_i - \lambda/2 &amp; y_i &gt; \lambda/2,\\[2pt]
+    y_i + \lambda/2 &amp; y_i &lt; -\lambda/2,\\[2pt]
+    0               &amp; \left|y_i\right| \le \lambda/2 .
+  \end{cases} \;}\tag{3.42}
+\end{split}\]</div>
+<p>This is the <em>soft thresholding</em> operator, written compactly as</p>
+<div class="math notranslate nohighlight">
+\[
+S_{\lambda/2}(y) = \mathrm{sgn}(y)\,\max\left(|y|-\lambda/2,\;0\right).\tag{3.43}
+\]</div>
+<p>Compare the three results.  OLS leaves the coefficient alone.  Ridge
+multiplies it by <span class="math notranslate nohighlight">\(1/(1+\lambda)\)</span>, shrinking it towards zero but reaching zero
+only in the limit <span class="math notranslate nohighlight">\(\lambda\to\infty\)</span>.  The Lasso subtracts a constant
+<span class="math notranslate nohighlight">\(\lambda/2\)</span> from its magnitude and <em>truncates at zero</em>, so every
+coefficient smaller than the threshold is eliminated outright at finite
+<span class="math notranslate nohighlight">\(\lambda\)</span>.  The difference between shrinkage and selection is contained in
+this one comparison.</p>
+<p><strong>Why the geometry does it.</strong>
+The constrained forms explain the same fact without any calculus.  Ridge
+minimises the squared error subject to <span class="math notranslate nohighlight">\(\|\bm{\theta}\|_2^{2}\le t\)</span>, a ball;
+the Lasso subject to <span class="math notranslate nohighlight">\(\|\bm{\theta}\|_1\le t\)</span>, a cross-polytope – a diamond
+in two dimensions.  The solution lies where the elliptical contours of the
+squared error first touch the constraint region.  A ball has no distinguished
+points, so the contact occurs at a generic location with all coordinates
+non-zero.  A diamond has corners, and the corners lie <em>on the axes</em>,
+where some coordinates vanish.  Contours are far more likely to meet a
+protruding corner than a flat face, and every corner is a solution with a zero
+coefficient.  In <span class="math notranslate nohighlight">\(p\)</span> dimensions the <span class="math notranslate nohighlight">\(1\)</span>-norm ball has corners, edges and faces
+of every dimension, each corresponding to a different set of variables being
+eliminated.</p>
+<p><strong>Coordinate descent.</strong>
+Equation (3.42) is exact only for an orthonormal design,
+but it suggests the algorithm that solves the general problem.  Suppose we fix
+all coefficients but one and minimise over <span class="math notranslate nohighlight">\(\theta_j\)</span> alone.  Writing the
+partial residual with the <span class="math notranslate nohighlight">\(j\)</span>th contribution removed,</p>
+<div class="math notranslate nohighlight">
+\[
+\bm{r}^{(j)} = \bm{y} - \sum_{k\neq j}\bm{x}_k\theta_k ,\tag{3.44}
+\]</div>
+<p>where <span class="math notranslate nohighlight">\(\bm{x}_k\)</span> is column <span class="math notranslate nohighlight">\(k\)</span>, the one-dimensional problem is exactly of the
+form solved above, and its answer is</p>
+<div class="math notranslate nohighlight">
+\[
+\theta_j \leftarrow
+    \frac{S_{\lambda/2}\left(\bm{x}_j^{T}\bm{r}^{(j)}\right)}
+         {\bm{x}_j^{T}\bm{x}_j} ,\tag{3.45}
+\]</div>
+<p>which for standardised columns has <span class="math notranslate nohighlight">\(\bm{x}_j^{T}\bm{x}_j=n\)</span>.  Cycling through
+the coordinates until the parameters stop changing is <em>coordinate
+descent</em>, and because the cost is convex and the non-differentiable part is
+separable – it is a sum of terms each involving one coordinate – the
+procedure is guaranteed to converge to the global minimum.  This is what
+<code class="docutils literal notranslate"><span class="pre">sklearn.linear_model.Lasso</span></code> runs.  The reader will recognise the
+pattern from the Gauss-Seidel iteration of Eq. (1.92):
+update one coordinate at a time, using the most recent values of all the
+others.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="k">def</span> <span class="nf">soft_threshold</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="n">gamma</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Soft thresholding operator S_gamma(z), Eq. (3.softthresholdop).&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">z</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">z</span><span class="p">)</span> <span class="o">-</span> <span class="n">gamma</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">lasso_coordinate_descent</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">lmbda</span><span class="p">,</span> <span class="n">n_iter</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="mf">1e-8</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Lasso by cyclic coordinate descent.</span>
+
+<span class="sd">    Minimises ||y - X theta||^2 / n + lmbda * ||theta||_1.</span>
+<span class="sd">    The columns of X are assumed centred and standardised, and no</span>
+<span class="sd">    intercept is penalised -- see Section on scaling and the intercept.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">n</span><span class="p">,</span> <span class="n">p</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span>
+    <span class="n">theta</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+    <span class="n">col_norms</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">X</span><span class="o">**</span><span class="mi">2</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">r</span> <span class="o">=</span> <span class="n">y</span> <span class="o">-</span> <span class="n">X</span> <span class="o">@</span> <span class="n">theta</span>                              <span class="c1"># full residual</span>
+
+    <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_iter</span><span class="p">):</span>
+        <span class="n">theta_old</span> <span class="o">=</span> <span class="n">theta</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">p</span><span class="p">):</span>
+            <span class="c1"># partial residual: add back the current contribution of column j</span>
+            <span class="n">r</span> <span class="o">+=</span> <span class="n">X</span><span class="p">[:,</span> <span class="n">j</span><span class="p">]</span> <span class="o">*</span> <span class="n">theta</span><span class="p">[</span><span class="n">j</span><span class="p">]</span>
+            <span class="n">rho</span> <span class="o">=</span> <span class="n">X</span><span class="p">[:,</span> <span class="n">j</span><span class="p">]</span> <span class="o">@</span> <span class="n">r</span>
+            <span class="n">theta</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">soft_threshold</span><span class="p">(</span><span class="n">rho</span><span class="p">,</span> <span class="n">lmbda</span> <span class="o">*</span> <span class="n">n</span> <span class="o">/</span> <span class="mf">2.0</span><span class="p">)</span> <span class="o">/</span> <span class="n">col_norms</span><span class="p">[</span><span class="n">j</span><span class="p">]</span>
+            <span class="n">r</span> <span class="o">-=</span> <span class="n">X</span><span class="p">[:,</span> <span class="n">j</span><span class="p">]</span> <span class="o">*</span> <span class="n">theta</span><span class="p">[</span><span class="n">j</span><span class="p">]</span>                <span class="c1"># remove the updated one</span>
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">theta</span> <span class="o">-</span> <span class="n">theta_old</span><span class="p">))</span> <span class="o">&lt;</span> <span class="n">tol</span><span class="p">:</span>
+            <span class="k">break</span>
+
+    <span class="k">return</span> <span class="n">theta</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="tip admonition">
+<p class="admonition-title">Machine learning connection</p>
+<p>The selection property makes the Lasso
+the natural first tool when <span class="math notranslate nohighlight">\(p\)</span> is large and most features are believed
+irrelevant – gene expression studies, text features, high-order polynomial
+bases.  It has real limitations.  When several features are strongly
+correlated the Lasso tends to pick one arbitrarily and discard the rest, which
+is unstable under resampling and misleading if the discarded features are
+scientifically meaningful; when <span class="math notranslate nohighlight">\(p&gt;n\)</span> it can select at most <span class="math notranslate nohighlight">\(n\)</span> variables.
+The <em>elastic net</em>, which penalises
+<span class="math notranslate nohighlight">\(\alpha\|\bm{\theta}\|_1+(1-\alpha)\|\bm{\theta}\|_2^{2}\)</span>, was designed to
+repair both defects by combining selection with the grouping behaviour of
+Ridge.  Note finally that the sparsity is a property of the <span class="math notranslate nohighlight">\(1\)</span>-norm, not of
+regression: the same penalty produces sparse solutions in compressed sensing,
+in dictionary learning and in the pruning of neural networks.</p>
+</div>
+</section>
+<section id="comparing-the-three-estimators">
+<h2><span class="section-number">3.10. </span>Comparing the three estimators<a class="headerlink" href="#comparing-the-three-estimators" title="Link to this heading">#</a></h2>
+<p>It is worth seeing the three methods act on the same small problem.  Take the
+targets and design matrix</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\bm{y}=\begin{bmatrix}4\\2\\3\end{bmatrix},
+  \qquad
+  \bm{X}=\begin{bmatrix}2&amp;0\\0&amp;1\\0&amp;0\end{bmatrix},\tag{3.46}
+\end{split}\]</div>
+<p>so that there are three observations, two features and two parameters.  The
+third row contributes nothing to the fit but does contribute to the error,
+which is what makes the example non-trivial.  Since
+<span class="math notranslate nohighlight">\(\bm{X}\bm{\theta}=(2\theta_0,\theta_1,0)^{T}\)</span>, the unpenalised cost is</p>
+<div class="math notranslate nohighlight">
+\[
+C(\bm{\theta}) = \left(4-2\theta_0\right)^{2}
+                 + \left(2-\theta_1\right)^{2} + 3^{2},\tag{3.47}
+\]</div>
+<p>minimised at</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\hat{\bm{\theta}}_{\mathrm{OLS}}
+   = \left(\bm{X}^{T}\bm{X}\right)^{-1}\bm{X}^{T}\bm{y}
+   = \begin{bmatrix}2\\2\end{bmatrix}.\tag{3.48}
+\end{split}\]</div>
+<p>Adding the Ridge penalty gives
+<span class="math notranslate nohighlight">\(C(\bm{\theta})=(4-2\theta_0)^{2}+(2-\theta_1)^{2}
++\lambda(\theta_0^{2}+\theta_1^{2})\)</span> up to the constant, and differentiating
+with respect to each parameter separately,</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\hat{\bm{\theta}}_{\mathrm{Ridge}}
+   = \begin{bmatrix}
+       \dfrac{8}{4+\lambda}\\[8pt]
+       \dfrac{2}{1+\lambda}
+     \end{bmatrix},\tag{3.49}
+\end{split}\]</div>
+<p>which reproduces Eq. (3.48) at <span class="math notranslate nohighlight">\(\lambda=0\)</span> and decays to zero as
+<span class="math notranslate nohighlight">\(\lambda\)</span> grows.  Notice that the two coefficients are shrunk by
+<em>different</em> factors, <span class="math notranslate nohighlight">\(4/(4+\lambda)\)</span> and <span class="math notranslate nohighlight">\(1/(1+\lambda)\)</span>: the penalty is
+applied uniformly in parameter space, but the curvature of the cost differs
+between directions, so the coefficient belonging to the better-determined
+feature resists shrinkage more strongly.  This is
+Eq. (3.31) with <span class="math notranslate nohighlight">\(\sigma_0^2=4\)</span> and <span class="math notranslate nohighlight">\(\sigma_1^2=1\)</span>.  Neither
+coefficient ever becomes exactly zero.</p>
+<p>The Lasso behaves differently.  Because the problem is diagonal, each
+coefficient can be treated separately as in Eq. (3.42):
+differentiating <span class="math notranslate nohighlight">\((2-\theta_1)^{2}+\lambda|\theta_1|\)</span> gives
+<span class="math notranslate nohighlight">\(\theta_1=\max(2-\lambda/2,\,0)\)</span>, while <span class="math notranslate nohighlight">\((4-2\theta_0)^{2}+\lambda|\theta_0|\)</span>
+gives <span class="math notranslate nohighlight">\(\theta_0=\max\left((16-\lambda)/8,\,0\right)\)</span>.  The first coefficient is
+eliminated at <span class="math notranslate nohighlight">\(\lambda=4\)</span> and the second at <span class="math notranslate nohighlight">\(\lambda=16\)</span>, both at finite
+<span class="math notranslate nohighlight">\(\lambda\)</span> and both exactly.  Plotting all
+three coefficient paths against <span class="math notranslate nohighlight">\(\lambda\)</span> shows the distinction at a glance:
+the Ridge curves approach the axis asymptotically, the Lasso curves reach it
+and stop.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">from</span> <span class="nn">sklearn.linear_model</span> <span class="kn">import</span> <span class="n">Ridge</span><span class="p">,</span> <span class="n">Lasso</span>
+
+<span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">2.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">],</span> <span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">],</span> <span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">]])</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">4.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">,</span> <span class="mf">3.0</span><span class="p">])</span>
+
+<span class="n">n</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">lambdas</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logspace</span><span class="p">(</span><span class="o">-</span><span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">200</span><span class="p">)</span>
+
+<span class="c1"># scikit-learn&#39;s Ridge minimises ||y - X t||^2 + alpha ||t||^2, so alpha = lambda,</span>
+<span class="c1"># but its Lasso minimises ||y - X t||^2 / (2n) + alpha ||t||_1, so alpha = lambda / (2n).</span>
+<span class="n">ridge_path</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">Ridge</span><span class="p">(</span><span class="n">alpha</span><span class="o">=</span><span class="n">l</span><span class="p">,</span> <span class="n">fit_intercept</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span><span class="o">.</span><span class="n">coef_</span>
+                       <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">lambdas</span><span class="p">])</span>
+<span class="n">lasso_path</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">Lasso</span><span class="p">(</span><span class="n">alpha</span><span class="o">=</span><span class="n">l</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">n</span><span class="p">),</span> <span class="n">fit_intercept</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                             <span class="n">max_iter</span><span class="o">=</span><span class="mi">100000</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span><span class="o">.</span><span class="n">coef_</span>
+                       <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">lambdas</span><span class="p">])</span>
+
+<span class="c1"># Analytical results: Eq. (3.toyridge) for Ridge, Eq. (3.softthreshold) for Lasso</span>
+<span class="n">ridge_exact</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">column_stack</span><span class="p">([</span><span class="mf">8.0</span> <span class="o">/</span> <span class="p">(</span><span class="mf">4.0</span> <span class="o">+</span> <span class="n">lambdas</span><span class="p">),</span> <span class="mf">2.0</span> <span class="o">/</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">+</span> <span class="n">lambdas</span><span class="p">)])</span>
+<span class="n">lasso_exact</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">column_stack</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">((</span><span class="mf">16.0</span> <span class="o">-</span> <span class="n">lambdas</span><span class="p">)</span> <span class="o">/</span> <span class="mf">8.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">),</span>
+                               <span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="mf">2.0</span> <span class="o">-</span> <span class="n">lambdas</span> <span class="o">/</span> <span class="mf">2.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)])</span>
+<span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">ridge_path</span><span class="p">,</span> <span class="n">ridge_exact</span><span class="p">)</span> <span class="ow">and</span> <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">lasso_path</span><span class="p">,</span> <span class="n">lasso_exact</span><span class="p">)</span>
+
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span> <span class="n">sharey</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">):</span>
+    <span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">semilogx</span><span class="p">(</span><span class="n">lambdas</span><span class="p">,</span> <span class="n">ridge_path</span><span class="p">[:,</span> <span class="n">k</span><span class="p">],</span> <span class="n">label</span><span class="o">=</span><span class="sa">rf</span><span class="s2">&quot;$\theta_</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s2">$&quot;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">semilogx</span><span class="p">(</span><span class="n">lambdas</span><span class="p">,</span> <span class="n">lasso_path</span><span class="p">[:,</span> <span class="n">k</span><span class="p">],</span> <span class="n">label</span><span class="o">=</span><span class="sa">rf</span><span class="s2">&quot;$\theta_</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s2">$&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Ridge&quot;</span><span class="p">);</span> <span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Lasso&quot;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">ax</span><span class="p">:</span>
+    <span class="n">a</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;$\lambda$&quot;</span><span class="p">);</span> <span class="n">a</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>The two rescalings in that code deserve attention, because they are exactly
+the trap warned against in Section <em>Scaling, centring and the intercept</em>.
+<code class="docutils literal notranslate"><span class="pre">scikit-learn</span></code> minimises
+<span class="math notranslate nohighlight">\(\|\bm{y}-\bm{X}\bm{\theta}\|_2^{2}+\alpha\|\bm{\theta}\|_2^{2}\)</span> for Ridge but
+<span class="math notranslate nohighlight">\(\|\bm{y}-\bm{X}\bm{\theta}\|_2^{2}/(2n)+\alpha\|\bm{\theta}\|_1\)</span> for the
+Lasso – the same library uses <em>different</em> conventions for the two
+methods, so <span class="math notranslate nohighlight">\(\alpha=\lambda\)</span> in one case and <span class="math notranslate nohighlight">\(\alpha=\lambda/(2n)\)</span> in the
+other.  With the conversions in place the computed paths agree with the
+analytical results (3.49) and (3.42) to
+machine precision, which is what the assertion checks.  Such factors differ
+between every implementation and every textbook, and reconciling one’s own
+code with a library means checking them explicitly rather than assuming.</p>
+</section>
+<section id="a-bayesian-reading">
+<h2><span class="section-number">3.11. </span>A Bayesian reading<a class="headerlink" href="#a-bayesian-reading" title="Link to this heading">#</a></h2>
+<p>The three estimators can be derived a second time, from a viewpoint in which
+the parameters rather than the data are random.  The unification is elegant,
+and it explains where the penalties come from rather than merely postulating
+them.</p>
+<p><strong>Bayes’ theorem.</strong>
+From the product rule for joint probabilities,
+<span class="math notranslate nohighlight">\(p(X,Y)=p(X\mid Y)p(Y)=p(Y\mid X)p(X)\)</span>, we obtain immediately</p>
+<div class="math notranslate nohighlight">
+\[
+p(\bm{\theta}\mid\bm{D})
+   = \frac{p(\bm{D}\mid\bm{\theta})\,p(\bm{\theta})}{p(\bm{D})}
+   \;\propto\; p(\bm{D}\mid\bm{\theta})\,p(\bm{\theta}),\tag{3.50}
+\]</div>
+<p>dropping the normalisation <span class="math notranslate nohighlight">\(p(\bm{D})\)</span>, which does not depend on
+<span class="math notranslate nohighlight">\(\bm{\theta}\)</span>.  The left-hand side is the <em>posterior</em>, the probability of
+the parameters given the data; on the right are the <em>likelihood</em>
+<span class="math notranslate nohighlight">\(p(\bm{D}\mid\bm{\theta})\)</span>, which we already modelled in
+Eq. (3.18), and the <em>prior</em> <span class="math notranslate nohighlight">\(p(\bm{\theta})\)</span>, which
+encodes what we believed about the parameters before seeing any data.
+Choosing the <span class="math notranslate nohighlight">\(\bm{\theta}\)</span> that maximises the posterior is
+<em>maximum-a-posteriori</em> (MAP) estimation.</p>
+<p><strong>A Gaussian prior gives Ridge.</strong>
+Suppose we believe, before seeing the data, that the parameters are small:
+independent, zero-mean Gaussians of variance <span class="math notranslate nohighlight">\(\tau^{2}\)</span>,</p>
+<div class="math notranslate nohighlight">
+\[
+p(\bm{\theta}) = \prod_{j=0}^{p-1}
+    \exp\left(-\frac{\theta_j^{2}}{2\tau^{2}}\right).\tag{3.51}
+\]</div>
+<p>The posterior is then the product of Eq. (3.18) and
+Eq. (3.51).  Taking the negative logarithm and discarding
+terms independent of <span class="math notranslate nohighlight">\(\bm{\theta}\)</span>,</p>
+<div class="math notranslate nohighlight">
+\[
+C(\bm{\theta})
+   = \frac{\left\|\bm{y}-\bm{X}\bm{\theta}\right\|_2^{2}}{2\sigma^{2}}
+   + \frac{1}{2\tau^{2}}\left\|\bm{\theta}\right\|_2^{2},\tag{3.52}
+\]</div>
+<p>which, on identifying <span class="math notranslate nohighlight">\(\lambda=\sigma^{2}/\tau^{2}\)</span> after multiplying through
+by <span class="math notranslate nohighlight">\(2\sigma^2\)</span>, is exactly the Ridge cost
+function (3.26).</p>
+<p><strong>A Laplace prior gives the Lasso.</strong>
+Replace the Gaussian prior by a Laplace (double exponential) distribution with
+zero mean,</p>
+<div class="math notranslate nohighlight">
+\[
+p(\bm{\theta}) = \prod_{j=0}^{p-1}
+    \exp\left(-\frac{\left|\theta_j\right|}{\tau}\right).\tag{3.53}
+\]</div>
+<p>The same steps give</p>
+<div class="math notranslate nohighlight">
+\[
+C(\bm{\theta})
+   = \frac{\left\|\bm{y}-\bm{X}\bm{\theta}\right\|_2^{2}}{2\sigma^{2}}
+   + \frac{1}{\tau}\left\|\bm{\theta}\right\|_1,\tag{3.54}
+\]</div>
+<p>the Lasso cost function (3.36).  A flat prior, expressing
+no preference at all, leaves only the likelihood and returns ordinary least
+squares.</p>
+<p><strong>What the unification tells us.</strong>
+The strength of the prior and the strength of the penalty are the same
+quantity.  A large <span class="math notranslate nohighlight">\(\lambda\)</span> corresponds to a small prior variance – a firm
+belief that the coefficients are near zero – and a small <span class="math notranslate nohighlight">\(\lambda\)</span> to a
+diffuse prior that lets the data speak.  The difference between Ridge and the
+Lasso is now visibly a difference between two prior <em>shapes</em>: the Laplace
+density has a sharp peak at the origin and heavier tails than the Gaussian, so
+it simultaneously expresses a stronger belief that coefficients are exactly
+zero and a greater tolerance for the few that are large.  That is precisely
+the behaviour of Eq. (3.42).</p>
+<p>It should be said that MAP estimation is not the whole of Bayesian inference.
+It returns a single point, the mode of the posterior, and discards the
+distribution around it – which is the part a Bayesian would consider the
+answer.  A full treatment would report the posterior itself, giving credible
+intervals directly rather than through the sampling argument of
+Eq. (3.24), and would integrate over <span class="math notranslate nohighlight">\(\bm{\theta}\)</span> when making
+predictions instead of fixing it at the mode.  We return to this when we
+discuss Bayesian neural networks and the Gaussian processes for which the
+Cholesky factorisation of Section <em>LU and Cholesky decompositions</em> was introduced.</p>
+</section>
+<section id="scaling-centring-and-the-intercept">
+<h2><span class="section-number">3.12. </span>Scaling, centring and the intercept<a class="headerlink" href="#scaling-centring-and-the-intercept" title="Link to this heading">#</a></h2>
+<p>We now address a set of practical questions which cause more confusion than
+any of the mathematics above, and which are the usual reason a hand-written
+implementation disagrees with a library.</p>
+<p><strong>Why scaling matters for penalised regression.</strong>
+The penalties <span class="math notranslate nohighlight">\(\|\bm{\theta}\|_2^{2}\)</span> and <span class="math notranslate nohighlight">\(\|\bm{\theta}\|_1\)</span> treat all
+coefficients alike, but a coefficient’s magnitude depends on the units of its
+feature.  Suppose one predictor is a person’s height.  Measured in
+millimetres the fitted coefficient is a thousand times smaller than the same
+coefficient measured in metres, and it is therefore penalised a thousand times
+less.  The consequence is stark: for Ridge and the Lasso, a change of units is
+not a harmless relabelling but a change of model.  Unless the features are
+already on comparable scales, they must be standardised – each column
+centred and divided by its standard deviation, as in
+Section <em>Arrays in practice: numpy, BLAS and LAPACK</em> – before a penalty is applied.  Ordinary least
+squares is exempt, since Eq. (3.8) is equivariant under
+rescaling of the columns; the fitted values do not change, only the
+coefficients, in a compensating way.</p>
+<p><strong>The intercept should not be penalised.</strong>
+The intercept <span class="math notranslate nohighlight">\(\theta_0\)</span> is the expected target when all predictors are zero.
+Penalising it shrinks the fitted values towards zero rather than towards the
+mean of the data, which is almost never what is wanted and which makes the
+result depend on where the origin of the target happens to be.  If we shift
+every <span class="math notranslate nohighlight">\(y_i\)</span> by a constant, we would like the fit simply to shift with it, and
+that fails if <span class="math notranslate nohighlight">\(\theta_0\)</span> is penalised.</p>
+<p>The standard remedy is to centre both <span class="math notranslate nohighlight">\(\bm{X}\)</span> and <span class="math notranslate nohighlight">\(\bm{y}\)</span>.  If every column
+of <span class="math notranslate nohighlight">\(\bm{X}\)</span> and the target <span class="math notranslate nohighlight">\(\bm{y}\)</span> have had their means subtracted, the
+intercept of the centred problem is exactly zero, so it can be dropped from
+the design matrix altogether and the penalty then applies only to the genuine
+slopes.  The intercept is recovered afterwards from</p>
+<div class="math notranslate nohighlight">
+\[
+\hat{\theta}_0 = \bar{y} - \sum_{j=1}^{p-1}\bar{x}_j\hat{\theta}_j ,\tag{3.55}
+\]</div>
+<p>with <span class="math notranslate nohighlight">\(\bar{y}\)</span> and <span class="math notranslate nohighlight">\(\bar{x}_j\)</span> the training means.  This is what
+<code class="docutils literal notranslate"><span class="pre">scikit-learn</span></code> does internally when the intercept is fitted, and it is
+why its default solutions are derived under the assumption that both
+<span class="math notranslate nohighlight">\(\bm{y}\)</span> and <span class="math notranslate nohighlight">\(\bm{X}\)</span> are zero centred.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="k">def</span> <span class="nf">fit_with_intercept</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">fit_centred</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Fit a penalised model without penalising the intercept.</span>
+
+<span class="sd">    fit_centred(Xc, yc) must return coefficients for centred data with no</span>
+<span class="sd">    intercept column.  Returns (theta_0, theta) plus the training</span>
+<span class="sd">    statistics needed to transform future data identically.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">x_mean</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">y_mean</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+    <span class="n">x_std</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">x_std</span><span class="p">[</span><span class="n">x_std</span> <span class="o">==</span> <span class="mf">0.0</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>                  <span class="c1"># leave constant columns alone</span>
+
+    <span class="n">Xc</span> <span class="o">=</span> <span class="p">(</span><span class="n">X</span> <span class="o">-</span> <span class="n">x_mean</span><span class="p">)</span> <span class="o">/</span> <span class="n">x_std</span>
+    <span class="n">theta</span> <span class="o">=</span> <span class="n">fit_centred</span><span class="p">(</span><span class="n">Xc</span><span class="p">,</span> <span class="n">y</span> <span class="o">-</span> <span class="n">y_mean</span><span class="p">)</span>
+
+    <span class="c1"># Undo the scaling so the coefficients apply to the raw features</span>
+    <span class="n">theta</span> <span class="o">=</span> <span class="n">theta</span> <span class="o">/</span> <span class="n">x_std</span>
+    <span class="n">theta_0</span> <span class="o">=</span> <span class="n">y_mean</span> <span class="o">-</span> <span class="n">x_mean</span> <span class="o">@</span> <span class="n">theta</span>
+    <span class="k">return</span> <span class="n">theta_0</span><span class="p">,</span> <span class="n">theta</span><span class="p">,</span> <span class="p">(</span><span class="n">x_mean</span><span class="p">,</span> <span class="n">x_std</span><span class="p">,</span> <span class="n">y_mean</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="n">X_new</span><span class="p">,</span> <span class="n">theta_0</span><span class="p">,</span> <span class="n">theta</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">theta_0</span> <span class="o">+</span> <span class="n">X_new</span> <span class="o">@</span> <span class="n">theta</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p><strong>The same transformation must be applied to new data.</strong>
+The means and standard deviations are computed on the <em>training</em> data
+and then applied unchanged to validation, test and future data.  Recomputing
+them on the test set, or computing them once on the full data set before
+splitting, leaks information and produces an optimistic error estimate, as
+warned in Sections <em>Training error, test error and generalisation</em> and <em>Cross-validation</em>.
+Inside a cross-validation loop this means the scaler must be refitted on every
+training fold, which is what a <code class="docutils literal notranslate"><span class="pre">Pipeline</span></code> does automatically.</p>
+<div class="tip admonition">
+<p class="admonition-title">Machine learning connection</p>
+<p>A checklist for reconciling one’s own
+code with a library, in decreasing order of how often each is the culprit:
+whether the intercept is included in the design matrix or handled separately;
+whether the intercept is penalised; whether the data have been centred and
+scaled, and with which convention for the standard deviation (<span class="math notranslate nohighlight">\(n\)</span> or <span class="math notranslate nohighlight">\(n-1\)</span>);
+whether the cost function carries a factor <span class="math notranslate nohighlight">\(1/n\)</span>, <span class="math notranslate nohighlight">\(1/(2n)\)</span> or nothing, which
+rescales <span class="math notranslate nohighlight">\(\lambda\)</span> correspondingly; and whether the library’s regularisation
+parameter is our <span class="math notranslate nohighlight">\(\lambda\)</span> or some multiple of it.  Every one of these changes
+the numbers while leaving the method unchanged, and discovering which is
+responsible is a routine part of the work.</p>
+</div>
+</section>
+<section id="a-complete-example-the-franke-function">
+<h2><span class="section-number">3.13. </span>A complete example: the Franke function<a class="headerlink" href="#a-complete-example-the-franke-function" title="Link to this heading">#</a></h2>
+<p>We now assemble everything into a single study.  The Franke function is a
+weighted sum of four exponentials on the unit square,</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{align}
+f(x,y) &amp;= \frac{3}{4}\exp\left(-\frac{(9x-2)^{2}}{4}
+                                -\frac{(9y-2)^{2}}{4}\right)
+          + \frac{3}{4}\exp\left(-\frac{(9x+1)^{2}}{49}
+                                -\frac{9y+1}{10}\right) \nonumber\\
+         &amp;\quad + \frac{1}{2}\exp\left(-\frac{(9x-7)^{2}}{4}
+                                -\frac{(9y-3)^{2}}{4}\right)
+          - \frac{1}{5}\exp\left(-(9x-4)^{2}-(9y-7)^{2}\right),
+\end{align}
+\end{split}\]</div>
+<p>for <span class="math notranslate nohighlight">\(x,y\in[0,1]\)</span>.  It is a standard test surface for interpolation and
+regression: smooth, but with two peaks, a saddle and a depression, so that it
+cannot be captured by a low-order polynomial and is well captured by a
+moderate one.  Adding Gaussian noise gives us a problem with a known truth, a
+known noise level and a tunable complexity – everything needed to see the
+bias-variance trade-off of Section <em>The bias-variance tradeoff</em> in action.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="k">def</span> <span class="nf">franke_function</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;The Franke function, Eq. (3.franke).&quot;&quot;&quot;</span>
+    <span class="n">t1</span> <span class="o">=</span> <span class="mf">0.75</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="p">(</span><span class="mf">0.25</span> <span class="o">*</span> <span class="p">(</span><span class="mi">9</span> <span class="o">*</span> <span class="n">x</span> <span class="o">-</span> <span class="mi">2</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="o">-</span> <span class="mf">0.25</span> <span class="o">*</span> <span class="p">((</span><span class="mi">9</span> <span class="o">*</span> <span class="n">y</span> <span class="o">-</span> <span class="mi">2</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">))</span>
+    <span class="n">t2</span> <span class="o">=</span> <span class="mf">0.75</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="p">((</span><span class="mi">9</span> <span class="o">*</span> <span class="n">x</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="o">/</span> <span class="mf">49.0</span> <span class="o">-</span> <span class="mf">0.1</span> <span class="o">*</span> <span class="p">(</span><span class="mi">9</span> <span class="o">*</span> <span class="n">y</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span>
+    <span class="n">t3</span> <span class="o">=</span> <span class="mf">0.50</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="p">(</span><span class="mi">9</span> <span class="o">*</span> <span class="n">x</span> <span class="o">-</span> <span class="mi">7</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span> <span class="o">/</span> <span class="mf">4.0</span> <span class="o">-</span> <span class="mf">0.25</span> <span class="o">*</span> <span class="p">((</span><span class="mi">9</span> <span class="o">*</span> <span class="n">y</span> <span class="o">-</span> <span class="mi">3</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">))</span>
+    <span class="n">t4</span> <span class="o">=</span> <span class="o">-</span><span class="mf">0.20</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="p">(</span><span class="mi">9</span> <span class="o">*</span> <span class="n">x</span> <span class="o">-</span> <span class="mi">4</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span> <span class="o">-</span> <span class="p">(</span><span class="mi">9</span> <span class="o">*</span> <span class="n">y</span> <span class="o">-</span> <span class="mi">7</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">t1</span> <span class="o">+</span> <span class="n">t2</span> <span class="o">+</span> <span class="n">t3</span> <span class="o">+</span> <span class="n">t4</span>
+
+
+<span class="k">def</span> <span class="nf">make_franke_data</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="mi">400</span><span class="p">,</span> <span class="n">noise</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">rng</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Sample the Franke function on random points with Gaussian noise.&quot;&quot;&quot;</span>
+    <span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">()</span> <span class="k">if</span> <span class="n">rng</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">rng</span>
+    <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">n</span><span class="p">),</span> <span class="n">rng</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+    <span class="n">z</span> <span class="o">=</span> <span class="n">franke_function</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span> <span class="o">+</span> <span class="n">noise</span> <span class="o">*</span> <span class="n">rng</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">n</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p><strong>The study.</strong>
+The analysis proceeds in the order of this book.  We build the design matrix
+of Eq. (3.5) for polynomial degrees from one to some
+maximum; we split the data into training and test sets; we standardise using
+training statistics only; we fit by OLS, Ridge and Lasso; and we report test
+errors, choosing <span class="math notranslate nohighlight">\(\lambda\)</span> by the <span class="math notranslate nohighlight">\(k\)</span>-fold cross-validation of
+Section <em>Cross-validation</em>.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">sklearn.linear_model</span> <span class="kn">import</span> <span class="n">LinearRegression</span><span class="p">,</span> <span class="n">Ridge</span><span class="p">,</span> <span class="n">Lasso</span>
+<span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span class="n">StandardScaler</span>
+<span class="kn">from</span> <span class="nn">sklearn.pipeline</span> <span class="kn">import</span> <span class="n">make_pipeline</span>
+<span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">train_test_split</span><span class="p">,</span> <span class="n">KFold</span><span class="p">,</span> <span class="n">cross_val_score</span>
+
+<span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="mi">2024</span><span class="p">)</span>
+<span class="c1"># A small, noisy sample: with n = 100 the number of parameters (3.numfeatures)</span>
+<span class="c1"># overtakes the 80 training points around degree eleven, which is where the</span>
+<span class="c1"># difference between the three methods becomes visible.</span>
+<span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span> <span class="o">=</span> <span class="n">make_franke_data</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">noise</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">rng</span><span class="o">=</span><span class="n">rng</span><span class="p">)</span>
+
+<span class="n">max_degree</span> <span class="o">=</span> <span class="mi">14</span>
+<span class="n">kfold</span> <span class="o">=</span> <span class="n">KFold</span><span class="p">(</span><span class="n">n_splits</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">2024</span><span class="p">)</span>
+<span class="n">lambdas</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logspace</span><span class="p">(</span><span class="o">-</span><span class="mi">5</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">25</span><span class="p">)</span>
+
+<span class="n">results</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;OLS&quot;</span><span class="p">:</span> <span class="p">[],</span> <span class="s2">&quot;Ridge&quot;</span><span class="p">:</span> <span class="p">[],</span> <span class="s2">&quot;Lasso&quot;</span><span class="p">:</span> <span class="p">[]}</span>
+<span class="k">for</span> <span class="n">degree</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">max_degree</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+    <span class="n">X</span> <span class="o">=</span> <span class="n">design_matrix_2d</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">degree</span><span class="p">)[:,</span> <span class="mi">1</span><span class="p">:]</span>      <span class="c1"># drop the intercept column</span>
+    <span class="n">X_train</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">z_train</span><span class="p">,</span> <span class="n">z_test</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">test_size</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span>
+                                                        <span class="n">random_state</span><span class="o">=</span><span class="mi">2024</span><span class="p">)</span>
+
+    <span class="c1"># OLS: the scaler is fitted on the training fold only, inside the pipeline</span>
+    <span class="n">ols_pipe</span> <span class="o">=</span> <span class="n">make_pipeline</span><span class="p">(</span><span class="n">StandardScaler</span><span class="p">(),</span> <span class="n">LinearRegression</span><span class="p">())</span>
+    <span class="n">ols_pipe</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">z_train</span><span class="p">)</span>
+    <span class="n">results</span><span class="p">[</span><span class="s2">&quot;OLS&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mse</span><span class="p">(</span><span class="n">z_test</span><span class="p">,</span> <span class="n">ols_pipe</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_test</span><span class="p">)))</span>
+
+    <span class="c1"># Ridge and Lasso: choose lambda by cross-validation on the training set</span>
+    <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">Model</span> <span class="ow">in</span> <span class="p">((</span><span class="s2">&quot;Ridge&quot;</span><span class="p">,</span> <span class="n">Ridge</span><span class="p">),</span> <span class="p">(</span><span class="s2">&quot;Lasso&quot;</span><span class="p">,</span> <span class="n">Lasso</span><span class="p">)):</span>
+        <span class="n">cv_error</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="o">-</span><span class="n">cross_val_score</span><span class="p">(</span><span class="n">make_pipeline</span><span class="p">(</span><span class="n">StandardScaler</span><span class="p">(),</span>
+                                           <span class="n">Model</span><span class="p">(</span><span class="n">alpha</span><span class="o">=</span><span class="n">lmb</span><span class="p">,</span> <span class="n">max_iter</span><span class="o">=</span><span class="mi">5000</span><span class="p">)),</span>
+                             <span class="n">X_train</span><span class="p">,</span> <span class="n">z_train</span><span class="p">,</span> <span class="n">cv</span><span class="o">=</span><span class="n">kfold</span><span class="p">,</span>
+                             <span class="n">scoring</span><span class="o">=</span><span class="s2">&quot;neg_mean_squared_error&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">lmb</span> <span class="ow">in</span> <span class="n">lambdas</span>
+        <span class="p">]</span>
+        <span class="n">best</span> <span class="o">=</span> <span class="n">make_pipeline</span><span class="p">(</span><span class="n">StandardScaler</span><span class="p">(),</span>
+                             <span class="n">Model</span><span class="p">(</span><span class="n">alpha</span><span class="o">=</span><span class="n">lambdas</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">argmin</span><span class="p">(</span><span class="n">cv_error</span><span class="p">))],</span>
+                                   <span class="n">max_iter</span><span class="o">=</span><span class="mi">5000</span><span class="p">))</span>
+        <span class="n">best</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">z_train</span><span class="p">)</span>
+        <span class="n">results</span><span class="p">[</span><span class="n">name</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mse</span><span class="p">(</span><span class="n">z_test</span><span class="p">,</span> <span class="n">best</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_test</span><span class="p">)))</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;Lasso&quot;</span><span class="p">:</span>
+            <span class="n">n_kept</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">best</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">coef_</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">))</span>
+
+<span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">errors</span> <span class="ow">in</span> <span class="n">results</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">:</span><span class="s2">&gt;6</span><span class="si">}</span><span class="s2">: best degree </span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">argmin</span><span class="p">(</span><span class="n">errors</span><span class="p">))</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="si">:</span><span class="s2">2d</span><span class="si">}</span><span class="s2">, &quot;</span>
+          <span class="sa">f</span><span class="s2">&quot;test MSE </span><span class="si">{</span><span class="nb">min</span><span class="p">(</span><span class="n">errors</span><span class="p">)</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">, &quot;</span>
+          <span class="sa">f</span><span class="s2">&quot;MSE at degree </span><span class="si">{</span><span class="n">max_degree</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">errors</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p><strong>What one observes.</strong>
+The output of the run above is</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>   <span class="n">OLS</span><span class="p">:</span> <span class="n">best</span> <span class="n">degree</span>  <span class="mi">4</span><span class="p">,</span> <span class="n">test</span> <span class="n">MSE</span> <span class="mf">0.0570</span><span class="p">,</span> <span class="n">MSE</span> <span class="n">at</span> <span class="n">degree</span> <span class="mi">14</span> <span class="mf">2428714.9322</span>
+ <span class="n">Ridge</span><span class="p">:</span> <span class="n">best</span> <span class="n">degree</span>  <span class="mi">2</span><span class="p">,</span> <span class="n">test</span> <span class="n">MSE</span> <span class="mf">0.0599</span><span class="p">,</span> <span class="n">MSE</span> <span class="n">at</span> <span class="n">degree</span> <span class="mi">14</span>       <span class="mf">0.0667</span>
+ <span class="n">Lasso</span><span class="p">:</span> <span class="n">best</span> <span class="n">degree</span>  <span class="mi">3</span><span class="p">,</span> <span class="n">test</span> <span class="n">MSE</span> <span class="mf">0.0607</span><span class="p">,</span> <span class="n">MSE</span> <span class="n">at</span> <span class="n">degree</span> <span class="mi">14</span>       <span class="mf">0.0644</span>
+</pre></div>
+</div>
+<p>and three features of it are worth dwelling on, because they are the lessons
+of the preceding chapters made visible.</p>
+<p>First, all three methods achieve very nearly the same best test error, about
+<span class="math notranslate nohighlight">\(0.057\)</span> to <span class="math notranslate nohighlight">\(0.061\)</span>, against a noise variance of <span class="math notranslate nohighlight">\(\sigma^{2}=0.04\)</span>.  By
+Eq. (2.47) that floor cannot be crossed, and the three
+methods are all within about fifty per cent of it.  <em>Regularisation does
+not make a good model better.</em></p>
+<p>Second, the behaviour away from the optimum is entirely different.  The OLS
+error is well behaved up to degree eight, rises to <span class="math notranslate nohighlight">\(14.5\)</span> at degree ten and
+then to over two million at degree fourteen – seven orders of magnitude worse
+than its own best value.  The reason is Eq. (3.5): at
+degree fourteen there are <span class="math notranslate nohighlight">\(119\)</span> parameters and only <span class="math notranslate nohighlight">\(80\)</span> training points, so
+<span class="math notranslate nohighlight">\(\bm{X}^{T}\bm{X}\)</span> is singular, the smallest singular values are pure noise,
+and Eq. (3.10) divides by them.  The penalised errors, by
+contrast, rise from <span class="math notranslate nohighlight">\(0.060\)</span> to <span class="math notranslate nohighlight">\(0.067\)</span> and from <span class="math notranslate nohighlight">\(0.061\)</span> to <span class="math notranslate nohighlight">\(0.064\)</span>: they
+barely move.  Cross-validation increases <span class="math notranslate nohighlight">\(\lambda\)</span> as the degree grows, and
+the shrinkage factors (3.31) suppress precisely the
+directions in which Eq. (3.25) shows the variance to be
+unbounded.  What regularisation buys is not a better optimum but insensitivity
+to choosing the complexity badly – which matters, because in a real problem
+the right complexity is not known.</p>
+<p>Third, the Lasso fits are genuinely sparse.  At degree ten it keeps <span class="math notranslate nohighlight">\(6\)</span> of
+<span class="math notranslate nohighlight">\(65\)</span> coefficients, and at degree fourteen <span class="math notranslate nohighlight">\(7\)</span> of <span class="math notranslate nohighlight">\(119\)</span>; Ridge at comparable
+test error keeps every one of them, each small.  The Lasso has performed model
+selection, discovering from the data that a handful of low-order monomials
+suffices – consistent with its optimum at degree three.</p>
+<p>Two further experiments make the point sharper.  Increasing <span class="math notranslate nohighlight">\(n\)</span> from <span class="math notranslate nohighlight">\(100\)</span> to
+<span class="math notranslate nohighlight">\(400\)</span> moves the OLS optimum from degree four to degree eleven and reduces the
+degradation at degree fourteen from a factor of <span class="math notranslate nohighlight">\(4\times10^{7}\)</span> to a factor of
+<span class="math notranslate nohighlight">\(3\)</span>, because <span class="math notranslate nohighlight">\(p\)</span> no longer approaches <span class="math notranslate nohighlight">\(n\)</span>.  Reducing the noise to <span class="math notranslate nohighlight">\(\sigma=0\)</span>
+while keeping <span class="math notranslate nohighlight">\(n=100\)</span> moves the optimum from degree four to degree eight, since
+with no noise there is less to overfit.  Note that even then the error
+eventually grows, by a factor of about <span class="math notranslate nohighlight">\(180\)</span> at degree fourteen: once
+<span class="math notranslate nohighlight">\(p\)</span> exceeds the number of training points the design matrix is rank deficient
+and Eq. (3.10) is dividing by singular values that are pure
+rounding error.  That failure is one of conditioning rather than of
+statistics, and it is the only one of the three that no amount of clean data
+will cure.  The best model is a property of the data set – its size and its
+noise level – and not of the function being approximated.</p>
+<div class="tip admonition">
+<p class="admonition-title">Machine learning connection</p>
+<p>The whole analysis rests on one number
+being honest: the test error.  It is worth listing the ways of corrupting it,
+all of which appear in student work and published papers alike.  Standardising
+before the split leaks the test distribution into training.  Choosing the
+polynomial degree by looking at the test error, then reporting that same error,
+turns the test set into a validation set – the reported figure is then
+optimistic, and the remedy is the three-way split of
+Section <em>Training error, test error and generalisation</em>.  Selecting features on the full data set
+before cross-validating leaks in the same way, and dramatically so when <span class="math notranslate nohighlight">\(p\)</span> is
+large.  And splitting spatially or temporally correlated data at random makes
+the test points near-duplicates of training points, which by
+Section <em>Correlated data and the autocorrelation function</em> measures interpolation rather than prediction.  For
+data sampled on a grid, as the Franke function often is, this last is a real
+concern.</p>
+</div>
+</section>
+<section id="summary-and-the-programs">
+<h2><span class="section-number">3.14. </span>Summary and the programs<a class="headerlink" href="#summary-and-the-programs" title="Link to this heading">#</a></h2>
+<p>Linear regression has given us, in closed form, every quantity the rest of
+this book will only be able to estimate.</p>
+<p>The estimator itself arrived three times over.  As an optimisation problem it
+is the minimiser of the squared error, Eq. (3.8); as
+geometry it is the orthogonal projection of the targets onto the column space
+of the design matrix, Eq. (3.9); and as statistics it is the
+maximum-likelihood estimate under Gaussian noise,
+Eq. (3.21).  The three derivations are worth holding together,
+because each generalises differently: the first survives into every method in
+this book, the second is what makes the linear case special, and the third is
+what tells us that a different noise model demands a different loss.</p>
+<p>The three penalties then formed a sequence.  Ordinary least squares is
+unbiased and, by Gauss-Markov, of minimum variance among unbiased linear
+estimators – and that guarantee is worth less than it sounds, because
+Eq. (2.27) counts variance alongside bias.  Ridge
+regression buys a large reduction in variance for a small bias, shrinking each
+singular direction by <span class="math notranslate nohighlight">\(\sigma_i^{2}/(\sigma_i^{2}+\lambda)\)</span> and hence
+suppressing hardest exactly those directions in which
+Eq. (3.25) shows the data to be least informative.  The Lasso
+replaces proportional shrinkage by soft
+thresholding (3.42), and thereby sets coefficients exactly
+to zero – a difference which is visible in the algebra, in the geometry of
+the <span class="math notranslate nohighlight">\(1\)</span>-norm ball, and in the shape of the corresponding Laplace prior.</p>
+<p>The Bayesian reading of Section <em>A Bayesian reading</em> unified the three: a flat
+prior gives OLS, a Gaussian prior gives Ridge, a Laplace prior gives the
+Lasso.  Regularisation is the expression of a prior belief, and the
+regularisation parameter is its strength.</p>
+<p>Finally, none of this survives careless practice.  Penalties are meaningless
+unless the features are on comparable scales; the intercept must be excluded
+from the penalty; every transformation must be fitted on training data alone;
+and the number one reports must come from data the model has never seen.</p>
+<p>The complete programs are collected in <code class="docutils literal notranslate"><span class="pre">doc/BookML/BookPrograms</span></code>:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">linear_regression.py</span></code> – OLS by the SVD, by QR and by the
+normal equations, with the conditioning comparison of
+Section <em>Ordinary least squares</em>; weighted least squares; and the quality
+measures of Section <em>Measures of quality</em>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ridge_lasso.py</span></code> – Ridge in closed form and through the SVD,
+the Lasso by coordinate descent with soft thresholding, and the
+coefficient paths of Section <em>Comparing the three estimators</em> compared against
+the analytical results.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">franke.py</span></code> – the complete study of Section <em>A complete example: the Franke function</em>:
+design matrices for two-dimensional polynomials, the train-test
+split, cross-validated selection of <span class="math notranslate nohighlight">\(\lambda\)</span>, test error against
+polynomial degree for all three methods, and the count of non-zero
+Lasso coefficients.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">scaling.py</span></code> – the intercept and standardisation conventions
+of Section <em>Scaling, centring and the intercept</em>, with a reconciliation of a
+hand-written implementation against <code class="docutils literal notranslate"><span class="pre">scikit-learn</span></code>.</p></li>
+</ul>
+<p>Each file runs as a script and reproduces the numbers quoted in this chapter.
+An executable version is available as a Jupyter notebook in the accompanying
+Jupyter-book.</p>
+</section>
+<section id="exercises">
+<h2><span class="section-number">3.15. </span>Exercises<a class="headerlink" href="#exercises" title="Link to this heading">#</a></h2>
+<section id="warm-up-exercises">
+<h3><span class="section-number">3.15.1. </span>Warm-up exercises<a class="headerlink" href="#warm-up-exercises" title="Link to this heading">#</a></h3>
+<ol class="arabic simple">
+<li><p><strong>The normal equations by hand.</strong>
+For the toy problem of Eq. (3.46):
+(a) compute <span class="math notranslate nohighlight">\(\bm{X}^{T}\bm{X}\)</span> and <span class="math notranslate nohighlight">\(\bm{X}^{T}\bm{y}\)</span> and verify
+Eq. (3.48);
+(b) compute the hat matrix (3.9) and verify that it is
+symmetric, idempotent, and has trace <span class="math notranslate nohighlight">\(2\)</span>;
+(c) verify that the residual is orthogonal to both columns of <span class="math notranslate nohighlight">\(\bm{X}\)</span>.</p></li>
+<li><p><strong>Ridge by hand.</strong>
+For the same problem, derive Eq. (3.49) by differentiating
+the penalised cost, and explain why the two coefficients are shrunk by
+different factors.  Relate the factors to the singular values of <span class="math notranslate nohighlight">\(\bm{X}\)</span>.</p></li>
+<li><p><strong>The Lasso threshold.</strong>
+For the same problem, show that the Lasso sets <span class="math notranslate nohighlight">\(\theta_1=0\)</span> for
+<span class="math notranslate nohighlight">\(\lambda\ge4\)</span> and <span class="math notranslate nohighlight">\(\theta_0=0\)</span> for <span class="math notranslate nohighlight">\(\lambda\ge16\)</span> (with the convention of
+Eq. (3.36) and the <span class="math notranslate nohighlight">\(1/n\)</span> dropped).  Sketch all three
+coefficient paths on one plot.</p></li>
+<li><p><strong>Equivariance under rescaling.</strong>
+(a) Show that if a column of <span class="math notranslate nohighlight">\(\bm{X}\)</span> is multiplied by <span class="math notranslate nohighlight">\(c\)</span>, the OLS fitted
+values <span class="math notranslate nohighlight">\(\tilde{\bm{y}}\)</span> are unchanged while the corresponding
+coefficient is divided by <span class="math notranslate nohighlight">\(c\)</span>.
+(b) Show that this fails for Ridge, and explain in one sentence why
+standardisation is therefore mandatory for penalised regression and
+optional for OLS.</p></li>
+<li><p><strong>Maximum likelihood with a different noise model.</strong>
+Repeat the derivation of Section <em>Deriving least squares from a probability distribution</em> assuming Laplace
+noise, <span class="math notranslate nohighlight">\(p(\varepsilon)\propto\exp(-|\varepsilon|/b)\)</span>.  Which cost function
+results?  What does this say about the robustness of the two fits to
+outliers?</p></li>
+<li><p><strong>Degrees of freedom.</strong>
+(a) Show that <span class="math notranslate nohighlight">\(\mathrm{Tr}(\bm{H})=p\)</span> for the OLS hat matrix.
+(b) Show that the Ridge analogue
+<span class="math notranslate nohighlight">\(\bm{H}_\lambda=\bm{X}(\bm{X}^{T}\bm{X}+\lambda\bm{I})^{-1}\bm{X}^{T}\)</span>
+has trace <span class="math notranslate nohighlight">\(\sum_i\sigma_i^{2}/(\sigma_i^{2}+\lambda)\)</span>, which is
+Eq. (1.132).
+(c) Verify that <span class="math notranslate nohighlight">\(\bm{H}_\lambda\)</span> is symmetric but <em>not</em> idempotent for
+<span class="math notranslate nohighlight">\(\lambda&gt;0\)</span>, and interpret this using the eigenvalue argument of
+Section <em>Orthonormal bases and projections</em>.</p></li>
+<li><p><strong>Conditioning in practice (numerical).</strong>
+Fit a polynomial of degree <span class="math notranslate nohighlight">\(d\)</span> to <span class="math notranslate nohighlight">\(100\)</span> points on <span class="math notranslate nohighlight">\([0,1]\)</span> using both
+functions of Section <em>Ordinary least squares</em>.
+(a) For <span class="math notranslate nohighlight">\(d=2,4,\dots,14\)</span>, compare the coefficients returned by the two.
+(b) Plot <span class="math notranslate nohighlight">\(\kappa_2(\bm{X})\)</span> and <span class="math notranslate nohighlight">\(\kappa_2(\bm{X}^{T}\bm{X})\)</span> against <span class="math notranslate nohighlight">\(d\)</span>.
+(c) At which <span class="math notranslate nohighlight">\(d\)</span> do the two methods first disagree in the first significant
+digit, and how does that relate to Eq. (1.118)?</p></li>
+<li><p><strong>Coordinate descent (numerical).</strong>
+Implement the Lasso by coordinate descent as in
+Eq. (3.45).
+(a) Verify on an orthonormal design that it reproduces the soft
+thresholding result (3.42) exactly.
+(b) Compare against <code class="docutils literal notranslate"><span class="pre">sklearn.linear_model.Lasso</span></code> on a general
+design, taking care over the factor conventions noted in
+Section <em>Comparing the three estimators</em>.
+(c) Plot the number of non-zero coefficients against <span class="math notranslate nohighlight">\(\lambda\)</span>.</p></li>
+<li><p><strong>Confidence intervals (numerical).</strong>
+For data generated from a known linear model:
+(a) compute the confidence intervals (3.24) for each
+coefficient;
+(b) repeat the whole experiment <span class="math notranslate nohighlight">\(1000\)</span> times with fresh noise and count how
+often the true value lies inside the interval;
+(c) does the coverage match the nominal <span class="math notranslate nohighlight">\(95\%\)</span>?  Repeat with two nearly
+collinear columns and comment.</p></li>
+<li><p><strong>Ridge and the bias-variance trade-off (numerical).</strong>
+For a fixed polynomial degree, plot the squared bias, the variance and the
+test error of a Ridge fit against <span class="math notranslate nohighlight">\(\lambda\)</span>, using the bootstrap procedure
+of Section <em>The bias-variance tradeoff</em>.  Verify that the bias increases
+monotonically, the variance decreases monotonically, and the minimum of the
+sum occurs at <span class="math notranslate nohighlight">\(\lambda&gt;0\)</span>.</p></li>
+</ol>
+</section>
+<section id="project-style-exercise-regression-analysis-of-the-franke-function">
+<h3><span class="section-number">3.15.2. </span>Project-style exercise: regression analysis of the Franke function<a class="headerlink" href="#project-style-exercise-regression-analysis-of-the-franke-function" title="Link to this heading">#</a></h3>
+<p>This extended exercise assembles the whole chapter, and follows the structure
+of the first project of the course.</p>
+<p><strong>Part a: ordinary least squares.</strong>
+Generate a data set from the Franke function (3.56) with
+<span class="math notranslate nohighlight">\(x,y\in[0,1]\)</span> and added noise <span class="math notranslate nohighlight">\(\mathcal{N}(0,\sigma^{2})\)</span>.  Write your own
+code – using either a matrix inversion or, preferably, the singular value
+decomposition – and perform a standard least-squares analysis with
+polynomials in <span class="math notranslate nohighlight">\(x\)</span> and <span class="math notranslate nohighlight">\(y\)</span> up to fifth order.</p>
+<p><strong>Part b: the bias-variance trade-off with the bootstrap.</strong>
+Using the bootstrap of Section <em>Resampling: the jackknife and the bootstrap</em>, decompose the test error
+into bias and variance as in Eq. (2.47) and plot all three
+against polynomial degree.  Explain the shape of each curve.  Then repeat with
+a substantially larger data set and account for the shift in the optimum.</p>
+<p><strong>Part c: cross-validation.</strong>
+Implement <span class="math notranslate nohighlight">\(k\)</span>-fold cross-validation from scratch, with <span class="math notranslate nohighlight">\(k\)</span> between five and
+ten, and compare its estimate of the test error with the bootstrap estimate of
+part b.  Which is cheaper, and which has the smaller variance?</p>
+<p><strong>Part d: Ridge regression.</strong>
+Repeat parts a to c for Ridge regression, as a function of both the polynomial
+degree and the penalty <span class="math notranslate nohighlight">\(\lambda\)</span>.  Present your results as a heat map of the
+cross-validated test error over the two hyperparameters, and identify the
+optimum.  Discuss the results in the light of the
+shrinkage (3.31) and of the variance
+difference (3.35).</p>
+<p><strong>Part e: the Lasso.</strong>
+Repeat part d for the Lasso, using either your own coordinate-descent
+implementation or <code class="docutils literal notranslate"><span class="pre">scikit-learn</span></code>.  In addition, count the non-zero
+coefficients at the optimal <span class="math notranslate nohighlight">\(\lambda\)</span> and compare with the number retained by
+Ridge.  Which monomials survive, and does the selection agree with your
+expectation from the shape of the Franke surface?</p>
+<p><strong>Part f: real data.</strong>
+Finally, replace the Franke function by a real data set – digital terrain
+data are a natural choice, being a genuine two-dimensional surface – and
+repeat the analysis.  Discuss what changes when the true function is unknown,
+the noise level is unknown, and the observations may be spatially correlated.
+In particular, reconsider whether a random train-test split is defensible, in
+the light of Section <em>Correlated data and the autocorrelation function</em>.</p>
+</section>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./."
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="chapter2.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title"><span class="section-number">2. </span>Chapter 2: Elements of Probability Theory and Statistics</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="chapter4.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title"><span class="section-number">4. </span>Chapter 4: Optimization</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-regression-problem">3.1. The regression problem</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-linear-model-and-the-design-matrix">3.2. The linear model and the design matrix</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#ordinary-least-squares">3.3. Ordinary least squares</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#weighted-least-squares-and-the-chi-2-function">3.4. Weighted least squares and the <span class="math notranslate nohighlight">\(\chi^2\)</span> function</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#measures-of-quality">3.5. Measures of quality</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#deriving-least-squares-from-a-probability-distribution">3.6. Deriving least squares from a probability distribution</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#statistical-properties-of-the-least-squares-estimator">3.7. Statistical properties of the least-squares estimator</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#ridge-regression">3.8. Ridge regression</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-lasso">3.9. The Lasso</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#comparing-the-three-estimators">3.10. Comparing the three estimators</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#a-bayesian-reading">3.11. A Bayesian reading</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#scaling-centring-and-the-intercept">3.12. Scaling, centring and the intercept</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#a-complete-example-the-franke-function">3.13. A complete example: the Franke function</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#summary-and-the-programs">3.14. Summary and the programs</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercises">3.15. Exercises</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#warm-up-exercises">3.15.1. Warm-up exercises</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#project-style-exercise-regression-analysis-of-the-franke-function">3.15.2. Project-style exercise: regression analysis of the Franke function</a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Morten Hjorth-Jensen
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2023.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

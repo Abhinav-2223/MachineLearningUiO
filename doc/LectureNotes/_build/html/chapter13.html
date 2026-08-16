@@ -1,0 +1,1876 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="./" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>17. Recurrent neural networks: Overarching view &#8212; Applied Data Analysis and Machine Learning</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+
+  
+  <link href="_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/sphinx-book-theme.css?v=eba8b062" />
+    <link rel="stylesheet" type="text/css" href="_static/togglebutton.css?v=13237357" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css?v=6644e6bb" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinx-design.min.css?v=95c83b7e" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+    <script src="_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="_static/doctools.js?v=9a2dae69"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="_static/copybutton.js?v=f281be69"></script>
+    <script src="_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="_static/togglebutton.js?v=4a39c7ea"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="_static/design-tabs.js?v=f930bc37"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'chapter13';</script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Exercises week 34" href="exercisesweek34.html" />
+    <link rel="prev" title="16. Convolutional Neural Networks" href="chapter12.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search this book..."
+         aria-label="Search this book..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="intro.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="_static/logo.png" class="logo__image only-light" alt="Applied Data Analysis and Machine Learning - Home"/>
+    <script>document.write(`<img src="_static/logo.png" class="logo__image only-dark" alt="Applied Data Analysis and Machine Learning - Home"/>`);</script>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="intro.html">
+                    Applied Data Analysis and Machine Learning
+                </a>
+            </li>
+        </ul>
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">About the course</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="schedule.html">Course setting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="teachers.html">Teachers and Grading</a></li>
+<li class="toctree-l1"><a class="reference internal" href="textbooks.html">Textbooks</a></li>
+
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Review of Statistics with Resampling Techniques and Linear Algebra</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="statistics.html">1. Elements of Probability Theory and Statistical Data Analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="linalg.html">2. Linear Algebra, Handling of Arrays and more Python Features</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">From Regression to Support Vector Machines</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="chapter1.html">3. Linear Regression</a></li>
+<li class="toctree-l1"><a class="reference internal" href="chapter2.html">4. Ridge and Lasso Regression</a></li>
+<li class="toctree-l1"><a class="reference internal" href="chapter3.html">5. Resampling Methods</a></li>
+<li class="toctree-l1"><a class="reference internal" href="chapter4.html">6. Logistic Regression</a></li>
+<li class="toctree-l1"><a class="reference internal" href="chapteroptimization.html">7. Optimization, the central part of any Machine Learning algortithm</a></li>
+<li class="toctree-l1"><a class="reference internal" href="chapter5.html">8. Support Vector Machines, overarching aims</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Decision Trees, Ensemble Methods and Boosting</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="chapter6.html">9. Decision trees, overarching aims</a></li>
+<li class="toctree-l1"><a class="reference internal" href="chapter7.html">10. Ensemble Methods: From a Single Tree to Many Trees and Extreme Boosting, Meet the Jungle of Methods</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Dimensionality Reduction</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="chapter8.html">11. Basic ideas of the Principal Component Analysis (PCA)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="clustering.html">12. Clustering and Unsupervised Learning</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Deep Learning Methods</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="chapter9.html">13. Neural networks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="chapter10.html">14. Building a Feed Forward Neural Network</a></li>
+<li class="toctree-l1"><a class="reference internal" href="chapter11.html">15. Solving Differential Equations  with Deep Learning</a></li>
+<li class="toctree-l1"><a class="reference internal" href="chapter12.html">16. Convolutional Neural Networks</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">17. Recurrent neural networks: Overarching view</a></li>
+
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Weekly material, notes and exercises</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="exercisesweek34.html">Exercises week 34</a></li>
+<li class="toctree-l1"><a class="reference internal" href="week34.html">Week 34: Introduction to the course, Logistics and Practicalities</a></li>
+<li class="toctree-l1"><a class="reference internal" href="exercisesweek35.html">Exercises week 35</a></li>
+<li class="toctree-l1"><a class="reference internal" href="week35.html">Week 35: From Ordinary Linear Regression to Ridge and Lasso Regression</a></li>
+<li class="toctree-l1"><a class="reference internal" href="exercisesweek36.html">Exercises week 36</a></li>
+<li class="toctree-l1"><a class="reference internal" href="week36.html">Week 36: Linear Regression and Gradient descent</a></li>
+<li class="toctree-l1"><a class="reference internal" href="exercisesweek37.html">Exercises week 37</a></li>
+<li class="toctree-l1"><a class="reference internal" href="week37.html">Week 37: Gradient descent methods</a></li>
+<li class="toctree-l1"><a class="reference internal" href="exercisesweek38.html">Exercises week 38</a></li>
+<li class="toctree-l1"><a class="reference internal" href="week38.html">Week 38: Statistical analysis, bias-variance tradeoff and resampling methods</a></li>
+<li class="toctree-l1"><a class="reference internal" href="exercisesweek39.html">Exercises week 39</a></li>
+<li class="toctree-l1"><a class="reference internal" href="week39.html">Week 39: Resampling methods and logistic regression</a></li>
+<li class="toctree-l1"><a class="reference internal" href="week40.html">Week 40: Gradient descent methods (continued) and start Neural networks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="week41.html">Week 41 Neural networks and constructing a neural network code</a></li>
+<li class="toctree-l1"><a class="reference internal" href="exercisesweek41.html">Exercises week 41</a></li>
+
+
+
+
+
+
+
+
+<li class="toctree-l1"><a class="reference internal" href="week42.html">Week 42 Constructing a Neural Network code with examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="exercisesweek42.html">Exercises week 42</a></li>
+
+
+
+
+
+
+
+
+
+<li class="toctree-l1"><a class="reference internal" href="week43.html">Week 43: Deep Learning: Constructing a Neural Network code and solving differential equations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="exercisesweek43.html">Exercises week 43</a></li>
+
+<li class="toctree-l1"><a class="reference internal" href="week44.html">Week 44,  Solving differential equations with neural networks and start Convolutional Neural Networks (CNN)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="exercisesweek44.html">Exercises week 44</a></li>
+
+<li class="toctree-l1"><a class="reference internal" href="week45.html">Week 45,  Convolutional Neural Networks (CCNs)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="week46.html">Week 46: Decision Trees, Ensemble methods  and Random Forests</a></li>
+<li class="toctree-l1"><a class="reference internal" href="week47.html">Week 47: Recurrent neural networks and Autoencoders</a></li>
+<li class="toctree-l1"><a class="reference internal" href="exercisesweek47.html">Exercise week 47-48</a></li>
+
+<li class="toctree-l1"><a class="reference internal" href="week48.html">Week 48: Autoencoders and summary of course</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Projects</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="project1.html">Project 1 on Machine Learning, deadline October 6 (midnight), 2025</a></li>
+<li class="toctree-l1"><a class="reference internal" href="project2.html">Project 2 on Machine Learning, deadline November 10 (Midnight)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="project3.html">Project 3 on Machine Learning, deadline December 15 (midnight), 2025</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="_sources/chapter13.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm pst-navbar-icon search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Recurrent neural networks: Overarching view</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#">17. Recurrent neural networks: Overarching view</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#a-simple-example">17.1. A simple example</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#an-extrapolation-example">17.2. An extrapolation example</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#predicting-new-points-with-a-trained-recurrent-neural-network">17.3. Predicting New Points With A Trained Recurrent Neural Network</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#other-types-of-recurrent-neural-networks">17.4. Other Types of Recurrent Neural Networks</a></li>
+</ul>
+</li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#generative-models">18. Generative Models</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#generative-adversarial-networks">18.1. Generative Adversarial Networks</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#writing-our-first-generative-adversarial-network">18.2. Writing Our First Generative Adversarial Network</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mnist-and-gans">18.2.1. MNIST and GANs</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <!-- HTML file automatically generated from DocOnce source (https://github.com/doconce/doconce/)
+doconce format html chapter13.do.txt  --><section class="tex2jax_ignore mathjax_ignore" id="recurrent-neural-networks-overarching-view">
+<h1><span class="section-number">17. </span>Recurrent neural networks: Overarching view<a class="headerlink" href="#recurrent-neural-networks-overarching-view" title="Link to this heading">#</a></h1>
+<p>Till now our focus has been, including convolutional neural networks
+as well, on feedforward neural networks. The output or the activations
+flow only in one direction, from the input layer to the output layer.</p>
+<p>A recurrent neural network (RNN) looks very much like a feedforward
+neural network, except that it also has connections pointing
+backward.</p>
+<p>RNNs are used to analyze time series data such as stock prices, and
+tell you when to buy or sell. In autonomous driving systems, they can
+anticipate car trajectories and help avoid accidents. More generally,
+they can work on sequences of arbitrary lengths, rather than on
+fixed-sized inputs like all the nets we have discussed so far. For
+example, they can take sentences, documents, or audio samples as
+input, making them extremely useful for natural language processing
+systems such as automatic translation and speech-to-text.</p>
+<p>More to text to be added</p>
+<section id="a-simple-example">
+<h2><span class="section-number">17.1. </span>A simple example<a class="headerlink" href="#a-simple-example" title="Link to this heading">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>%matplotlib inline
+
+# Start importing packages
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import tensorflow as tf
+from tensorflow.keras import datasets, layers, models
+from tensorflow.keras.layers import Input
+from tensorflow.keras.models import Model, Sequential 
+from tensorflow.keras.layers import Dense, SimpleRNN, LSTM, GRU
+from tensorflow.keras import optimizers     
+from tensorflow.keras import regularizers           
+from tensorflow.keras.utils import to_categorical 
+
+
+
+# convert into dataset matrix
+def convertToMatrix(data, step):
+ X, Y =[], []
+ for i in range(len(data)-step):
+  d=i+step  
+  X.append(data[i:d,])
+  Y.append(data[d,])
+ return np.array(X), np.array(Y)
+
+step = 4
+N = 1000    
+Tp = 800    
+
+t=np.arange(0,N)
+x=np.sin(0.02*t)+2*np.random.rand(N)
+df = pd.DataFrame(x)
+df.head()
+
+plt.plot(df)
+plt.show()
+
+values=df.values
+train,test = values[0:Tp,:], values[Tp:N,:]
+
+# add step elements into train and test
+test = np.append(test,np.repeat(test[-1,],step))
+train = np.append(train,np.repeat(train[-1,],step))
+ 
+trainX,trainY =convertToMatrix(train,step)
+testX,testY =convertToMatrix(test,step)
+trainX = np.reshape(trainX, (trainX.shape[0], 1, trainX.shape[1]))
+testX = np.reshape(testX, (testX.shape[0], 1, testX.shape[1]))
+
+model = Sequential()
+model.add(SimpleRNN(units=32, input_shape=(1,step), activation=&quot;relu&quot;))
+model.add(Dense(8, activation=&quot;relu&quot;)) 
+model.add(Dense(1))
+model.compile(loss=&#39;mean_squared_error&#39;, optimizer=&#39;rmsprop&#39;)
+model.summary()
+
+model.fit(trainX,trainY, epochs=100, batch_size=16, verbose=2)
+trainPredict = model.predict(trainX)
+testPredict= model.predict(testX)
+predicted=np.concatenate((trainPredict,testPredict),axis=0)
+
+trainScore = model.evaluate(trainX, trainY, verbose=0)
+print(trainScore)
+
+index = df.index.values
+plt.plot(index,df)
+plt.plot(index,predicted)
+plt.axvline(df.index[Tp], c=&quot;r&quot;)
+plt.show()
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="an-extrapolation-example">
+<h2><span class="section-number">17.2. </span>An extrapolation example<a class="headerlink" href="#an-extrapolation-example" title="Link to this heading">#</a></h2>
+<p>The following code provides an example of how recurrent neural
+networks can be used to extrapolate to unknown values of physics data
+sets.  Specifically, the data sets used in this program come from
+a quantum mechanical many-body calculation of energies as functions of the number of particles.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>
+# For matrices and calculations
+import numpy as np
+# For machine learning (backend for keras)
+import tensorflow as tf
+# User-friendly machine learning library
+# Front end for TensorFlow
+import tensorflow.keras
+# Different methods from Keras needed to create an RNN
+# This is not necessary but it shortened function calls 
+# that need to be used in the code.
+from tensorflow.keras import datasets, layers, models
+from tensorflow.keras.layers import Input
+from tensorflow.keras import regularizers
+from tensorflow.keras.models import Model, Sequential
+from tensorflow.keras.layers import Dense, SimpleRNN, LSTM, GRU
+# For timing the code
+from timeit import default_timer as timer
+# For plotting
+import matplotlib.pyplot as plt
+
+
+# The data set
+datatype=&#39;VaryDimension&#39;
+X_tot = np.arange(2, 42, 2)
+y_tot = np.array([-0.03077640549, -0.08336233266, -0.1446729567, -0.2116753732, -0.2830637392, -0.3581341341, -0.436462435, -0.5177783846,
+	-0.6019067271, -0.6887363571, -0.7782028952, -0.8702784034, -0.9649652536, -1.062292565, -1.16231451, 
+	-1.265109911, -1.370782966, -1.479465113, -1.591317992, -1.70653767])
+</pre></div>
+</div>
+</div>
+</div>
+<p>The way the recurrent neural networks are trained in this program
+differs from how machine learning algorithms are usually trained.
+Typically a machine learning algorithm is trained by learning the
+relationship between the x data and the y data.  In this program, the
+recurrent neural network will be trained to recognize the relationship
+in a sequence of y values.  This is type of data formatting is
+typically used time series forcasting, but it can also be used in any
+extrapolation (time series forecasting is just a specific type of
+extrapolation along the time axis).  This method of data formatting
+does not use the x data and assumes that the y data are evenly spaced.</p>
+<p>For a standard machine learning algorithm, the training data has the
+form of (x,y) so the machine learning algorithm learns to assiciate a
+y value with a given x value.  This is useful when the test data has x
+values within the same range as the training data.  However, for this
+application, the x values of the test data are outside of the x values
+of the training data and the traditional method of training a machine
+learning algorithm does not work as well.  For this reason, the
+recurrent neural network is trained on sequences of y values of the
+form ((y1, y2), y3), so that the network is concerned with learning
+the pattern of the y data and not the relation between the x and y
+data.  As long as the pattern of y data outside of the training region
+stays relatively stable compared to what was inside the training
+region, this method of training can produce accurate extrapolations to
+y values far removed from the training data set.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span># FORMAT_DATA
+def format_data(data, length_of_sequence = 2):  
+    &quot;&quot;&quot;
+        Inputs:
+            data(a numpy array): the data that will be the inputs to the recurrent neural
+                network
+            length_of_sequence (an int): the number of elements in one iteration of the
+                sequence patter.  For a function approximator use length_of_sequence = 2.
+        Returns:
+            rnn_input (a 3D numpy array): the input data for the recurrent neural network.  Its
+                dimensions are length of data - length of sequence, length of sequence, 
+                dimnsion of data
+            rnn_output (a numpy array): the training data for the neural network
+        Formats data to be used in a recurrent neural network.
+    &quot;&quot;&quot;
+
+    X, Y = [], []
+    for i in range(len(data)-length_of_sequence):
+        # Get the next length_of_sequence elements
+        a = data[i:i+length_of_sequence]
+        # Get the element that immediately follows that
+        b = data[i+length_of_sequence]
+        # Reshape so that each data point is contained in its own array
+        a = np.reshape (a, (len(a), 1))
+        X.append(a)
+        Y.append(b)
+    rnn_input = np.array(X)
+    rnn_output = np.array(Y)
+
+    return rnn_input, rnn_output
+
+
+# ## Defining the Recurrent Neural Network Using Keras
+# 
+# The following method defines a simple recurrent neural network in keras consisting of one input layer, one hidden layer, and one output layer.
+
+def rnn(length_of_sequences, batch_size = None, stateful = False):
+    &quot;&quot;&quot;
+        Inputs:
+            length_of_sequences (an int): the number of y values in &quot;x data&quot;.  This is determined
+                when the data is formatted
+            batch_size (an int): Default value is None.  See Keras documentation of SimpleRNN.
+            stateful (a boolean): Default value is False.  See Keras documentation of SimpleRNN.
+        Returns:
+            model (a Keras model): The recurrent neural network that is built and compiled by this
+                method
+        Builds and compiles a recurrent neural network with one hidden layer and returns the model.
+    &quot;&quot;&quot;
+    # Number of neurons in the input and output layers
+    in_out_neurons = 1
+    # Number of neurons in the hidden layer
+    hidden_neurons = 200
+    # Define the input layer
+    inp = Input(batch_shape=(batch_size, 
+                length_of_sequences, 
+                in_out_neurons))  
+    # Define the hidden layer as a simple RNN layer with a set number of neurons and add it to 
+    # the network immediately after the input layer
+    rnn = SimpleRNN(hidden_neurons, 
+                    return_sequences=False,
+                    stateful = stateful,
+                    name=&quot;RNN&quot;)(inp)
+    # Define the output layer as a dense neural network layer (standard neural network layer)
+    #and add it to the network immediately after the hidden layer.
+    dens = Dense(in_out_neurons,name=&quot;dense&quot;)(rnn)
+    # Create the machine learning model starting with the input layer and ending with the 
+    # output layer
+    model = Model(inputs=[inp],outputs=[dens])
+    # Compile the machine learning model using the mean squared error function as the loss 
+    # function and an Adams optimizer.
+    model.compile(loss=&quot;mean_squared_error&quot;, optimizer=&quot;adam&quot;)  
+    return model
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="predicting-new-points-with-a-trained-recurrent-neural-network">
+<h2><span class="section-number">17.3. </span>Predicting New Points With A Trained Recurrent Neural Network<a class="headerlink" href="#predicting-new-points-with-a-trained-recurrent-neural-network" title="Link to this heading">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>def test_rnn (x1, y_test, plot_min, plot_max):
+    &quot;&quot;&quot;
+        Inputs:
+            x1 (a list or numpy array): The complete x component of the data set
+            y_test (a list or numpy array): The complete y component of the data set
+            plot_min (an int or float): the smallest x value used in the training data
+            plot_max (an int or float): the largest x valye used in the training data
+        Returns:
+            None.
+        Uses a trained recurrent neural network model to predict future points in the 
+        series.  Computes the MSE of the predicted data set from the true data set, saves
+        the predicted data set to a csv file, and plots the predicted and true data sets w
+        while also displaying the data range used for training.
+    &quot;&quot;&quot;
+    # Add the training data as the first dim points in the predicted data array as these
+    # are known values.
+    y_pred = y_test[:dim].tolist()
+    # Generate the first input to the trained recurrent neural network using the last two 
+    # points of the training data.  Based on how the network was trained this means that it
+    # will predict the first point in the data set after the training data.  All of the 
+    # brackets are necessary for Tensorflow.
+    next_input = np.array([[[y_test[dim-2]], [y_test[dim-1]]]])
+    # Save the very last point in the training data set.  This will be used later.
+    last = [y_test[dim-1]]
+
+    # Iterate until the complete data set is created.
+    for i in range (dim, len(y_test)):
+        # Predict the next point in the data set using the previous two points.
+        next = model.predict(next_input)
+        # Append just the number of the predicted data set
+        y_pred.append(next[0][0])
+        # Create the input that will be used to predict the next data point in the data set.
+        next_input = np.array([[last, next[0]]], dtype=np.float64)
+        last = next
+
+    # Print the mean squared error between the known data set and the predicted data set.
+    print(&#39;MSE: &#39;, np.square(np.subtract(y_test, y_pred)).mean())
+    # Save the predicted data set as a csv file for later use
+    name = datatype + &#39;Predicted&#39;+str(dim)+&#39;.csv&#39;
+    np.savetxt(name, y_pred, delimiter=&#39;,&#39;)
+    # Plot the known data set and the predicted data set.  The red box represents the region that was used
+    # for the training data.
+    fig, ax = plt.subplots()
+    ax.plot(x1, y_test, label=&quot;true&quot;, linewidth=3)
+    ax.plot(x1, y_pred, &#39;g-.&#39;,label=&quot;predicted&quot;, linewidth=4)
+    ax.legend()
+    # Created a red region to represent the points used in the training data.
+    ax.axvspan(plot_min, plot_max, alpha=0.25, color=&#39;red&#39;)
+    plt.show()
+
+# Check to make sure the data set is complete
+assert len(X_tot) == len(y_tot)
+
+# This is the number of points that will be used in as the training data
+dim=12
+
+# Separate the training data from the whole data set
+X_train = X_tot[:dim]
+y_train = y_tot[:dim]
+
+
+# Generate the training data for the RNN, using a sequence of 2
+rnn_input, rnn_training = format_data(y_train, 2)
+
+
+# Create a recurrent neural network in Keras and produce a summary of the 
+# machine learning model
+model = rnn(length_of_sequences = rnn_input.shape[1])
+model.summary()
+
+# Start the timer.  Want to time training+testing
+start = timer()
+# Fit the model using the training data genenerated above using 150 training iterations and a 5%
+# validation split.  Setting verbose to True prints information about each training iteration.
+hist = model.fit(rnn_input, rnn_training, batch_size=None, epochs=150, 
+                 verbose=True,validation_split=0.05)
+
+for label in [&quot;loss&quot;,&quot;val_loss&quot;]:
+    plt.plot(hist.history[label],label=label)
+
+plt.ylabel(&quot;loss&quot;)
+plt.xlabel(&quot;epoch&quot;)
+plt.title(&quot;The final validation loss: {}&quot;.format(hist.history[&quot;val_loss&quot;][-1]))
+plt.legend()
+plt.show()
+
+# Use the trained neural network to predict more points of the data set
+test_rnn(X_tot, y_tot, X_tot[0], X_tot[dim-1])
+# Stop the timer and calculate the total time needed.
+end = timer()
+print(&#39;Time: &#39;, end-start)
+</pre></div>
+</div>
+</div>
+</div>
+<p>Changing the size of the recurrent neural network and its parameters
+can drastically change the results you get from the model.  The below
+code takes the simple recurrent neural network from above and adds a
+second hidden layer, changes the number of neurons in the hidden
+layer, and explicitly declares the activation function of the hidden
+layers to be a sigmoid function.  The loss function and optimizer can
+also be changed but are kept the same as the above network.  These
+parameters can be tuned to provide the optimal result from the
+network.  For some ideas on how to improve the performance of a
+<a class="reference external" href="https://danijar.com/tips-for-training-recurrent-neural-networks">recurrent neural network</a>.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>def rnn_2layers(length_of_sequences, batch_size = None, stateful = False):
+    &quot;&quot;&quot;
+        Inputs:
+            length_of_sequences (an int): the number of y values in &quot;x data&quot;.  This is determined
+                when the data is formatted
+            batch_size (an int): Default value is None.  See Keras documentation of SimpleRNN.
+            stateful (a boolean): Default value is False.  See Keras documentation of SimpleRNN.
+        Returns:
+            model (a Keras model): The recurrent neural network that is built and compiled by this
+                method
+        Builds and compiles a recurrent neural network with two hidden layers and returns the model.
+    &quot;&quot;&quot;
+    # Number of neurons in the input and output layers
+    in_out_neurons = 1
+    # Number of neurons in the hidden layer, increased from the first network
+    hidden_neurons = 500
+    # Define the input layer
+    inp = Input(batch_shape=(batch_size, 
+                length_of_sequences, 
+                in_out_neurons))  
+    # Create two hidden layers instead of one hidden layer.  Explicitly set the activation
+    # function to be the sigmoid function (the default value is hyperbolic tangent)
+    rnn1 = SimpleRNN(hidden_neurons, 
+                    return_sequences=True,  # This needs to be True if another hidden layer is to follow
+                    stateful = stateful, activation = &#39;sigmoid&#39;,
+                    name=&quot;RNN1&quot;)(inp)
+    rnn2 = SimpleRNN(hidden_neurons, 
+                    return_sequences=False, activation = &#39;sigmoid&#39;,
+                    stateful = stateful,
+                    name=&quot;RNN2&quot;)(rnn1)
+    # Define the output layer as a dense neural network layer (standard neural network layer)
+    #and add it to the network immediately after the hidden layer.
+    dens = Dense(in_out_neurons,name=&quot;dense&quot;)(rnn2)
+    # Create the machine learning model starting with the input layer and ending with the 
+    # output layer
+    model = Model(inputs=[inp],outputs=[dens])
+    # Compile the machine learning model using the mean squared error function as the loss 
+    # function and an Adams optimizer.
+    model.compile(loss=&quot;mean_squared_error&quot;, optimizer=&quot;adam&quot;)  
+    return model
+
+# Check to make sure the data set is complete
+assert len(X_tot) == len(y_tot)
+
+# This is the number of points that will be used in as the training data
+dim=12
+
+# Separate the training data from the whole data set
+X_train = X_tot[:dim]
+y_train = y_tot[:dim]
+
+
+# Generate the training data for the RNN, using a sequence of 2
+rnn_input, rnn_training = format_data(y_train, 2)
+
+
+# Create a recurrent neural network in Keras and produce a summary of the 
+# machine learning model
+model = rnn_2layers(length_of_sequences = 2)
+model.summary()
+
+# Start the timer.  Want to time training+testing
+start = timer()
+# Fit the model using the training data genenerated above using 150 training iterations and a 5%
+# validation split.  Setting verbose to True prints information about each training iteration.
+hist = model.fit(rnn_input, rnn_training, batch_size=None, epochs=150, 
+                 verbose=True,validation_split=0.05)
+
+
+# This section plots the training loss and the validation loss as a function of training iteration.
+# This is not required for analyzing the couple cluster data but can help determine if the network is
+# being overtrained.
+for label in [&quot;loss&quot;,&quot;val_loss&quot;]:
+    plt.plot(hist.history[label],label=label)
+
+plt.ylabel(&quot;loss&quot;)
+plt.xlabel(&quot;epoch&quot;)
+plt.title(&quot;The final validation loss: {}&quot;.format(hist.history[&quot;val_loss&quot;][-1]))
+plt.legend()
+plt.show()
+
+# Use the trained neural network to predict more points of the data set
+test_rnn(X_tot, y_tot, X_tot[0], X_tot[dim-1])
+# Stop the timer and calculate the total time needed.
+end = timer()
+print(&#39;Time: &#39;, end-start)
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="other-types-of-recurrent-neural-networks">
+<h2><span class="section-number">17.4. </span>Other Types of Recurrent Neural Networks<a class="headerlink" href="#other-types-of-recurrent-neural-networks" title="Link to this heading">#</a></h2>
+<p>Besides a simple recurrent neural network layer, there are two other
+commonly used types of recurrent neural network layers: Long Short
+Term Memory (LSTM) and Gated Recurrent Unit (GRU).  For a short
+introduction to these layers see <a class="reference external" href="https://medium.com/mindboard/lstm-vs-gru-experimental-comparison-955820c21e8b">https://medium.com/mindboard/lstm-vs-gru-experimental-comparison-955820c21e8b</a>
+and <a class="reference external" href="https://medium.com/mindboard/lstm-vs-gru-experimental-comparison-955820c21e8b">https://medium.com/mindboard/lstm-vs-gru-experimental-comparison-955820c21e8b</a>.</p>
+<p>The first network created below is similar to the previous network,
+but it replaces the SimpleRNN layers with LSTM layers.  The second
+network below has two hidden layers made up of GRUs, which are
+preceeded by two dense (feeddorward) neural network layers.  These
+dense layers “preprocess” the data before it reaches the recurrent
+layers.  This architecture has been shown to improve the performance
+of recurrent neural networks (see the link above and also
+<a class="reference external" href="https://arxiv.org/pdf/1807.02857.pdf">https://arxiv.org/pdf/1807.02857.pdf</a>.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>def lstm_2layers(length_of_sequences, batch_size = None, stateful = False):
+    &quot;&quot;&quot;
+        Inputs:
+            length_of_sequences (an int): the number of y values in &quot;x data&quot;.  This is determined
+                when the data is formatted
+            batch_size (an int): Default value is None.  See Keras documentation of SimpleRNN.
+            stateful (a boolean): Default value is False.  See Keras documentation of SimpleRNN.
+        Returns:
+            model (a Keras model): The recurrent neural network that is built and compiled by this
+                method
+        Builds and compiles a recurrent neural network with two LSTM hidden layers and returns the model.
+    &quot;&quot;&quot;
+    # Number of neurons on the input/output layer and the number of neurons in the hidden layer
+    in_out_neurons = 1
+    hidden_neurons = 250
+    # Input Layer
+    inp = Input(batch_shape=(batch_size, 
+                length_of_sequences, 
+                in_out_neurons)) 
+    # Hidden layers (in this case they are LSTM layers instead if SimpleRNN layers)
+    rnn= LSTM(hidden_neurons, 
+                    return_sequences=True,
+                    stateful = stateful,
+                    name=&quot;RNN&quot;, use_bias=True, activation=&#39;tanh&#39;)(inp)
+    rnn1 = LSTM(hidden_neurons, 
+                    return_sequences=False,
+                    stateful = stateful,
+                    name=&quot;RNN1&quot;, use_bias=True, activation=&#39;tanh&#39;)(rnn)
+    # Output layer
+    dens = Dense(in_out_neurons,name=&quot;dense&quot;)(rnn1)
+    # Define the midel
+    model = Model(inputs=[inp],outputs=[dens])
+    # Compile the model
+    model.compile(loss=&#39;mean_squared_error&#39;, optimizer=&#39;adam&#39;)  
+    # Return the model
+    return model
+
+def dnn2_gru2(length_of_sequences, batch_size = None, stateful = False):
+    &quot;&quot;&quot;
+        Inputs:
+            length_of_sequences (an int): the number of y values in &quot;x data&quot;.  This is determined
+                when the data is formatted
+            batch_size (an int): Default value is None.  See Keras documentation of SimpleRNN.
+            stateful (a boolean): Default value is False.  See Keras documentation of SimpleRNN.
+        Returns:
+            model (a Keras model): The recurrent neural network that is built and compiled by this
+                method
+        Builds and compiles a recurrent neural network with four hidden layers (two dense followed by
+        two GRU layers) and returns the model.
+    &quot;&quot;&quot;    
+    # Number of neurons on the input/output layers and hidden layers
+    in_out_neurons = 1
+    hidden_neurons = 250
+    # Input layer
+    inp = Input(batch_shape=(batch_size, 
+                length_of_sequences, 
+                in_out_neurons)) 
+    # Hidden Dense (feedforward) layers
+    dnn = Dense(hidden_neurons/2, activation=&#39;relu&#39;, name=&#39;dnn&#39;)(inp)
+    dnn1 = Dense(hidden_neurons/2, activation=&#39;relu&#39;, name=&#39;dnn1&#39;)(dnn)
+    # Hidden GRU layers
+    rnn1 = GRU(hidden_neurons, 
+                    return_sequences=True,
+                    stateful = stateful,
+                    name=&quot;RNN1&quot;, use_bias=True)(dnn1)
+    rnn = GRU(hidden_neurons, 
+                    return_sequences=False,
+                    stateful = stateful,
+                    name=&quot;RNN&quot;, use_bias=True)(rnn1)
+    # Output layer
+    dens = Dense(in_out_neurons,name=&quot;dense&quot;)(rnn)
+    # Define the model
+    model = Model(inputs=[inp],outputs=[dens])
+    # Compile the mdoel
+    model.compile(loss=&#39;mean_squared_error&#39;, optimizer=&#39;adam&#39;)  
+    # Return the model
+    return model
+
+# Check to make sure the data set is complete
+assert len(X_tot) == len(y_tot)
+
+# This is the number of points that will be used in as the training data
+dim=12
+
+# Separate the training data from the whole data set
+X_train = X_tot[:dim]
+y_train = y_tot[:dim]
+
+
+# Generate the training data for the RNN, using a sequence of 2
+rnn_input, rnn_training = format_data(y_train, 2)
+
+
+# Create a recurrent neural network in Keras and produce a summary of the 
+# machine learning model
+# Change the method name to reflect which network you want to use
+model = dnn2_gru2(length_of_sequences = 2)
+model.summary()
+
+# Start the timer.  Want to time training+testing
+start = timer()
+# Fit the model using the training data genenerated above using 150 training iterations and a 5%
+# validation split.  Setting verbose to True prints information about each training iteration.
+hist = model.fit(rnn_input, rnn_training, batch_size=None, epochs=150, 
+                 verbose=True,validation_split=0.05)
+
+
+# This section plots the training loss and the validation loss as a function of training iteration.
+# This is not required for analyzing the couple cluster data but can help determine if the network is
+# being overtrained.
+for label in [&quot;loss&quot;,&quot;val_loss&quot;]:
+    plt.plot(hist.history[label],label=label)
+
+plt.ylabel(&quot;loss&quot;)
+plt.xlabel(&quot;epoch&quot;)
+plt.title(&quot;The final validation loss: {}&quot;.format(hist.history[&quot;val_loss&quot;][-1]))
+plt.legend()
+plt.show()
+
+# Use the trained neural network to predict more points of the data set
+test_rnn(X_tot, y_tot, X_tot[0], X_tot[dim-1])
+# Stop the timer and calculate the total time needed.
+end = timer()
+print(&#39;Time: &#39;, end-start)
+
+
+# ### Training Recurrent Neural Networks in the Standard Way (i.e. learning the relationship between the X and Y data)
+# 
+# Finally, comparing the performace of a recurrent neural network using the standard data formatting to the performance of the network with time sequence data formatting shows the benefit of this type of data formatting with extrapolation.
+
+# Check to make sure the data set is complete
+assert len(X_tot) == len(y_tot)
+
+# This is the number of points that will be used in as the training data
+dim=12
+
+# Separate the training data from the whole data set
+X_train = X_tot[:dim]
+y_train = y_tot[:dim]
+
+# Reshape the data for Keras specifications
+X_train = X_train.reshape((dim, 1))
+y_train = y_train.reshape((dim, 1))
+
+
+# Create a recurrent neural network in Keras and produce a summary of the 
+# machine learning model
+# Set the sequence length to 1 for regular data formatting 
+model = rnn(length_of_sequences = 1)
+model.summary()
+
+# Start the timer.  Want to time training+testing
+start = timer()
+# Fit the model using the training data genenerated above using 150 training iterations and a 5%
+# validation split.  Setting verbose to True prints information about each training iteration.
+hist = model.fit(X_train, y_train, batch_size=None, epochs=150, 
+                 verbose=True,validation_split=0.05)
+
+
+# This section plots the training loss and the validation loss as a function of training iteration.
+# This is not required for analyzing the couple cluster data but can help determine if the network is
+# being overtrained.
+for label in [&quot;loss&quot;,&quot;val_loss&quot;]:
+    plt.plot(hist.history[label],label=label)
+
+plt.ylabel(&quot;loss&quot;)
+plt.xlabel(&quot;epoch&quot;)
+plt.title(&quot;The final validation loss: {}&quot;.format(hist.history[&quot;val_loss&quot;][-1]))
+plt.legend()
+plt.show()
+
+# Use the trained neural network to predict the remaining data points
+X_pred = X_tot[dim:]
+X_pred = X_pred.reshape((len(X_pred), 1))
+y_model = model.predict(X_pred)
+y_pred = np.concatenate((y_tot[:dim], y_model.flatten()))
+
+# Plot the known data set and the predicted data set.  The red box represents the region that was used
+# for the training data.
+fig, ax = plt.subplots()
+ax.plot(X_tot, y_tot, label=&quot;true&quot;, linewidth=3)
+ax.plot(X_tot, y_pred, &#39;g-.&#39;,label=&quot;predicted&quot;, linewidth=4)
+ax.legend()
+# Created a red region to represent the points used in the training data.
+ax.axvspan(X_tot[0], X_tot[dim], alpha=0.25, color=&#39;red&#39;)
+plt.show()
+
+# Stop the timer and calculate the total time needed.
+end = timer()
+print(&#39;Time: &#39;, end-start)
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section class="tex2jax_ignore mathjax_ignore" id="generative-models">
+<h1><span class="section-number">18. </span>Generative Models<a class="headerlink" href="#generative-models" title="Link to this heading">#</a></h1>
+<p><strong>Generative models</strong> describe a class of statistical models that are a contrast
+to <strong>discriminative models</strong>. Informally we say that generative models can
+generate new data instances while discriminative models discriminate between
+different kinds of data instances. A generative model could generate new photos
+of animals that look like ‘real’ animals while a discriminative model could tell
+a dog from a cat. More formally, given a data set <span class="math notranslate nohighlight">\(x\)</span> and a set of labels /
+targets <span class="math notranslate nohighlight">\(y\)</span>. Generative models capture the joint probability <span class="math notranslate nohighlight">\(p(x, y)\)</span>, or
+just <span class="math notranslate nohighlight">\(p(x)\)</span> if there are no labels, while discriminative models capture the
+conditional probability <span class="math notranslate nohighlight">\(p(y | x)\)</span>. Discriminative models generally try to draw
+boundaries in the data space (often high dimensional), while generative models
+try to model how data is placed throughout the space.</p>
+<p><strong>Note</strong>: this material is thanks to Linus Ekstrøm.</p>
+<section id="generative-adversarial-networks">
+<h2><span class="section-number">18.1. </span>Generative Adversarial Networks<a class="headerlink" href="#generative-adversarial-networks" title="Link to this heading">#</a></h2>
+<p><strong>Generative Adversarial Networks</strong> are a type of unsupervised machine learning
+algorithm proposed by <a class="reference external" href="https://arxiv.org/pdf/1406.2661.pdf">Goodfellow et. al</a>
+in 2014 (short and good article).</p>
+<p>The simplest formulation of
+the model is based on a game theoretic approach, <em>zero sum game</em>, where we pit
+two neural networks against one another. We define two rival networks, one
+generator <span class="math notranslate nohighlight">\(g\)</span>, and one discriminator <span class="math notranslate nohighlight">\(d\)</span>. The generator directly produces
+samples</p>
+<!-- Equation labels as ordinary links -->
+<div id="_auto1"></div>
+<div class="math notranslate nohighlight">
+\[
+\begin{equation}
+    x = g(z; \theta^{(g)})
+\label{_auto1} \tag{1}
+\end{equation}
+\]</div>
+<p>The discriminator attempts to distinguish between samples drawn from the
+training data and samples drawn from the generator. In other words, it tries to
+tell the difference between the fake data produced by <span class="math notranslate nohighlight">\(g\)</span> and the actual data
+samples we want to do prediction on. The discriminator outputs a probability
+value given by</p>
+<!-- Equation labels as ordinary links -->
+<div id="_auto2"></div>
+<div class="math notranslate nohighlight">
+\[
+\begin{equation}
+    d(x; \theta^{(d)})
+\label{_auto2} \tag{2}
+\end{equation}
+\]</div>
+<p>indicating the probability that <span class="math notranslate nohighlight">\(x\)</span> is a real training example rather than a
+fake sample the generator has generated. The simplest way to formulate the
+learning process in a generative adversarial network is a zero-sum game, in
+which a function</p>
+<!-- Equation labels as ordinary links -->
+<div id="_auto3"></div>
+<div class="math notranslate nohighlight">
+\[
+\begin{equation}
+    v(\theta^{(g)}, \theta^{(d)})
+\label{_auto3} \tag{3}
+\end{equation}
+\]</div>
+<p>determines the reward for the discriminator, while the generator gets the
+conjugate reward</p>
+<!-- Equation labels as ordinary links -->
+<div id="_auto4"></div>
+<div class="math notranslate nohighlight">
+\[
+\begin{equation}
+    -v(\theta^{(g)}, \theta^{(d)})
+\label{_auto4} \tag{4}
+\end{equation}
+\]</div>
+<p>During learning both of the networks maximize their own reward function, so that
+the generator gets better and better at tricking the discriminator, while the
+discriminator gets better and better at telling the difference between the fake
+and real data. The generator and discriminator alternate on which one trains at
+one time (i.e. for one epoch). In other words, we keep the generator constant
+and train the discriminator, then we keep the discriminator constant to train
+the generator and repeat. It is this back and forth dynamic which lets GANs
+tackle otherwise intractable generative problems. As the generator improves with
+training, the discriminator’s performance gets worse because it cannot easily
+tell the difference between real and fake. If the generator ends up succeeding
+perfectly, the the discriminator will do no better than random guessing i.e.
+50%. This progression in the training poses a problem for the convergence
+criteria for GANs. The discriminator feedback gets less meaningful over time,
+if we continue training after this point then the generator is effectively
+training on junk data which can undo the learning up to that point. Therefore,
+we stop training when the discriminator starts outputting <span class="math notranslate nohighlight">\(1/2\)</span> everywhere.</p>
+<p>At convergence we have</p>
+<!-- Equation labels as ordinary links -->
+<div id="_auto5"></div>
+<div class="math notranslate nohighlight">
+\[
+\begin{equation}
+    g^* = \underset{g}{\mathrm{argmin}}\hspace{2pt}
+          \underset{d}{\mathrm{max}}v(\theta^{(g)}, \theta^{(d)})
+\label{_auto5} \tag{5}
+\end{equation}
+\]</div>
+<p>The default choice for <span class="math notranslate nohighlight">\(v\)</span> is</p>
+<!-- Equation labels as ordinary links -->
+<div id="_auto6"></div>
+<div class="math notranslate nohighlight">
+\[
+\begin{equation}
+    v(\theta^{(g)}, \theta^{(d)}) = \mathbb{E}_{x\sim p_\mathrm{data}}\log d(x)
+                                  + \mathbb{E}_{x\sim p_\mathrm{model}}
+                                  \log (1 - d(x))
+\label{_auto6} \tag{6}
+\end{equation}
+\]</div>
+<p>The main motivation for the design of GANs is that the learning process requires
+neither approximate inference (variational autoencoders for example) nor
+approximation of a partition function. In the case where</p>
+<!-- Equation labels as ordinary links -->
+<div id="_auto7"></div>
+<div class="math notranslate nohighlight">
+\[
+\begin{equation}
+    \underset{d}{\mathrm{max}}v(\theta^{(g)}, \theta^{(d)})
+\label{_auto7} \tag{7}
+\end{equation}
+\]</div>
+<p>is convex in $\theta^{(g)} then the procedure is guaranteed to converge and is
+asymptotically consistent
+( <a class="reference external" href="https://arxiv.org/pdf/1804.09139.pdf">Seth Lloyd on QuGANs</a>  ).</p>
+<p>This is in
+general not the case and it is possible to get situations where the training
+process never converges because the generator and discriminator chase one
+another around in the parameter space indefinitely. A much deeper discussion on
+the currently open research problem of GAN convergence is available
+<a class="reference external" href="https://www.deeplearningbook.org/contents/generative_models.html">here</a>. To
+anyone interested in learning more about GANs it is a highly recommended read.
+Direct quote: “In this best-performing formulation, the generator aims to
+increase the log probability that the discriminator makes a mistake, rather than
+aiming to decrease the log probability that the discriminator makes the correct
+prediction.” <a class="reference external" href="https://arxiv.org/abs/1701.00160">Another interesting read</a></p>
+</section>
+<section id="writing-our-first-generative-adversarial-network">
+<h2><span class="section-number">18.2. </span>Writing Our First Generative Adversarial Network<a class="headerlink" href="#writing-our-first-generative-adversarial-network" title="Link to this heading">#</a></h2>
+<p>Let us now move on to actually implementing a GAN in tensorflow. We will study
+the performance of our GAN on the MNIST dataset. This code is based on and
+adapted from the
+<a class="reference external" href="https://www.tensorflow.org/tutorials/generative/dcgan">google tutorial</a></p>
+<p>First we import our libraries</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>import os
+import time
+import numpy as np
+import tensorflow as tf
+import matplotlib.pyplot as plt
+from tensorflow.keras import layers
+from tensorflow.keras.utils import plot_model
+</pre></div>
+</div>
+</div>
+</div>
+<p>Next we define our hyperparameters and import our data the usual way</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>BUFFER_SIZE = 60000
+BATCH_SIZE = 256
+EPOCHS = 30
+
+data = tf.keras.datasets.mnist.load_data()
+(train_images, train_labels), (test_images, test_labels) = data
+train_images = np.reshape(train_images, (train_images.shape[0],
+                                         28,
+                                         28,
+                                         1)).astype(&#39;float32&#39;)
+
+# we normalize between -1 and 1
+train_images = (train_images - 127.5) / 127.5
+training_dataset = tf.data.Dataset.from_tensor_slices(
+                      train_images).shuffle(BUFFER_SIZE).batch(BATCH_SIZE)
+</pre></div>
+</div>
+</div>
+</div>
+<section id="mnist-and-gans">
+<h3><span class="section-number">18.2.1. </span>MNIST and GANs<a class="headerlink" href="#mnist-and-gans" title="Link to this heading">#</a></h3>
+<p>Let’s have a quick look</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>plt.imshow(train_images[0], cmap=&#39;Greys&#39;)
+plt.show()
+</pre></div>
+</div>
+</div>
+</div>
+<p>Now we define our two models. This is where the ‘magic’ happens. There are a
+huge amount of possible formulations for both models. A lot of engineering and
+trial and error can be done here to try to produce better performing models. For
+more advanced GANs this is by far the step where you can ‘make or break’ a
+model.</p>
+<p>We start with the generator. As stated in the introductory text the generator
+<span class="math notranslate nohighlight">\(g\)</span> upsamples from a random sample to the shape of what we want to predict. In
+our case we are trying to predict MNIST images (<span class="math notranslate nohighlight">\(28\times 28\)</span> pixels).</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>def generator_model():
+    &quot;&quot;&quot;
+    The generator uses upsampling layers tf.keras.layers.Conv2DTranspose() to
+    produce an image from a random seed. We start with a Dense layer taking this
+    random sample as an input and subsequently upsample through multiple
+    convolutional layers.
+    &quot;&quot;&quot;
+
+    # we define our model
+    model = tf.keras.Sequential()
+
+
+    # adding our input layer. Dense means that every neuron is connected and
+    # the input shape is the shape of our random noise. The units need to match
+    # in some sense the upsampling strides to reach our desired output shape.
+    # we are using 100 random numbers as our seed
+    model.add(layers.Dense(units=7*7*BATCH_SIZE,
+                           use_bias=False,
+                           input_shape=(100, )))
+    # we normalize the output form the Dense layer
+    model.add(layers.BatchNormalization())
+    # and add an activation function to our &#39;layer&#39;. LeakyReLU avoids vanishing
+    # gradient problem
+    model.add(layers.LeakyReLU())
+    model.add(layers.Reshape((7, 7, BATCH_SIZE)))
+    assert model.output_shape == (None, 7, 7, BATCH_SIZE)
+    # even though we just added four keras layers we think of everything above
+    # as &#39;one&#39; layer
+
+    # next we add our upscaling convolutional layers
+    model.add(layers.Conv2DTranspose(filters=128,
+                                     kernel_size=(5, 5),
+                                     strides=(1, 1),
+                                     padding=&#39;same&#39;,
+                                     use_bias=False))
+    model.add(layers.BatchNormalization())
+    model.add(layers.LeakyReLU())
+    assert model.output_shape == (None, 7, 7, 128)
+
+    model.add(layers.Conv2DTranspose(filters=64,
+                                     kernel_size=(5, 5),
+                                     strides=(2, 2),
+                                     padding=&#39;same&#39;,
+                                     use_bias=False))
+    model.add(layers.BatchNormalization())
+    model.add(layers.LeakyReLU())
+    assert model.output_shape == (None, 14, 14, 64)
+
+    model.add(layers.Conv2DTranspose(filters=1,
+                                     kernel_size=(5, 5),
+                                     strides=(2, 2),
+                                     padding=&#39;same&#39;,
+                                     use_bias=False,
+                                     activation=&#39;tanh&#39;))
+    assert model.output_shape == (None, 28, 28, 1)
+
+    return model
+</pre></div>
+</div>
+</div>
+</div>
+<p>And there we have our ‘simple’ generator model. Now we move on to defining our
+discriminator model <span class="math notranslate nohighlight">\(d\)</span>, which is a convolutional neural network based image
+classifier.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>def discriminator_model():
+    &quot;&quot;&quot;
+    The discriminator is a convolutional neural network based image classifier
+    &quot;&quot;&quot;
+
+    # we define our model
+    model = tf.keras.Sequential()
+    model.add(layers.Conv2D(filters=64,
+                            kernel_size=(5, 5),
+                            strides=(2, 2),
+                            padding=&#39;same&#39;,
+                            input_shape=[28, 28, 1]))
+    model.add(layers.LeakyReLU())
+    # adding a dropout layer as you do in conv-nets
+    model.add(layers.Dropout(0.3))
+
+
+    model.add(layers.Conv2D(filters=128,
+                            kernel_size=(5, 5),
+                            strides=(2, 2),
+                            padding=&#39;same&#39;))
+    model.add(layers.LeakyReLU())
+    # adding a dropout layer as you do in conv-nets
+    model.add(layers.Dropout(0.3))
+
+    model.add(layers.Flatten())
+    model.add(layers.Dense(1))
+
+    return model
+</pre></div>
+</div>
+</div>
+</div>
+<p>Let us take a look at our models.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>generator = generator_model()
+plot_model(generator, show_shapes=True, rankdir=&#39;LR&#39;)
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>discriminator = discriminator_model()
+plot_model(discriminator, show_shapes=True, rankdir=&#39;LR&#39;)
+</pre></div>
+</div>
+</div>
+</div>
+<p>Next we need a few helper objects we will use in training</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>cross_entropy = tf.keras.losses.BinaryCrossentropy(from_logits=True)
+generator_optimizer = tf.keras.optimizers.Adam(1e-4)
+discriminator_optimizer = tf.keras.optimizers.Adam(1e-4)
+</pre></div>
+</div>
+</div>
+</div>
+<p>The first object, <em>cross_entropy</em> is our loss function and the two others are
+our optimizers. Notice we use the same learning rate for both <span class="math notranslate nohighlight">\(g\)</span> and <span class="math notranslate nohighlight">\(d\)</span>. This
+is because they need to improve their accuracy at approximately equal speeds to
+get convergence (not necessarily exactly equal). Now we define our loss
+functions</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>def generator_loss(fake_output):
+    loss = cross_entropy(tf.ones_like(fake_output), fake_output)
+
+    return loss
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>def discriminator_loss(real_output, fake_output):
+    real_loss = cross_entropy(tf.ones_like(real_output), real_output)
+    fake_loss = cross_entropy(tf.zeros_liks(fake_output), fake_output)
+    total_loss = real_loss + fake_loss
+
+    return total_loss
+</pre></div>
+</div>
+</div>
+</div>
+<p>Next we define a kind of seed to help us compare the learning process over
+multiple training epochs.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>noise_dimension = 100
+n_examples_to_generate = 16
+seed_images = tf.random.normal([n_examples_to_generate, noise_dimension])
+</pre></div>
+</div>
+</div>
+</div>
+<p>Now we have everything we need to define our training step, which we will apply
+for every step in our training loop. Notice the &#64;tf.function flag signifying
+that the function is tensorflow ‘compiled’. Removing this flag doubles the
+computation time.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>@tf.function
+def train_step(images):
+    noise = tf.random.normal([BATCH_SIZE, noise_dimension])
+
+    with tf.GradientTape() as gen_tape, tf.GradientTape() as disc_tape:
+        generated_images = generator(noise, training=True)
+
+        real_output = discriminator(images, training=True)
+        fake_output = discriminator(generated_images, training=True)
+
+        gen_loss = generator_loss(fake_output)
+        disc_loss = discriminator_loss(real_output, fake_output)
+
+    gradients_of_generator = gen_tape.gradient(gen_loss,
+                                            generator.trainable_variables)
+    gradients_of_discriminator = disc_tape.gradient(disc_loss,
+                                            discriminator.trainable_variables)
+    generator_optimizer.apply_gradients(zip(gradients_of_generator,
+                                            generator.trainable_variables))
+    discriminator_optimizer.apply_gradients(zip(gradients_of_discriminator,
+                                            discriminator.trainable_variables))
+
+    return gen_loss, disc_loss
+</pre></div>
+</div>
+</div>
+</div>
+<p>Next we define a helper function to produce an output over our training epochs
+to see the predictive progression of our generator model. <strong>Note</strong>: I am including
+this code here, but comment it out in the training loop.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>def generate_and_save_images(model, epoch, test_input):
+    # we&#39;re making inferences here
+    predictions = model(test_input, training=False)
+
+    fig = plt.figure(figsize=(4, 4))
+
+    for i in range(predictions.shape[0]):
+        plt.subplot(4, 4, i+1)
+        plt.imshow(predictions[i, :, :, 0] * 127.5 + 127.5, cmap=&#39;gray&#39;)
+        plt.axis(&#39;off&#39;)
+
+    plt.savefig(f&#39;./images_from_seed_images/image_at_epoch_{str(epoch).zfill(3)}.png&#39;)
+    plt.close()
+    #plt.show()
+</pre></div>
+</div>
+</div>
+</div>
+<p>Setting up checkpoints to periodically save our model during training so that
+everything is not lost even if the program were to somehow terminate while
+training.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span># Setting up checkpoints to save model during training
+checkpoint_dir = &#39;./training_checkpoints&#39;
+checkpoint_prefix = os.path.join(checkpoint_dir, &#39;ckpt&#39;)
+checkpoint = tf.train.Checkpoint(generator_optimizer=generator_optimizer,
+                            discriminator_optimizer=discriminator_optimizer,
+                            generator=generator,
+                            discriminator=discriminator)
+</pre></div>
+</div>
+</div>
+</div>
+<p>Now we define our training loop</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>def train(dataset, epochs):
+    generator_loss_list = []
+    discriminator_loss_list = []
+
+    for epoch in range(epochs):
+        start = time.time()
+
+        for image_batch in dataset:
+            gen_loss, disc_loss = train_step(image_batch)
+            generator_loss_list.append(gen_loss.numpy())
+            discriminator_loss_list.append(disc_loss.numpy())
+
+        #generate_and_save_images(generator, epoch + 1, seed_images)
+
+        if (epoch + 1) % 15 == 0:
+            checkpoint.save(file_prefix=checkpoint_prefix)
+
+        print(f&#39;Time for epoch {epoch} is {time.time() - start}&#39;)
+
+    #generate_and_save_images(generator, epochs, seed_images)
+
+    loss_file = &#39;./data/lossfile.txt&#39;
+    with open(loss_file, &#39;w&#39;) as outfile:
+        outfile.write(str(generator_loss_list))
+        outfile.write(&#39;\n&#39;)
+        outfile.write(&#39;\n&#39;)
+        outfile.write(str(discriminator_loss_list))
+        outfile.write(&#39;\n&#39;)
+        outfile.write(&#39;\n&#39;)
+</pre></div>
+</div>
+</div>
+</div>
+<p>To train simply call this function. <strong>Warning</strong>: this might take a long time so
+there is a folder of a pretrained network already included in the repository.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>train(train_dataset, EPOCHS)
+</pre></div>
+</div>
+</div>
+</div>
+<p>Now to avoid having to train and everything, which will take a while depending
+on your computer setup we now load in the model which produced the above gif.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>checkpoint.restore(tf.train.latest_checkpoint(checkpoint_dir))
+restored_generator = checkpoint.generator
+restored_discriminator = checkpoint.discriminator
+
+print(restored_generator)
+print(restored_discriminator)
+</pre></div>
+</div>
+</div>
+</div>
+<p>We have successfully loaded in our latest model. Let us now play around a bit
+and see what kind of things we can learn about this model. Our generator takes
+an array of 100 numbers. One idea can be to try to systematically change our
+input. Let us try and see what we get</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>def generate_latent_points(number=100, scale_means=1, scale_stds=1):
+    latent_dim = 100
+    means = scale_means * tf.linspace(-1, 1, num=latent_dim)
+    stds = scale_stds * tf.linspace(-1, 1, num=latent_dim)
+    latent_space_value_range = tf.random.normal([number, latent_dim],
+                                                means,
+                                                stds,
+                                                dtype=tf.float64)
+
+    return latent_space_value_range
+
+def generate_images(latent_points):
+    # notice we set training to false because we are making inferences
+    generated_images = restored_generator.predict(latent_points)
+
+    return generated_images
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>def plot_result(generated_images, number=100):
+    # obviously this assumes sqrt number is an int
+    fig, axs = plt.subplots(int(np.sqrt(number)), int(np.sqrt(number)),
+                            figsize=(10, 10))
+
+    for i in range(int(np.sqrt(number))):
+        for j in range(int(np.sqrt(number))):
+            axs[i, j].imshow(generated_images[i*j], cmap=&#39;Greys&#39;)
+            axs[i, j].axis(&#39;off&#39;)
+
+    plt.show()
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>generated_images = generate_images(generate_latent_points())
+plot_result(generated_images)
+</pre></div>
+</div>
+</div>
+</div>
+<p>We see that the generator generates images that look like MNIST
+numbers: <span class="math notranslate nohighlight">\(1, 4, 7, 9\)</span>. Let’s try to tweak it a bit more to see if we are able
+to generate a similar plot where we generate every MNIST number. Let us now try
+to ‘move’ a bit around in the latent space. <strong>Note</strong>: decrease the plot number if
+these following cells take too long to run on your computer.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>plot_number = 225
+
+generated_images = generate_images(generate_latent_points(number=plot_number,
+                                                          scale_means=5,
+                                                          scale_stds=1))
+plot_result(generated_images, number=plot_number)
+
+generated_images = generate_images(generate_latent_points(number=plot_number,
+                                                          scale_means=-5,
+                                                          scale_stds=1))
+plot_result(generated_images, number=plot_number)
+
+generated_images = generate_images(generate_latent_points(number=plot_number,
+                                                          scale_means=1,
+                                                          scale_stds=5))
+plot_result(generated_images, number=plot_number)
+</pre></div>
+</div>
+</div>
+</div>
+<p>Again, we have found something interesting. <em>Moving</em> around using our means
+takes us from digit to digit, while <em>moving</em> around using our standard
+deviations seem to increase the number of different digits! In the last image
+above, we can barely make out every MNIST digit. Let us make on last plot using
+this information by upping the standard deviation of our Gaussian noises.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>plot_number = 400
+generated_images = generate_images(generate_latent_points(number=plot_number,
+                                                          scale_means=1,
+                                                          scale_stds=10))
+plot_result(generated_images, number=plot_number)
+</pre></div>
+</div>
+</div>
+</div>
+<p>A pretty cool result! We see that our generator indeed has learned a
+distribution which qualitatively looks a whole lot like the MNIST dataset.</p>
+<p>Another interesting way to explore the latent space of our generator model is by
+interpolating between the MNIST digits. This section is largely based on
+<a class="reference external" href="https://machinelearningmastery.com/how-to-interpolate-and-perform-vector-arithmetic-with-faces-using-a-generative-adversarial-network/">this excellent blogpost</a>
+by Jason Brownlee.</p>
+<p>So let us start by defining a function to interpolate between two points in the
+latent space.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>def interpolation(point_1, point_2, n_steps=10):
+    ratios = np.linspace(0, 1, num=n_steps)
+    vectors = []
+    for i, ratio in enumerate(ratios):
+        vectors.append(((1.0 - ratio) * point_1 + ratio * point_2))
+
+    return tf.stack(vectors)
+</pre></div>
+</div>
+</div>
+</div>
+<p>Now we have all we need to do our interpolation analysis.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>plot_number = 100
+latent_points = generate_latent_points(number=plot_number)
+results = None
+for i in range(0, 2*np.sqrt(plot_number), 2):
+    interpolated = interpolation(latent_points[i], latent_points[i+1])
+    generated_images = generate_images(interpolated)
+
+    if results is None:
+        results = generated_images
+    else:
+        results = tf.stack((results, generated_images))
+
+plot_results(results, plot_number)
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./."
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="chapter12.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title"><span class="section-number">16. </span>Convolutional Neural Networks</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="exercisesweek34.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Exercises week 34</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#">17. Recurrent neural networks: Overarching view</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#a-simple-example">17.1. A simple example</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#an-extrapolation-example">17.2. An extrapolation example</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#predicting-new-points-with-a-trained-recurrent-neural-network">17.3. Predicting New Points With A Trained Recurrent Neural Network</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#other-types-of-recurrent-neural-networks">17.4. Other Types of Recurrent Neural Networks</a></li>
+</ul>
+</li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#generative-models">18. Generative Models</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#generative-adversarial-networks">18.1. Generative Adversarial Networks</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#writing-our-first-generative-adversarial-network">18.2. Writing Our First Generative Adversarial Network</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mnist-and-gans">18.2.1. MNIST and GANs</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Morten Hjorth-Jensen
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2023.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

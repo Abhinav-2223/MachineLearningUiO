@@ -1,0 +1,698 @@
+<!--
+Automatically generated HTML file from DocOnce source
+(https://github.com/hplgit/doconce/)
+-->
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="DocOnce: https://github.com/hplgit/doconce/" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="description" content="Summary of course">
+
+<title>Summary of course</title>
+
+
+<link href="https://cdn.rawgit.com/hplgit/doconce/master/bundled/html_styles/style_solarized_box/css/solarized_light_code.css" rel="stylesheet" type="text/css" title="light"/>
+<script src="https://cdn.rawgit.com/hplgit/doconce/master/bundled/html_styles/style_solarized_box/js/highlight.pack.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+
+<link href="https://thomasf.github.io/solarized-css/solarized-light.min.css" rel="stylesheet">
+<style type="text/css">
+h1 {color: #b58900;}  /* yellow */
+/* h1 {color: #cb4b16;}  orange */
+/* h1 {color: #d33682;}  magenta, the original choice of thomasf */
+code { padding: 0px; background-color: inherit; }
+pre {
+  border: 0pt solid #93a1a1;
+  box-shadow: none;
+}
+
+div { text-align: justify; text-justify: inter-word; }
+</style>
+
+
+</head>
+
+<!-- tocinfo
+{'highest level': 2,
+ 'sections': [('What? Me worry? No final exam in this course!',
+               2,
+               None,
+               '___sec0'),
+              ('What did I learn in school this year?', 2, None, '___sec1'),
+              ('Topics we have covered this year', 2, None, '___sec2'),
+              ('Statistical analysis and optimization of data',
+               2,
+               None,
+               '___sec3'),
+              ('Machine learning', 2, None, '___sec4'),
+              ('Learning outcomes and overarching aims of this course',
+               2,
+               None,
+               '___sec5'),
+              ('Perspective on Machine Learning', 2, None, '___sec6'),
+              ('Machine Learning Research', 2, None, '___sec7'),
+              ('Starting your Machine Learning Project', 2, None, '___sec8'),
+              ('Choose a Model and Algorithm', 2, None, '___sec9'),
+              ('Preparing Your Data', 2, None, '___sec10'),
+              ('Which Activation and Weights to Choose in Neural Networks',
+               2,
+               None,
+               '___sec11'),
+              ('Optimization Methods and Hyperparameters', 2, None, '___sec12'),
+              ('Resampling', 2, None, '___sec13'),
+              ('Other courses on Data science and Machine Learning  at UiO',
+               2,
+               None,
+               '___sec14'),
+              ('Additional courses of interest', 2, None, '___sec15'),
+              ("What's the future like?", 2, None, '___sec16'),
+              ('Bayesian Machine Learning', 2, None, '___sec17'),
+              ('Reinforcement Learning', 2, None, '___sec18'),
+              ('Transfer learning', 2, None, '___sec19'),
+              ('Adversarial learning', 2, None, '___sec20'),
+              ('Dual learning', 2, None, '___sec21'),
+              ('Distributed machine learning', 2, None, '___sec22'),
+              ('Meta learning', 2, None, '___sec23'),
+              ('The Challenges Facing Machine Learning', 2, None, '___sec24'),
+              ('Explainable machine learning', 2, None, '___sec25'),
+              ('Quantum machine learning', 2, None, '___sec26'),
+              ('Quantum machine learning algorithms based on linear algebra',
+               2,
+               None,
+               '___sec27'),
+              ('Quantum reinforcement learning', 2, None, '___sec28'),
+              ('Quantum deep learning', 2, None, '___sec29'),
+              ('Social machine learning', 2, None, '___sec30'),
+              ('The last words?', 2, None, '___sec31'),
+              ('Best wishes to you all and thanks so much for your heroic '
+               'efforts this semester',
+               2,
+               None,
+               '___sec32')]}
+end of tocinfo -->
+
+<body>
+
+
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  TeX: {
+     equationNumbers: {  autoNumber: "AMS"  },
+     extensions: ["AMSmath.js", "AMSsymbols.js", "autobold.js", "color.js"]
+  }
+});
+</script>
+<script type="text/javascript" async
+ src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+
+
+    
+<!-- ------------------- main content ---------------------- -->
+
+
+
+<center><h1>Summary of course</h1></center>  <!-- document title -->
+
+<p>
+<!-- author(s): Morten Hjorth-Jensen   Email morten.hjorth-jensen@fys.uio.no -->
+
+<center>
+<b>Morten Hjorth-Jensen   Email morten.hjorth-jensen@fys.uio.no</b> [1, 2]
+</center>
+
+<p>
+<!-- institution(s) -->
+
+<center>[1] <b>Department of Physics and Center of Mathematics for Applications, University of Oslo</b></center>
+<center>[2] <b>National Superconducting Cyclotron Laboratory, Michigan State University</b></center>
+<br>
+<p>
+<center><h4>Nov 28, 2019</h4></center> <!-- date -->
+<br>
+<p>
+<!-- !split --><br><br><br><br><br><br><br><br><br><br>
+
+<h2 id="___sec0">What? Me worry? No final exam in this course! </h2>
+<br /><br /><center><p><img src="figures/exam1.jpeg" align="bottom" width=500></p></center><br /><br />
+
+<p>
+<!-- !split --><br><br><br><br><br><br><br><br><br><br>
+
+<h2 id="___sec1">What did I learn in school this year? </h2>
+
+<p>
+<a href="http://hplgit.github.io/edu/py_vs_m/computing_competence.html" target="_blank">Our ideal about knowledge on computational science</a>
+
+<p>
+Does that match the experiences you have made this semester?
+<br /><br /><center><p><img src="figures/exam2.jpg" align="bottom" width=500></p></center><br /><br />
+
+<p>
+<!-- !split --><br><br><br><br><br><br><br><br><br><br>
+
+<h2 id="___sec2">Topics we have covered this year </h2>
+
+<p>
+The course has two central parts
+
+<ol>
+<li> Statistical analysis and optimization of data</li>
+<li> Machine learning</li>
+</ol>
+
+<!-- !split --><br><br><br><br><br><br><br><br><br><br>
+
+<h2 id="___sec3">Statistical analysis and optimization of data </h2>
+
+<p>
+The following topics will be covered
+
+<ol>
+<li> Basic concepts, expectation values, variance, covariance, correlation functions and errors;</li>
+<li> Simpler models, binomial distribution, the Poisson distribution, simple and multivariate normal distributions;</li>
+<li> Central elements from linear algebra</li>
+<li> Gradient methods for data optimization</li>
+<li> Estimation of errors using cross-validation, blocking, bootstrapping and jackknife methods;</li>
+<li> Practical optimization using Singular-value decomposition and least squares for parameterizing data.</li>
+<li> Principal Component Analysis.</li>
+</ol>
+
+<!-- !split --><br><br><br><br><br><br><br><br><br><br>
+
+<h2 id="___sec4">Machine learning </h2>
+
+<p>
+The following topics will be covered
+
+<ol>
+<li> Linear methods for regression and classification;</li>
+<li> Neural networks;</li>
+<li> Decisions trees, random forests, boosting and bagging</li>
+<li> Support vector machines</li>
+</ol>
+
+<!-- !split --><br><br><br><br><br><br><br><br><br><br>
+
+<h2 id="___sec5">Learning outcomes and overarching aims of this course </h2>
+
+<p>
+The course introduces a variety of central algorithms and methods
+essential for studies of data analysis and machine learning. The
+course is project based and through the various projects, normally
+three, you will be exposed to fundamental research problems
+in these fields, with the aim to reproduce state of the art scientific
+results. The students will learn to develop and structure large codes
+for studying these systems, get acquainted with computing facilities
+and learn to handle large scientific projects. A good scientific and
+ethical conduct is emphasized throughout the course. 
+
+<ul>
+<li> Understand linear methods for regression and classification;</li>
+<li> Learn about neural network;</li>
+<li> Learn about baggin, boosting and trees</li>
+<li> Support vector machines</li>
+<li> Learn about basic data analysis;</li>
+<li> Be capable of extending the acquired knowledge to other systems and cases;</li>
+<li> Have an understanding of central algorithms used in data analysis and machine learning;</li>
+<li> Work on numerical projects to illustrate the theory. The projects play a central role and you are expected to know modern programming languages like Python or C++.</li>
+</ul>
+
+<!-- !split --><br><br><br><br><br><br><br><br><br><br>
+
+<h2 id="___sec6">Perspective on Machine Learning </h2>
+
+<ol>
+<li> Rapidly emerging application area</li>
+<li> Experiment AND theory are evolving in many many fields. Still many low-hanging fruits.</li>
+<li> Requires education/retraining for more widespread adoption</li>
+<li> A lot of &#8220;word-of-mouth&#8221; development methods</li>
+</ol>
+
+Huge amounts of data sets require automation, classical analysis tools often inadequate. 
+High energy physics hit this wall in the 90&#8217;s.
+In 2009 single top quark production was determined via <a href="https://arxiv.org/pdf/0903.0850.pdf" target="_blank">Boosted decision trees, Bayesian
+Neural Networks, etc.</a>
+
+<p>
+<!-- !split --><br><br><br><br><br><br><br><br><br><br>
+
+<h2 id="___sec7">Machine Learning Research </h2>
+
+<p>
+Where to find recent results:
+
+<ol>
+<li> Conference proceedings, arXiv and blog posts!</li>
+<li> <b>NIPS</b>: <a href="https://papers.nips.cc" target="_blank">Neural Information Processing Systems</a></li>
+<li> <b>ICLR</b>: <a href="https://openreview.net/group?id=ICLR.cc/2018/Conference#accepted-oral-papers" target="_blank">International Conference on Learning Representations</a></li>
+<li> <b>ICML</b>: International Conference on Machine Learning</li>
+<li> <a href="http://www.jmlr.org/papers/v19/" target="_blank">Journal of Machine Learning Research</a></li> 
+</ol>
+
+<!-- !split --><br><br><br><br><br><br><br><br><br><br>
+
+<h2 id="___sec8">Starting your Machine Learning Project  </h2>
+
+<ol>
+<li> Identify problem type: classification, generation, regression</li>
+<li> Consider your data carefully</li>
+<li> Choose a simple model that fits 1. and 2.</li>
+<li> Consider your data carefully again&#8230; data representation</li>
+<li> Based on results, feedback loop to earliest possible point</li>
+</ol>
+
+<!-- !split --><br><br><br><br><br><br><br><br><br><br>
+
+<h2 id="___sec9">Choose a Model and Algorithm  </h2>
+
+<ol>
+<li> Supervised?</li>
+<li> Start with the simplest model that fits your problem</li>
+<li> Start with minimal processing of data</li>
+</ol>
+
+<!-- !split --><br><br><br><br><br><br><br><br><br><br>
+
+<h2 id="___sec10">Preparing Your Data </h2>
+
+<ol>
+<li> Shuffle your data</li>
+<li> Mean center your data</li>
+
+<ul>
+  <li> Why?</li>
+</ul>
+
+<li> Normalize the variance</li>
+
+<ul>
+  <li> Why?</li>
+</ul>
+
+<li> <b>Whitening</b></li>
+
+<ul>
+  <li> Decorrelates data</li>
+  <li> Can be hit or miss</li>
+</ul>
+
+<li> When to do train/test split?</li>
+</ol>
+
+<!-- !split --><br><br><br><br><br><br><br><br><br><br>
+
+<h2 id="___sec11">Which Activation and Weights to Choose in Neural Networks </h2>
+
+<ol>
+<li> RELU? ELU?</li>
+<li> Sigmoid or Tanh?</li>
+<li> Set all weights to 0?</li>
+
+<ul>
+  <li> Terrible idea</li>
+</ul>
+
+<li> Set all weights to random values?</li>
+
+<ul>
+  <li> Small random values</li>
+</ul>
+
+</ol>
+
+<!-- !split --><br><br><br><br><br><br><br><br><br><br>
+
+<h2 id="___sec12">Optimization Methods and Hyperparameters </h2>
+
+<ol>
+<li> Stochastic gradient descent
+
+<ol type="a"></li>
+<li> Stochastic gradient descent + momentum</li>
+</ol>
+
+<li> State-of-the-art approaches:</li>
+
+<ul>
+  <li> RMSProp</li>
+  <li> Adam</li>
+</ul>
+
+</ol>
+
+Which regularization and hyperparameters? \( L_1 \) or \( L_2 \), soft classifiers, depths of trees and many other. Need to explore a large set of hyperparameters and regularization methods.
+
+<p>
+<!-- !split --><br><br><br><br><br><br><br><br><br><br>
+
+<h2 id="___sec13">Resampling </h2>
+
+<p>
+When do we resample?
+
+<ol>
+<li> Bootstrap</li>
+<li> Cross-validation</li>
+<li> Jackknife and many other</li>
+</ol>
+
+<!-- !split --><br><br><br><br><br><br><br><br><br><br>
+
+<h2 id="___sec14">Other courses on Data science and Machine Learning  at UiO </h2>
+
+<p>
+The link here <a href="https://www.mn.uio.no/english/research/about/centre-focus/innovation/data-science/studies/" target="_blank"><tt>https://www.mn.uio.no/english/research/about/centre-focus/innovation/data-science/studies/</tt></a>  gives an excellent overview of courses on Machine learning at UiO.
+
+<ol>
+<li> <a href="http://www.uio.no/studier/emner/matnat/math/STK2100/index-eng.html" target="_blank">STK2100 Machine learning and statistical methods for prediction and classification</a>.</li> 
+<li> <a href="https://www.uio.no/studier/emner/matnat/ifi/IN3050/index-eng.html" target="_blank">IN3050/IN4050 Introduction to Artificial Intelligence and Machine Learning</a>. Introductory course in machine learning and AI with an algorithmic approach.</li> 
+<li> <a href="http://www.uio.no/studier/emner/matnat/math/STK-INF3000/index-eng.html" target="_blank">STK-INF3000/4000 Selected Topics in Data Science</a>. The course provides insight into selected contemporary relevant topics within Data Science.</li> 
+<li> <a href="https://www.uio.no/studier/emner/matnat/ifi/IN4080/index.html" target="_blank">IN4080 Natural Language Processing</a>. Probabilistic and machine learning techniques applied to natural language processing.</li> 
+<li> <a href="https://www.uio.no/studier/emner/matnat/math/STK-IN4300/index-eng.html" target="_blank">STK-IN4300 &#8211; Statistical learning methods in Data Science</a>. An advanced introduction to statistical and machine learning. For students with a good mathematics and statistics background.</li>
+<li> <a href="https://www.uio.no/studier/emner/matnat/ifi/IN-STK5000/index-eng.html" target="_blank">IN-STK5000  Adaptive Methods for Data-Based Decision Making</a>. Methods for adaptive collection and processing of data based on machine learning techniques.</li> 
+<li> <a href="https://www.uio.no/studier/emner/matnat/ifi/IN5400/" target="_blank">IN5400/INF5860 &#8211; Machine Learning for Image Analysis</a>. An introduction to deep learning with particular emphasis on applications within Image analysis, but useful for other application areas too.</li>
+<li> <a href="https://www.uio.no/studier/emner/matnat/its/TEK5040/" target="_blank">TEK5040 &#8211; Dyp l&#230;ring for autonome systemer</a>. The course addresses advanced algorithms and architectures for deep learning with neural networks. The course provides an introduction to how deep-learning techniques can be used in the construction of key parts of advanced autonomous systems that exist in physical environments and cyber environments.</li>
+</ol>
+
+<!-- !split --><br><br><br><br><br><br><br><br><br><br>
+
+<h2 id="___sec15">Additional courses of interest </h2>
+
+<ol>
+<li> <a href="https://www.uio.no/studier/emner/matnat/math/STK4051/index-eng.html" target="_blank">STK4051 Computational Statistics</a></li>
+<li> <a href="https://www.uio.no/studier/emner/matnat/math/STK4021/index-eng.html" target="_blank">STK4021 Applied Bayesian Analysis and Numerical Methods</a></li>
+</ol>
+
+<!-- !split --><br><br><br><br><br><br><br><br><br><br>
+
+<h2 id="___sec16">What's the future like?  </h2>
+
+<p>
+Based on multi-layer nonlinear neural networks, deep learning can
+learn directly from raw data, automatically extract and abstract
+features from layer to layer, and then achieve the goal of regression,
+classification, or ranking. Deep learning has made breakthroughs in
+computer vision, speech processing and natural language, and reached
+or even surpassed human level. The success of deep learning is mainly
+due to the three factors: big data, big model, and big computing.
+
+<p>
+In the past few decades, many different architectures of deep neural
+networks have been proposed, such as
+
+<ol>
+<li> Convolutional neural networks, which are mostly used in image and video data processing, and have also been applied to sequential data such as text processing;</li>
+<li> Recurrent neural networks, which can process sequential data of variable length and have been widely used in natural language understanding and speech processing;</li>
+<li> Encoder-decoder framework, which is mostly used for image or sequence generation, such as machine translation, text summarization, and image captioning.</li>
+</ol>
+
+<!-- !split --><br><br><br><br><br><br><br><br><br><br>
+
+<h2 id="___sec17">Bayesian Machine Learning </h2>
+
+<p>
+This is an important topic if we aim at extracting a probability
+distribution. This gives us also a confidence interval and error
+estimates.
+
+<p>
+Bayesian machine learning allows us to encode our prior beliefs about
+what those models should look like, independent of what the data tells
+us. This is especially useful when we don&#8217;t have a ton of data to
+confidently learn our model.
+
+<p>
+<!-- !split --><br><br><br><br><br><br><br><br><br><br>
+
+<h2 id="___sec18">Reinforcement Learning </h2>
+
+<p>
+Reinforcement learning is a sub-area of machine learning. It studies
+how agents take actions based on trial and error, so as to maximize
+some notion of cumulative reward in a dynamic system or
+environment. Due to its generality, the problem has also been studied
+in many other disciplines, such as game theory, control theory,
+operations research, information theory, multi-agent systems, swarm
+intelligence, statistics, and genetic algorithms.
+
+<p>
+In March 2016, AlphaGo, a computer program that plays the board game
+Go, beat Lee Sedol in a five-game match. This was the first time a
+computer Go program had beaten a 9-dan (highest rank) professional
+without handicaps. AlphaGo is based on deep convolutional neural
+networks and reinforcement learning. AlphaGo&#8217;s victory was a major
+milestone in artificial intelligence and it has also made
+reinforcement learning a hot research area in the field of machine
+learning.
+
+<p>
+<!-- !split --><br><br><br><br><br><br><br><br><br><br>
+
+<h2 id="___sec19">Transfer learning </h2>
+
+<p>
+The goal of transfer learning is to transfer the model or knowledge
+obtained from a source task to the target task, in order to resolve
+the issues of insufficient training data in the target task. The
+rationality of doing so lies in that usually the source and target
+tasks have inter-correlations, and therefore either the features,
+samples, or models in the source task might provide useful information
+for us to better solve the target task. Transfer learning is a hot
+research topic in recent years, with many problems still waiting to be
+solved in this space.
+
+<p>
+<!-- !split --><br><br><br><br><br><br><br><br><br><br>
+
+<h2 id="___sec20">Adversarial learning </h2>
+
+<p>
+The conventional deep generative model has a potential problem: the
+model tends to generate extreme instances to maximize the
+probabilistic likelihood, which will hurt its performance. Adversarial
+learning utilizes the adversarial behaviors (e.g., generating
+adversarial instances or training an adversarial model) to enhance the
+robustness of the model and improve the quality of the generated
+data. In recent years, one of the most promising unsupervised learning
+technologies, generative adversarial networks (GAN), has already been
+successfully applied to image, speech, and text.
+
+<p>
+<!-- !split --><br><br><br><br><br><br><br><br><br><br>
+
+<h2 id="___sec21">Dual learning </h2>
+
+<p>
+Dual learning is a new learning paradigm, the basic idea of which is
+to use the primal-dual structure between machine learning tasks to
+obtain effective feedback/regularization, and guide and strengthen the
+learning process, thus reducing the requirement of large-scale labeled
+data for deep learning. The idea of dual learning has been applied to
+many problems in machine learning, including machine translation,
+image style conversion, question answering and generation, image
+classification and generation, text classification and generation,
+image-to-text, and text-to-image.
+
+<p>
+<!-- !split --><br><br><br><br><br><br><br><br><br><br>
+
+<h2 id="___sec22">Distributed machine learning </h2>
+
+<p>
+Distributed computation will speed up machine learning algorithms,
+significantly improve their efficiency, and thus enlarge their
+application. When distributed meets machine learning, more than just
+implementing the machine learning algorithms in parallel is required.
+
+<p>
+<!-- !split --><br><br><br><br><br><br><br><br><br><br>
+
+<h2 id="___sec23">Meta learning </h2>
+
+<p>
+Meta learning is an emerging research direction in machine
+learning. Roughly speaking, meta learning concerns learning how to
+learn, and focuses on the understanding and adaptation of the learning
+itself, instead of just completing a specific learning task. That is,
+a meta learner needs to be able to evaluate its own learning methods
+and adjust its own learning methods according to specific learning
+tasks.
+
+<p>
+<!-- !split --><br><br><br><br><br><br><br><br><br><br>
+
+<h2 id="___sec24">The Challenges Facing Machine Learning </h2>
+
+<p>
+While there has been much progress in machine learning, there are also challenges.
+
+<p>
+For example, the mainstream machine learning technologies are
+black-box approaches, making us concerned about their potential
+risks. To tackle this challenge, we may want to make machine learning
+more explainable and controllable. As another example, the
+computational complexity of machine learning algorithms is usually
+very high and we may want to invent lightweight algorithms or
+implementations. Furthermore, in many domains such as physics,
+chemistry, biology, and social sciences, people usually seek elegantly
+simple equations (e.g., the Schr&#246;dinger equation) to uncover the
+underlying laws behind various phenomena. In the field of machine
+learning, can we reveal simple laws instead of designing more complex
+models for data fitting? Although there are many challenges, we are
+still very optimistic about the future of machine learning. As we look
+forward to the future, here are what we think the research hotspots in
+the next ten years will be.
+
+<p>
+<!-- !split --><br><br><br><br><br><br><br><br><br><br>
+
+<h2 id="___sec25">Explainable machine learning </h2>
+
+<p>
+Machine learning, especially deep learning, evolves rapidly. The
+ability gap between machine and human on many complex cognitive tasks
+becomes narrower and narrower. However, we are still in the very early
+stage in terms of explaining why those effective models work and how
+they work.
+
+<p>
+What is missing: the gap between correlation and causation Most
+machine learning techniques, especially the statistical ones, depend
+highly on data correlation to make predictions and analyses. In
+contrast, rational humans tend to reply on clear and trustworthy
+causality relations obtained via logical reasoning on real and clear
+facts. It is one of the core goals of explainable machine learning to
+transition from solving problems by data correlation to solving
+problems by logical reasoning.
+
+<p>
+<!-- !split --><br><br><br><br><br><br><br><br><br><br>
+
+<h2 id="___sec26">Quantum machine learning </h2>
+
+<p>
+Quantum machine learning is an emerging interdisciplinary research
+area at the intersection of quantum computing and machine learning.
+
+<p>
+Quantum computers use effects such as quantum coherence and quantum
+entanglement to process information, which is fundamentally different
+from classical computers. Quantum algorithms have surpassed the best
+classical algorithms in several problems (e.g., searching for an
+unsorted database, inverting a sparse matrix), which we call quantum
+acceleration.
+
+<p>
+When quantum computing meets machine learning, it can be a mutually
+beneficial and reinforcing process, as it allows us to take advantage
+of quantum computing to improve the performance of classical machine
+learning algorithms. In addition, we can also use the machine learning
+algorithms (on classic computers) to analyze and improve quantum
+computing systems.
+
+<p>
+<!-- !split --><br><br><br><br><br><br><br><br><br><br>
+
+<h2 id="___sec27">Quantum machine learning algorithms based on linear algebra </h2>
+
+<p>
+Many quantum machine learning algorithms are based on variants of
+quantum algorithms for solving linear equations, which can efficiently
+solve N-variable linear equations with complexity of O(log2 N) under
+certain conditions. The quantum matrix inversion algorithm can
+accelerate many machine learning methods, such as least square linear
+regression, least square version of support vector machine, Gaussian
+process, and more. The training of these algorithms can be simplified
+to solve linear equations. The key bottleneck of this type of quantum
+machine learning algorithms is data input&#8212;that is, how to initialize
+the quantum system with the entire data set. Although efficient
+data-input algorithms exist for certain situations, how to efficiently
+input data into a quantum system is as yet unknown for most cases.
+
+<p>
+<!-- !split --><br><br><br><br><br><br><br><br><br><br>
+
+<h2 id="___sec28">Quantum reinforcement learning </h2>
+
+<p>
+In quantum reinforcement learning, a quantum agent interacts with the
+classical environment to obtain rewards from the environment, so as to
+adjust and improve its behavioral strategies. In some cases, it
+achieves quantum acceleration by the quantum processing capabilities
+of the agent or the possibility of exploring the environment through
+quantum superposition. Such algorithms have been proposed in
+superconducting circuits and systems of trapped ions.
+
+<p>
+<!-- !split --><br><br><br><br><br><br><br><br><br><br>
+
+<h2 id="___sec29">Quantum deep learning </h2>
+
+<p>
+Dedicated quantum information processors, such as quantum annealers
+and programmable photonic circuits, are well suited for building deep
+quantum networks. The simplest deep quantum network is the Boltzmann
+machine. The classical Boltzmann machine consists of bits with tunable
+interactions and is trained by adjusting the interaction of these bits
+so that the distribution of its expression conforms to the statistics
+of the data. To quantize the Boltzmann machine, the neural network can
+simply be represented as a set of interacting quantum spins that
+correspond to an adjustable Ising model. Then, by initializing the
+input neurons in the Boltzmann machine to a fixed state and allowing
+the system to heat up, we can read out the output qubits to get the
+result.
+
+<p>
+<!-- !split --><br><br><br><br><br><br><br><br><br><br>
+
+<h2 id="___sec30">Social machine learning </h2>
+
+<p>
+Machine learning aims to imitate how humans
+learn. While we have developed successful machine learning algorithms,
+until now we have ignored one important fact: humans are social. Each
+of us is one part of the total society and it is difficult for us to
+live, learn, and improve ourselves, alone and isolated. Therefore, we
+should design machines with social properties. Can we let machines
+evolve by imitating human society so as to achieve more effective,
+intelligent, interpretable &#8220;social machine learning&#8221;?
+
+<p>
+And much more.
+
+<p>
+<!-- !split --><br><br><br><br><br><br><br><br><br><br>
+
+<h2 id="___sec31">The last words? </h2>
+
+<p>
+Early computer scientist Alan Kay said, <b>The best way to predict the
+future is to create it</b>. Therefore, all machine learning
+practitioners, whether scholars or engineers, professors or students,
+need to work together to advance these important research
+topics. Together, we will not just predict the future, but create it.
+
+<p>
+<!-- !split --><br><br><br><br><br><br><br><br><br><br>
+
+<h2 id="___sec32">Best wishes to you all and thanks so much for your heroic efforts this semester </h2>
+
+<p>
+<br /><br /><center><p><img src="figures/Nebbdyr2.png" align="bottom" width=500></p></center><br /><br />
+
+<!-- ------------------- end of main content --------------- -->
+
+
+<center style="font-size:80%">
+<!-- copyright --> &copy; 1999-2019, Morten Hjorth-Jensen   Email morten.hjorth-jensen@fys.uio.no. Released under CC Attribution-NonCommercial 4.0 license
+</center>
+
+
+</body>
+</html>
+    
+
