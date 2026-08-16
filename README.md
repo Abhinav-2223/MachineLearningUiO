@@ -2,6 +2,8 @@
 
 This site contains all material relevant for the courses on Applied
 Data Analysis and Machine Learning. The courses are FYS-STK3155/4155 and FYS5429/9429.
+The link to the textbook as jupyter-book is at https://github.com/EducationalMaterialUiO/MachineLearningUiO/blob/main/doc/LectureNotes/_build/html/index.html
+and the PDF file is at https://github.com/EducationalMaterialUiO/MachineLearningUiO/blob/main/doc/BookML/LecturesBook.pdf
 
 ## Introduction
 
