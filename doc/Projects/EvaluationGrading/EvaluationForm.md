@@ -20,14 +20,14 @@ Mark and comments:
 
 ## Formalism
 *Formalism/methods: Discussion of the methods used and their basis/suitability.
-Total number of possible points 20*
+Total number of possible points 10*
 
 Mark and comments:
 
 
 ## Code, implementation and testing
 *Code/Implementations/test: Readability of code, implementation, testing and
-discussion of benchmarks. Total number of possible points 20*
+discussion of benchmarks. Total number of possible points 10*
 
 Mark and comments:
 
@@ -35,7 +35,7 @@ Mark and comments:
 ## Analysis
 *Analysis: of results and the effectiveness of their selection and presentation.
 Are the results well understood and discussed? Total number of possible points:
-20*
+40*
 
 Mark and comments:
 
@@ -67,12 +67,17 @@ Mark and comments:
 ## Grading of all projects
 *The final number of points is based on the average of all projects (including eventual additional points) and the grade follows the following table:*
 
- * 92-100 points: A
- * 77-91 points: B
- * 58-76 points: C
- * 46-57 points: D
- * 40-45 points: E
- * 0-39 points: F-failed
+
+ * 95-100 points: A
+ * 85-94 points: B
+ * 72-84 points: C
+ * 64-71 points: D
+ * 60-63 points: E
+ * 0-59 points: F-failed
+
+In addition you can get an extra score for weekly assignments (10 in total and due each Friday). Each weekly assignment counts 1 point. As an example, this means that if your average after three projects is 88 points and you have handed in and gotten approved seven weekly exercises, the total score is 88+7=95, which translates into an A. 
+
+
 
 ##  General guidelines on how to write a report
 
