@@ -1,7 +1,7 @@
 # Guidelines for Declaring the Use of Large Language Models in Project Reports
 
-**Course:** Qauntum Computing and Quantum machine Learning (FYS5419/9419 University of Oslo)**  
-**Applies to:** Last project and its  report and submitted code
+**Course:** FYS-STK3155/4155 University of Oslo **  
+**Applies to:** All three projects and their  reports and submitted codes
 
 ---
 
