@@ -231,9 +231,7 @@ Here we list several useful Python libraries we strongly recommend (if you use a
 
 _Recommended textbooks_:
 
-The lecture notes are collected as a jupyter-book at
-https://compphysics.github.io/MachineLearning/doc/LectureNotes/_build/html/intro.html. In
-addition to the electure notes, we recommend the books of Goodfellow et al. and Raschka et al. We will follow these texts closely and
+In addition to the lecture notes listed above, we recommend the books of Goodfellow et al. and Raschka et al. We will follow these texts closely and
 the weekly reading assignments refer to these two texts.
 
 - Ian Goodfellow, Yoshua Bengio, and Aaron Courville. The different chapters are available for free at https://www.deeplearningbook.org/. Chapters 2-14 are highly recommended. The lectures follow to a good extent this text.
