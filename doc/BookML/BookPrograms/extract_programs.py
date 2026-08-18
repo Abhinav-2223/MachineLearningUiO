@@ -1,10 +1,10 @@
 """Extract every Python listing from the book chapters into BookPrograms/chapterN/."""
 import re, os, ast
-SRC="/sessions/kind-inspiring-knuth/mnt/MachineLearning/doc/BookML"
+SRC=os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DST=f"{SRC}/BookPrograms"
 
 TITLES={1:"linear_algebra",2:"statistics",3:"linear_regression",4:"optimization",
-        5:"logistic_regression",6:"support_vector_machines",7:"trees_and_ensembles",8:"neural_networks",9:"differential_equations",10:"convolutional_networks",11:"recurrent_networks",12:"autoencoders",13:"transformers",14:"boltzmann",15:"vae",16:"diffusion"}
+        5:"logistic_regression",6:"support_vector_machines",7:"trees_and_ensembles",8:"neural_networks",9:"differential_equations",10:"convolutional_networks",11:"recurrent_networks",12:"autoencoders",13:"transformers",14:"boltzmann",15:"vae",16:"diffusion",17:"gan"}
 
 def strip_comments(s):
     """Strip LaTeX %-comments, but never inside a Python listing.
@@ -38,7 +38,7 @@ def section_of(tex, pos):
     return re.sub(r"[^a-z0-9]+","_",best[0].lower().replace("$","")).strip("_")[:40] or "listing"
 
 total=0
-for ch in range(1,17):
+for ch in range(1,18):
     tex=strip_comments(open(f"{SRC}/chapter{ch}.tex").read())
     d=f"{DST}/chapter{ch:02d}_{TITLES[ch]}"
     os.makedirs(d, exist_ok=True)
