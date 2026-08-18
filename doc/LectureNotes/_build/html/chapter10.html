@@ -508,7 +508,7 @@ one-dimensional input, in the layer notation of
 Section <em>Notation and the feed-forward pass</em>.  The dense layer of panel (a) is one layer of
 Figure 8.5; the convolutional layer of panel (b) differs from it
 in exactly two respects, and those two respects are the whole of this chapter.</p>
-<p><img alt="The two structural assumptions of Section Why not simply use a dense l" src="_images/10-connect.png" /></p>
+<p><img alt="The two structural assumptions of Section Why not simply use a dense l" src="../BookML/BookFigures/chapter10_convolutional_networks/10-connect.png" /></p>
 <p><em>Figure 10.1: The two structural assumptions of Section <em>Why not simply use a dense layer?</em>, drawn on a one-dimensional input of six components.  (a) A dense layer connects every input to every output and gives each edge its own weight.  (b) A convolutional layer with <span class="math notranslate nohighlight">\(F=3\)</span> connects each output to a window of three neighbouring inputs – that is locality – and uses the <em>same</em> three weights <span class="math notranslate nohighlight">\(w_1,w_2,w_3\)</span> at every position, drawn here in the same three colours – that is parameter sharing.  Twenty-four weights become three, and the three do not grow when the input is lengthened.  Both pictures use the layer notation of Section <em>Notation and the feed-forward pass</em>: panel (a) is one layer of Figure 8.5.</em></p>
 </section>
 <section id="convolution">
@@ -794,7 +794,7 @@ output is large.  And <span class="math notranslate nohighlight">\(W\)</span> do
 sharing, written out.  Figure 10.2 shows the three
 statements as one picture: a filter drawn as a block spanning the full depth,
 one output value produced from it, and the <span class="math notranslate nohighlight">\(K\)</span> maps that <span class="math notranslate nohighlight">\(K\)</span> such filters make.</p>
-<p><img alt="Equation 10.16 drawn.  A filter is a  block, not an  patch it spans th" src="_images/10-convlayer.png" /></p>
+<p><img alt="Equation 10.16 drawn.  A filter is a  block, not an  patch it spans th" src="../BookML/BookFigures/chapter10_convolutional_networks/10-convlayer.png" /></p>
 <p><em>Figure 10.2: Equation (10.16) drawn.  A filter is a <span class="math notranslate nohighlight">\(C\times F\times F\)</span> block, not an <span class="math notranslate nohighlight">\(F\times F\)</span> patch: it spans the <em>whole</em> depth of the input at each spatial location, which is why the sum over <span class="math notranslate nohighlight">\(c\)</span> in Eq. (10.16) has no counterpart among the output indices.  The block shown produces the single value <span class="math notranslate nohighlight">\(Z(k,i,j)\)</span> marked in the output; sliding it over all positions <span class="math notranslate nohighlight">\((i,j)\)</span> with step <span class="math notranslate nohighlight">\(S\)</span> fills one feature map, and using <span class="math notranslate nohighlight">\(K\)</span> different filters produces the <span class="math notranslate nohighlight">\(K\)</span> maps stacked behind it.  The spatial sizes follow Proposition 10.4 and the parameter count is independent of <span class="math notranslate nohighlight">\(H_1\)</span> and <span class="math notranslate nohighlight">\(W_1\)</span>.</em></p>
 <section id="output-size-and-parameter-count">
 <h3><span class="section-number">10.3.1. </span>Output size and parameter count<a class="headerlink" href="#output-size-and-parameter-count" title="Link to this heading">#</a></h3>
@@ -986,7 +986,7 @@ arrangement; a translation that permutes positions within <span class="math notr
 therefore leaves it fixed.  A translation carrying the support into the next
 window leaves the multiset intact but attaches it to the next output index.</p>
 </div>
-<p><img alt="Max pooling with , Eq. 10.21.  The four non-overlapping windows are sh" src="_images/10-pool.png" /></p>
+<p><img alt="Max pooling with , Eq. 10.21.  The four non-overlapping windows are sh" src="../BookML/BookFigures/chapter10_convolutional_networks/10-pool.png" /></p>
 <p><em>Figure 10.5: Max pooling with <span class="math notranslate nohighlight">\(F=S=2\)</span>, Eq. (10.21).  The four non-overlapping windows are shaded in four colours and each contributes one value, its maximum, to the correspondingly shaded output cell.  Three quarters of the activations are discarded and nothing is learned: the operation has no parameters at all.  Proposition 10.9 is visible here – move the <span class="math notranslate nohighlight">\(9\)</span> anywhere within its own window and the output is unchanged, move it into a neighbouring window and the output merely shifts.</em></p>
 <p>Proposition 10.9 is the precise version of “a limited
 invariance”.  Pooling is exactly invariant to displacements that stay inside a
@@ -1070,7 +1070,7 @@ dilation is standard in segmentation, where the output must have the same size
 as the input, and in the audio models where the receptive field must span
 thousands of samples.  Figure 10.6 shows both cases for two
 layers, with the reach of a single output unit shaded on the input row.</p>
-<p><img alt="The receptive field of Proposition 10.10 and what dilation does to it," src="_images/10-rf.png" /></p>
+<p><img alt="The receptive field of Proposition 10.10 and what dilation does to it," src="../BookML/BookFigures/chapter10_convolutional_networks/10-rf.png" /></p>
 <p><em>Figure 10.6: The receptive field of Proposition 10.10 and what dilation does to it, for two layers of <span class="math notranslate nohighlight">\(F=3\)</span> with unit stride.  The shaded input units are those the single top unit can see.  (a) Without dilation the two layers reach five inputs, and Eq. (10.22) gives the familiar <span class="math notranslate nohighlight">\(R_\ell=2\ell+1\)</span>. (b) With <span class="math notranslate nohighlight">\(D_2=2\)</span> the second layer reads every other unit of the first – the pale edges are first-layer units that are computed but not read by this particular output – and the reach becomes seven.  The filter has the same three taps in both panels and the resolution is reduced in neither; Proposition 10.11 continues the pattern to <span class="math notranslate nohighlight">\(R_L=2^{L+1}-1\)</span>.</em></p>
 </section>
 </section>
@@ -1389,7 +1389,7 @@ parameter counts of the network we hand to PyTorch and Keras in
 Section <em>The same network in PyTorch and TensorFlow</em>, and it is worth looking at before reading the
 code: the shapes are the only thing that has to be got right, and every one of
 them follows from Proposition 10.4.</p>
-<p><img alt="The pattern of Eq. 10.32, instantiated with the widths of the PyTorch " src="_images/10-arch.png" /></p>
+<p><img alt="The pattern of Eq. 10.32, instantiated with the widths of the PyTorch " src="../BookML/BookFigures/chapter10_convolutional_networks/10-arch.png" /></p>
 <p><em>Figure 10.7: The pattern of Eq. (10.32), instantiated with the widths of the PyTorch and Keras listings of Section <em>The same network in PyTorch and TensorFlow</em> on MNIST, with <span class="math notranslate nohighlight">\(F=3\)</span>, <span class="math notranslate nohighlight">\(S=1\)</span>, <span class="math notranslate nohighlight">\(P=1\)</span> and <span class="math notranslate nohighlight">\(2\times2\)</span> pooling throughout; the dropout layer of Section <em>Dropout</em>, which has no parameters, is not drawn.  Each slab is one tensor and is labelled with its shape; every spatial size follows Proposition 10.4 and every parameter count is the one checked against Keras in Section <em>Parameter counts, checked</em>.  The shape of the picture is the argument of this chapter and its own refutation at once.  The two convolutional layers, which carry all the locality, sharing and equivariance, hold <span class="math notranslate nohighlight">\(18\,816\)</span> of the <span class="math notranslate nohighlight">\(3\,241\,354\)</span> parameters; the single dense layer that follows the flattening, which has none of those properties, holds <span class="math notranslate nohighlight">\(3\,212\,288\)</span>.</em></p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">

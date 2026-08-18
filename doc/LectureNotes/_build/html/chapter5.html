@@ -380,20 +380,26 @@ document.write(`
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#more-than-two-classes-the-softmax">5.6. More than two classes: the softmax</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#optimising-the-cross-entropy">5.7. Optimising the cross entropy</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#an-implementation">5.8. An implementation</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#kernel-logistic-regression">5.9. Kernel logistic regression</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-problem-and-what-the-representer-theorem-gives">5.9.1. The problem, and what the representer theorem gives</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gradient-hessian-and-kernel-irls">5.9.2. Gradient, Hessian and kernel IRLS</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-method-verified">5.9.3. The method, verified</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#what-the-coefficients-are">5.9.4. What the coefficients are</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-penalty-measured">5.9.5. The penalty, measured</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#other-loss-functions-and-automatic-differentiation">5.9. Other loss functions, and automatic differentiation</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#margin-based-losses">5.9.1. Margin-based losses</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#what-each-loss-estimates">5.9.2. What each loss estimates</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#one-program-for-every-loss">5.9.3. One program for every loss</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#measuring-the-quality-of-a-classifier">5.10. Measuring the quality of a classifier</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-wisconsin-breast-cancer-data">5.11. The Wisconsin breast cancer data</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#summary-and-the-programs">5.12. Summary and the programs</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercises">5.13. Exercises</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#warm-up-exercises">5.13.1. Warm-up exercises</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#project-style-exercise-classification-from-end-to-end">5.13.2. Project-style exercise: classification from end to end</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#kernel-logistic-regression">5.10. Kernel logistic regression</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-problem-and-what-the-representer-theorem-gives">5.10.1. The problem, and what the representer theorem gives</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gradient-hessian-and-kernel-irls">5.10.2. Gradient, Hessian and kernel IRLS</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-method-verified">5.10.3. The method, verified</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#what-the-coefficients-are">5.10.4. What the coefficients are</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-penalty-measured">5.10.5. The penalty, measured</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#measuring-the-quality-of-a-classifier">5.11. Measuring the quality of a classifier</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-wisconsin-breast-cancer-data">5.12. The Wisconsin breast cancer data</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#summary-and-the-programs">5.13. Summary and the programs</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercises">5.14. Exercises</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#warm-up-exercises">5.14.1. Warm-up exercises</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#project-style-exercise-classification-from-end-to-end">5.14.2. Project-style exercise: classification from end to end</a></li>
 </ul>
 </li>
 </ul>
@@ -659,7 +665,7 @@ P(\mathcal{D}\mid\bm{\theta})
      \left[1-p(y_i=1\mid x_i,\bm{\theta})\right]^{1-y_i} .\tag{5.11}
 \]</div>
 <p>This is a product of Bernoulli probabilities, exactly as
-Eq. (3.19) was a product of Gaussians.</p>
+Eq. (3.25) was a product of Gaussians.</p>
 <p>As in Section <em>Deriving least squares from a probability distribution</em> we take logarithms, both because it
 turns the product into a sum and because a product of <span class="math notranslate nohighlight">\(n\)</span> numbers smaller
 than one underflows.  The log-likelihood is</p>
@@ -721,7 +727,9 @@ correct.  A badly wrong, confidently made prediction therefore produces almost
 no gradient and the model learns nothing from its worst mistakes.  The
 cross-entropy gradient, as the next section shows, contains no such factor: it
 is simply the error <span class="math notranslate nohighlight">\(y_i-p_i\)</span>.  This cancellation is one of the reasons the
-cross entropy is universal in classification.</p>
+cross entropy is universal in classification.  It is not the only possible
+loss, however, and Section <em>Other loss functions, and automatic differentiation</em> surveys the alternatives –
+and fits all of them with a single program.</p>
 </div>
 <p>Figure 5.3 makes the argument visually.  The left panel
 shows the two losses for a point whose true label is <span class="math notranslate nohighlight">\(y=1\)</span>: both fall as the
@@ -1262,16 +1270,415 @@ training continues.  With a fixed number of epochs the growth is simply
 truncated; setting <code class="docutils literal notranslate"><span class="pre">lmbda</span></code> to a small positive value is the principled
 fix.</p>
 </section>
+<section id="other-loss-functions-and-automatic-differentiation">
+<h2><span class="section-number">5.9. </span>Other loss functions, and automatic differentiation<a class="headerlink" href="#other-loss-functions-and-automatic-differentiation" title="Link to this heading">#</a></h2>
+<p>Everything so far has used the cross entropy, and Section <em>Maximum likelihood and the cross-entropy</em>
+explained why it is the natural choice: it is the negative log-likelihood of
+the Bernoulli model.  It is not, however, the only choice, and two of the most
+important classifiers of the following chapters – the support vector machine
+of Chapter 6 and the boosting methods of
+Chapter 7 – are obtained from logistic regression by
+changing nothing but the loss.  This section sets out the family, derives
+what each member actually estimates, and then does something that would have
+been tedious a chapter ago: fits all of them with one program, in which the
+loss is an argument and no gradient is ever written down.  That is the
+promise of Section <em>Automatic differentiation</em> kept.</p>
+<section id="margin-based-losses">
+<h3><span class="section-number">5.9.1. </span>Margin-based losses<a class="headerlink" href="#margin-based-losses" title="Link to this heading">#</a></h3>
+<p>It is convenient to relabel the classes as <span class="math notranslate nohighlight">\(\tilde y_i=2y_i-1\in\{-1,+1\}\)</span> and
+to define the <em>margin</em> of observation <span class="math notranslate nohighlight">\(i\)</span>,</p>
+<div class="math notranslate nohighlight">
+\[
+m_i = \tilde y_i\,t_i,
+  \qquad t_i=\bm{x}_i^{T}\bm{\theta},\tag{5.35}
+\]</div>
+<p>which is positive when the point is on the correct side of the decision
+boundary <span class="math notranslate nohighlight">\(t=0\)</span> and large when it is far from it.  The quantity we would like
+to minimise is the number of misclassifications, the <em>0–1 loss</em>
+<span class="math notranslate nohighlight">\(\ell_{01}(m)=\mathbf{1}[m&lt;0]\)</span>, but it is piecewise constant, so its
+gradient is zero wherever it exists and no gradient method can move.  Every
+practical classifier therefore minimises a <em>surrogate</em>: a function
+<span class="math notranslate nohighlight">\(\ell(m)\)</span> that upper-bounds the 0–1 loss, decreases in <span class="math notranslate nohighlight">\(m\)</span>, and is smooth
+enough or convex enough to optimise.  The cross entropy is one such surrogate.
+Using <span class="math notranslate nohighlight">\(\sigma(-t)=1-\sigma(t)\)</span>, the per-observation cross entropy of
+Eq. (5.14) can be written as a function of the
+margin alone,</p>
+<div class="math notranslate nohighlight">
+\[
+-y\log\sigma(t)-(1-y)\log[1-\sigma(t)]
+   = -\log\sigma(\tilde y t) = \log\left(1+e^{-m}\right),\tag{5.36}
+\]</div>
+<p>the <em>logistic loss</em>.  The other members of the family in common use are
+collected in Table 5.1 and drawn in the left panel of
+Fig. 5.4.</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p><strong>Loss</strong></p></th>
+<th class="head"><p><span class="math notranslate nohighlight">\(\ell(m)\)</span> or <span class="math notranslate nohighlight">\(\ell(t,y)\)</span></p></th>
+<th class="head"><p>convex in <span class="math notranslate nohighlight">\(t\)</span></p></th>
+<th class="head"><p><span class="math notranslate nohighlight">\(\sigma(t^{*})\)</span></p></th>
+<th class="head"><p><strong>Where it is used</strong></p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>0–1</p></td>
+<td><p><span class="math notranslate nohighlight">\(\mathbf{1}[m&lt;0]\)</span></p></td>
+<td><p>no</p></td>
+<td><p>–</p></td>
+<td><p>the target, never optimised</p></td>
+</tr>
+<tr class="row-odd"><td><p>logistic (cross entropy)</p></td>
+<td><p><span class="math notranslate nohighlight">\(\log(1+e^{-m})\)</span></p></td>
+<td><p>yes</p></td>
+<td><p><span class="math notranslate nohighlight">\(\eta\)</span></p></td>
+<td><p>logistic regression, networks</p></td>
+</tr>
+<tr class="row-even"><td><p>squared error (Brier)</p></td>
+<td><p><span class="math notranslate nohighlight">\((y-\sigma(t))^{2}\)</span></p></td>
+<td><p>no</p></td>
+<td><p><span class="math notranslate nohighlight">\(\eta\)</span></p></td>
+<td><p>older networks, Brier score</p></td>
+</tr>
+<tr class="row-odd"><td><p>hinge</p></td>
+<td><p><span class="math notranslate nohighlight">\(\max(0,1-m)\)</span></p></td>
+<td><p>yes</p></td>
+<td><p>sign only</p></td>
+<td><p>support vector machines</p></td>
+</tr>
+<tr class="row-even"><td><p>squared hinge</p></td>
+<td><p><span class="math notranslate nohighlight">\(\max(0,1-m)^{2}\)</span></p></td>
+<td><p>yes</p></td>
+<td><p><span class="math notranslate nohighlight">\(\sigma(2\eta-1)\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(\ell_2\)</span>-SVM</p></td>
+</tr>
+<tr class="row-odd"><td><p>exponential</p></td>
+<td><p><span class="math notranslate nohighlight">\(e^{-m}\)</span></p></td>
+<td><p>yes</p></td>
+<td><p><span class="math notranslate nohighlight">\(\sigma(\tfrac12\log\frac{\eta}{1-\eta})\)</span></p></td>
+<td><p>AdaBoost</p></td>
+</tr>
+<tr class="row-even"><td><p>focal</p></td>
+<td><p><span class="math notranslate nohighlight">\(-(1-p)^{\gamma}\log p\)</span></p></td>
+<td><p>no</p></td>
+<td><p>compressed</p></td>
+<td><p>imbalanced data</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p><em>Table 5.1: Loss functions for binary classification.  <span class="math notranslate nohighlight">\(m=\tilde y\,t\)</span> is the
+margin, <span class="math notranslate nohighlight">\(\eta=p(y=1\mid\bm{x})\)</span> the true class probability, and <span class="math notranslate nohighlight">\(t^{*}\)</span> the
+value of the linear predictor that minimises the expected loss at a point,
+Proposition 5.1; for the focal loss <span class="math notranslate nohighlight">\(p\)</span> denotes the
+probability assigned to the correct class.  Only the losses whose <span class="math notranslate nohighlight">\(\sigma(t^{*})\)</span>
+column reads <span class="math notranslate nohighlight">\(\eta\)</span> estimate the class probability directly.</em></p>
+<p><img alt="Left the loss functions of Table 5.1 against the margin, for a point o" src="../BookML/BookFigures/chapter05_logistic_regression/margin_losses.png" /></p>
+<p><em>Figure 5.4: Left: the loss functions of Table 5.1 against the margin, for a point of class <span class="math notranslate nohighlight">\(\tilde y=+1\)</span>; the 0–1 loss is dotted.  Right: the probability <span class="math notranslate nohighlight">\(\sigma(\bm{x}^{T}\hat{\bm{\theta}})\)</span> obtained by minimising each loss with a linear model on <span class="math notranslate nohighlight">\(400\)</span> points drawn from a true logistic model, plotted against the true probability.  The cross entropy and the squared error follow the diagonal; the exponential loss recovers half the log-odds, so its curve is the diagonal compressed towards <span class="math notranslate nohighlight">\(\tfrac12\)</span>; the squared hinge and the focal loss are compressed further; the hinge loss does not estimate a probability at all.</em></p>
+<p>A few features of the picture are worth pointing out before the algebra.  All
+the surrogates agree on the sign of what they want – push the margin
+positive – and differ in how hard they push and where they stop.  The
+hinge loss is exactly zero once <span class="math notranslate nohighlight">\(m\ge1\)</span>, so points comfortably on the right
+side exert no force whatever; that is what will make support vectors in
+Chapter 6.  The logistic and exponential losses never reach zero
+and keep rewarding larger margins, exponentially weakly in the first case and
+linearly in the second; the exponential loss also punishes a large negative
+margin <em>exponentially</em> hard, which is the origin of AdaBoost’s known
+sensitivity to mislabelled points.  The squared error and the focal loss
+flatten out for large negative margins, which is the vanishing-gradient
+problem of the notebox in Section <em>Maximum likelihood and the cross-entropy</em> seen again: a
+confidently wrong point produces almost no gradient.</p>
+</section>
+<section id="what-each-loss-estimates">
+<h3><span class="section-number">5.9.2. </span>What each loss estimates<a class="headerlink" href="#what-each-loss-estimates" title="Link to this heading">#</a></h3>
+<p>A loss function does two jobs.  It has to be minimised, which is a matter of
+convexity and smoothness, and its minimiser has to mean something.  The
+second question has a clean answer, because in the limit of infinite data the
+fit at each <span class="math notranslate nohighlight">\(\bm{x}\)</span> minimises the <em>expected</em> loss there.  Fix a point
+with true class probability <span class="math notranslate nohighlight">\(\eta=p(y=1\mid\bm{x})\)</span> and ask which value of the
+linear predictor <span class="math notranslate nohighlight">\(t\)</span> minimises</p>
+<div class="math notranslate nohighlight">
+\[
+L(t) = \mathbb{E}_{y}\left[\ell(t,y)\right]
+       = \eta\,\ell(t,1) + (1-\eta)\,\ell(t,0).\tag{5.37}
+\]</div>
+<p>For a margin loss <span class="math notranslate nohighlight">\(\ell(t,1)=\ell(t)\)</span> and <span class="math notranslate nohighlight">\(\ell(t,0)=\ell(-t)\)</span>.  If the
+minimiser <span class="math notranslate nohighlight">\(t^{*}\)</span> has the sign of <span class="math notranslate nohighlight">\(2\eta-1\)</span>, the surrogate is
+<em>classification-calibrated</em> [bartlett2006]: minimising it recovers
+the Bayes decision rule of the 0–1 loss.  If, further, <span class="math notranslate nohighlight">\(\sigma(t^{*})=\eta\)</span>
+– or some fixed, invertible function of <span class="math notranslate nohighlight">\(t^{*}\)</span> equals <span class="math notranslate nohighlight">\(\eta\)</span> – the
+surrogate is a <em>proper scoring rule</em> [brier1950,gneiting2007] and the
+model’s output can be read as a probability.</p>
+<div class="important admonition">
+<p class="admonition-title">Proposition 5.1 (Pointwise minimisers of the classification losses)</p>
+<p>For <span class="math notranslate nohighlight">\(0&lt;\eta&lt;1\)</span> the minimiser of Eq. (5.37) is</p>
+<div class="math notranslate nohighlight">
+\[\]</div>
+<div class="amsmath math notranslate nohighlight" id="equation-2ddb1c80-8196-4725-8135-e2c091a9ccc5">
+<span class="eqno">(5.1)<a class="headerlink" href="#equation-2ddb1c80-8196-4725-8135-e2c091a9ccc5" title="Permalink to this equation">#</a></span>\[\begin{align}
+\text{logistic:}  
+    &amp;t^{*}=\log\frac{\eta}{1-\eta},
+    &amp;&amp;\sigma(t^{*})=\eta;
+    
+
+  \text{squared error:}  
+    &amp;\sigma(t^{*})=\eta;
+    
+
+  \text{exponential:}  
+    &amp;t^{*}=\tfrac12\log\frac{\eta}{1-\eta},
+    &amp;&amp;\sigma(2t^{*})=\eta;
+    
+
+  \text{squared hinge:}  
+    &amp;t^{*}=2\eta-1;
+    
+
+  \text{hinge:}  
+    &amp;t^{*}=\mathrm{sign}(2\eta-1).
+\end{align}\]</div>
+<div class="math notranslate nohighlight">
+\[\]</div>
+<p>All five are classification-calibrated.  The logistic and squared-error
+losses are proper; the exponential and squared-hinge losses determine <span class="math notranslate nohighlight">\(\eta\)</span>
+through <span class="math notranslate nohighlight">\(\sigma(2t^{*})\)</span> and <span class="math notranslate nohighlight">\((t^{*}+1)/2\)</span> respectively; the hinge loss
+carries no information about <span class="math notranslate nohighlight">\(\eta\)</span> beyond its sign.</p>
+</div>
+<div class="note admonition">
+<p class="admonition-title">Proof</p>
+<p>Each is a one-variable minimisation.  For the logistic loss,
+<span class="math notranslate nohighlight">\(L(t)=\eta\log(1+e^{-t})+(1-\eta)\log(1+e^{t})\)</span> and
+<span class="math notranslate nohighlight">\(L'(t)=-\eta(1-\sigma(t))+(1-\eta)\sigma(t)=\sigma(t)-\eta\)</span>, which vanishes
+exactly at <span class="math notranslate nohighlight">\(\sigma(t^{*})=\eta\)</span>; <span class="math notranslate nohighlight">\(L''=\sigma(1-\sigma)&gt;0\)</span>, so it is the
+minimum.  For the squared error,
+<span class="math notranslate nohighlight">\(L(t)=\eta(1-\sigma)^{2}+(1-\eta)\sigma^{2}\)</span> with <span class="math notranslate nohighlight">\(\sigma=\sigma(t)\)</span>, and
+<span class="math notranslate nohighlight">\(L'(t)=2(\sigma-\eta)\,\sigma'(t)\)</span>; since <span class="math notranslate nohighlight">\(\sigma'&gt;0\)</span> the only stationary
+point is again <span class="math notranslate nohighlight">\(\sigma(t^{*})=\eta\)</span>, and <span class="math notranslate nohighlight">\(L\to\eta\)</span> or <span class="math notranslate nohighlight">\(1-\eta\)</span> at
+<span class="math notranslate nohighlight">\(t\to\mp\infty\)</span>, both larger than the value <span class="math notranslate nohighlight">\(\eta(1-\eta)\)</span> at the stationary
+point, so it is the global minimum although <span class="math notranslate nohighlight">\(L\)</span> is not convex.  For the
+exponential loss <span class="math notranslate nohighlight">\(L(t)=\eta e^{-t}+(1-\eta)e^{t}\)</span>, <span class="math notranslate nohighlight">\(L'(t)=-\eta e^{-t}
++(1-\eta)e^{t}=0\)</span> gives <span class="math notranslate nohighlight">\(e^{2t^{*}}=\eta/(1-\eta)\)</span>, and
+<span class="math notranslate nohighlight">\(\sigma(2t^{*})=e^{2t^{*}}/(1+e^{2t^{*}})=\eta\)</span>.  For the squared hinge the
+minimiser lies in <span class="math notranslate nohighlight">\([-1,1]\)</span>, where both hinges are active,
+<span class="math notranslate nohighlight">\(L(t)=\eta(1-t)^{2}+(1-\eta)(1+t)^{2}\)</span> and <span class="math notranslate nohighlight">\(L'(t)=-2\eta(1-t)+2(1-\eta)(1+t)
+=2(t-(2\eta-1))\)</span>.  For the hinge, <span class="math notranslate nohighlight">\(L(t)=\eta\max(0,1-t)+(1-\eta)\max(0,1+t)\)</span>
+is piecewise linear with slope <span class="math notranslate nohighlight">\(-\eta+(1-\eta)=1-2\eta\)</span> on <span class="math notranslate nohighlight">\([-1,1]\)</span>, slope
+<span class="math notranslate nohighlight">\(1-\eta&gt;0\)</span> for <span class="math notranslate nohighlight">\(t&gt;1\)</span> and slope <span class="math notranslate nohighlight">\(-\eta&lt;0\)</span> for <span class="math notranslate nohighlight">\(t&lt;-1\)</span>; it is therefore
+minimised at <span class="math notranslate nohighlight">\(t=1\)</span> if <span class="math notranslate nohighlight">\(\eta&gt;\tfrac12\)</span> and at <span class="math notranslate nohighlight">\(t=-1\)</span> if <span class="math notranslate nohighlight">\(\eta&lt;\tfrac12\)</span>, and
+the value at the minimum, <span class="math notranslate nohighlight">\(2\min(\eta,1-\eta)\)</span>, depends on <span class="math notranslate nohighlight">\(\eta\)</span> but its
+location does not.  In every case <span class="math notranslate nohighlight">\(\mathrm{sign}(t^{*})=\mathrm{sign}(2\eta-1)\)</span>.
+\qed</p>
+</div>
+<p>The proposition is what the right panel of Fig. 5.4
+shows empirically, and it explains a common misuse.  A support vector machine
+does not produce probabilities, and passing its decision function through a
+sigmoid produces numbers that are systematically too close to <span class="math notranslate nohighlight">\(\tfrac12\)</span> –
+which is why <code class="docutils literal notranslate"><span class="pre">scikit-learn</span></code> fits a separate logistic regression on top
+of the SVM output when probabilities are requested (Platt scaling).  A model
+trained with the exponential loss must be read through <span class="math notranslate nohighlight">\(\sigma(2t)\)</span>, not
+<span class="math notranslate nohighlight">\(\sigma(t)\)</span>; that is why the AdaBoost of Chapter 7 outputs
+half the log-odds.  And the focal loss [lin2017],</p>
+<div class="math notranslate nohighlight">
+\[
+\ell_{\mathrm{focal}}(t,y)
+   = -y\,(1-p)^{\gamma}\log p - (1-y)\,p^{\gamma}\log(1-p),
+  \qquad p=\sigma(t),\ \gamma\ge0,\tag{5.43}
+\]</div>
+<p>which multiplies each cross-entropy term by a factor that vanishes for
+well-classified points and thereby concentrates the gradient on the hard and
+the rare ones, is deliberately <em>not</em> proper: its minimiser is pushed
+towards <span class="math notranslate nohighlight">\(\tfrac12\)</span> (Exercise at the end of the chapter), so a detector trained
+with it must be recalibrated before its scores are read as probabilities.
+The cross entropy is the only member of the family that is convex, proper,
+and free of the vanishing-gradient defect, and that is the whole case for it;
+but each of the others buys something in exchange, and the following code
+makes it possible to see what without deriving a single derivative.</p>
+</section>
+<section id="one-program-for-every-loss">
+<h3><span class="section-number">5.9.3. </span>One program for every loss<a class="headerlink" href="#one-program-for-every-loss" title="Link to this heading">#</a></h3>
+<p>The class of Section <em>An implementation</em> hard-wired the cross-entropy
+gradient (5.17).  With automatic differentiation the loss
+becomes a plain Python function of the linear predictor and the label, the
+cost is its mean over the data plus the penalty of Eq. (5.23),
+and JAX supplies the gradient – and, if wanted, the Hessian – of whatever
+we wrote.  Trying a new loss means writing one line.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">jax</span>
+<span class="n">jax</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="s2">&quot;jax_enable_x64&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+<span class="kn">import</span> <span class="nn">jax.numpy</span> <span class="k">as</span> <span class="nn">jnp</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">jax</span> <span class="kn">import</span> <span class="n">grad</span><span class="p">,</span> <span class="n">jit</span><span class="p">,</span> <span class="n">hessian</span>
+<span class="kn">from</span> <span class="nn">jax.nn</span> <span class="kn">import</span> <span class="n">sigmoid</span><span class="p">,</span> <span class="n">softplus</span><span class="p">,</span> <span class="n">log_sigmoid</span>
+
+<span class="c1"># Every loss is a function of the linear predictor t = x^T theta and the label</span>
+<span class="c1"># y in {0, 1}, evaluated pointwise; softplus(t) = log(1 + e^t) is the stable</span>
+<span class="c1"># form of Eq. (5.crossentropycompact), log_sigmoid(t) = log sigma(t).</span>
+<span class="k">def</span> <span class="nf">cross_entropy</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">softplus</span><span class="p">(</span><span class="n">t</span><span class="p">)</span> <span class="o">-</span> <span class="n">y</span> <span class="o">*</span> <span class="n">t</span>                          <span class="c1"># Eq. (5.logisticloss)</span>
+
+<span class="k">def</span> <span class="nf">squared_error</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">y</span> <span class="o">-</span> <span class="n">sigmoid</span><span class="p">(</span><span class="n">t</span><span class="p">))</span><span class="o">**</span><span class="mi">2</span>                          <span class="c1"># the Brier score</span>
+
+<span class="k">def</span> <span class="nf">hinge</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">jnp</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span> <span class="o">-</span> <span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">y</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">t</span><span class="p">)</span>        <span class="c1"># margin m = (2y-1) t</span>
+
+<span class="k">def</span> <span class="nf">squared_hinge</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">jnp</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span> <span class="o">-</span> <span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">y</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">t</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span>
+
+<span class="k">def</span> <span class="nf">exponential</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">jnp</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">y</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">t</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">focal</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">gamma</span><span class="o">=</span><span class="mf">2.0</span><span class="p">):</span>                             <span class="c1"># Eq. (5.focal)</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="n">sigmoid</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+    <span class="k">return</span> <span class="o">-</span><span class="p">(</span><span class="n">y</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">p</span><span class="p">)</span><span class="o">**</span><span class="n">gamma</span> <span class="o">*</span> <span class="n">log_sigmoid</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+             <span class="o">+</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">y</span><span class="p">)</span> <span class="o">*</span> <span class="n">p</span><span class="o">**</span><span class="n">gamma</span> <span class="o">*</span> <span class="n">log_sigmoid</span><span class="p">(</span><span class="o">-</span><span class="n">t</span><span class="p">))</span>
+
+<span class="n">LOSSES</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;cross entropy&quot;</span><span class="p">:</span> <span class="n">cross_entropy</span><span class="p">,</span> <span class="s2">&quot;squared error&quot;</span><span class="p">:</span> <span class="n">squared_error</span><span class="p">,</span>
+          <span class="s2">&quot;hinge&quot;</span><span class="p">:</span> <span class="n">hinge</span><span class="p">,</span> <span class="s2">&quot;squared hinge&quot;</span><span class="p">:</span> <span class="n">squared_hinge</span><span class="p">,</span>
+          <span class="s2">&quot;exponential&quot;</span><span class="p">:</span> <span class="n">exponential</span><span class="p">,</span> <span class="s2">&quot;focal (gamma=2)&quot;</span><span class="p">:</span> <span class="n">focal</span><span class="p">}</span>
+
+<span class="k">def</span> <span class="nf">cost</span><span class="p">(</span><span class="n">theta</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">loss</span><span class="p">,</span> <span class="n">lmbda</span><span class="o">=</span><span class="mf">0.0</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Mean loss over the data plus an l2 penalty that spares the intercept.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">jnp</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">loss</span><span class="p">(</span><span class="n">X</span> <span class="o">@</span> <span class="n">theta</span><span class="p">,</span> <span class="n">y</span><span class="p">))</span> <span class="o">+</span> <span class="n">lmbda</span> <span class="o">*</span> <span class="n">jnp</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">theta</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="n">loss</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">eta</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">epochs</span><span class="o">=</span><span class="mi">3000</span><span class="p">,</span> <span class="n">lmbda</span><span class="o">=</span><span class="mf">0.0</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Gradient descent, Eq. (5.gd), with the gradient supplied by JAX.&quot;&quot;&quot;</span>
+    <span class="n">c</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">th</span><span class="p">:</span> <span class="n">cost</span><span class="p">(</span><span class="n">th</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">loss</span><span class="p">,</span> <span class="n">lmbda</span><span class="p">)</span>
+    <span class="n">step</span> <span class="o">=</span> <span class="n">jit</span><span class="p">(</span><span class="k">lambda</span> <span class="n">th</span><span class="p">:</span> <span class="n">th</span> <span class="o">-</span> <span class="n">eta</span> <span class="o">*</span> <span class="n">grad</span><span class="p">(</span><span class="n">c</span><span class="p">)(</span><span class="n">th</span><span class="p">))</span>
+    <span class="n">theta</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+    <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">epochs</span><span class="p">):</span>
+        <span class="n">theta</span> <span class="o">=</span> <span class="n">step</span><span class="p">(</span><span class="n">theta</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">theta</span>
+
+<span class="k">def</span> <span class="nf">newton</span><span class="p">(</span><span class="n">loss</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">iters</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">lmbda</span><span class="o">=</span><span class="mf">1e-8</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Newton-Raphson, Eq. (5.newtonabstract), with the Hessian from JAX.&quot;&quot;&quot;</span>
+    <span class="n">c</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">th</span><span class="p">:</span> <span class="n">cost</span><span class="p">(</span><span class="n">th</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">loss</span><span class="p">,</span> <span class="n">lmbda</span><span class="p">)</span>
+    <span class="n">g</span><span class="p">,</span> <span class="n">H</span> <span class="o">=</span> <span class="n">jit</span><span class="p">(</span><span class="n">grad</span><span class="p">(</span><span class="n">c</span><span class="p">)),</span> <span class="n">jit</span><span class="p">(</span><span class="n">hessian</span><span class="p">(</span><span class="n">c</span><span class="p">))</span>
+    <span class="n">theta</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+    <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">iters</span><span class="p">):</span>
+        <span class="n">theta</span> <span class="o">=</span> <span class="n">theta</span> <span class="o">-</span> <span class="n">jnp</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">H</span><span class="p">(</span><span class="n">theta</span><span class="p">),</span> <span class="n">g</span><span class="p">(</span><span class="n">theta</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">theta</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Before using it on anything, we check the machinery against the hand-derived
+results of Section <em>Gradients, the Hessian and convexity</em>: the automatic gradient of the
+cross entropy must be <span class="math notranslate nohighlight">\(-\bm{X}^{T}(\bm{y}-\bm{p})/n\)</span> and its automatic
+Hessian must be <span class="math notranslate nohighlight">\(\bm{X}^{T}\bm{W}\bm{X}/n\)</span>.  The data are drawn from a
+<em>true</em> logistic model, so that we can afterwards ask not only whether
+each loss classifies well but whether it estimates the right probabilities.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="mi">2024</span><span class="p">)</span>
+<span class="n">n</span> <span class="o">=</span> <span class="mi">400</span>
+<span class="n">X</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">c_</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">n</span><span class="p">),</span> <span class="n">rng</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="mi">2</span><span class="p">))])</span>
+<span class="n">theta_true</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0</span><span class="p">])</span>
+<span class="n">p_true</span> <span class="o">=</span> <span class="n">sigmoid</span><span class="p">(</span><span class="n">X</span> <span class="o">@</span> <span class="n">theta_true</span><span class="p">)</span>                       <span class="c1"># the truth we try to recover</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">asarray</span><span class="p">((</span><span class="n">rng</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">n</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">p_true</span><span class="p">))</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">))</span>
+
+<span class="n">theta0</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.1</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.3</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">])</span>
+<span class="n">g_ad</span> <span class="o">=</span> <span class="n">grad</span><span class="p">(</span><span class="n">cost</span><span class="p">)(</span><span class="n">theta0</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">cross_entropy</span><span class="p">)</span>
+<span class="n">g_hand</span> <span class="o">=</span> <span class="o">-</span><span class="n">X</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="p">(</span><span class="n">y</span> <span class="o">-</span> <span class="n">sigmoid</span><span class="p">(</span><span class="n">X</span> <span class="o">@</span> <span class="n">theta0</span><span class="p">))</span> <span class="o">/</span> <span class="n">n</span>                 <span class="c1"># Eq. (5.gradient)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;gradient: max |AD - hand| =&quot;</span><span class="p">,</span> <span class="nb">float</span><span class="p">(</span><span class="n">jnp</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">jnp</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">g_ad</span> <span class="o">-</span> <span class="n">g_hand</span><span class="p">))))</span>
+
+<span class="n">p0</span> <span class="o">=</span> <span class="n">sigmoid</span><span class="p">(</span><span class="n">X</span> <span class="o">@</span> <span class="n">theta0</span><span class="p">)</span>
+<span class="n">H_ad</span> <span class="o">=</span> <span class="n">hessian</span><span class="p">(</span><span class="n">cost</span><span class="p">)(</span><span class="n">theta0</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">cross_entropy</span><span class="p">)</span>
+<span class="n">H_hand</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="p">((</span><span class="n">p0</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">p0</span><span class="p">))[:,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="n">X</span><span class="p">)</span> <span class="o">/</span> <span class="n">n</span>              <span class="c1"># Eq. (5.hessian)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Hessian:  max |AD - hand| =&quot;</span><span class="p">,</span> <span class="nb">float</span><span class="p">(</span><span class="n">jnp</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">jnp</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">H_ad</span> <span class="o">-</span> <span class="n">H_hand</span><span class="p">))))</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Newton :&quot;</span><span class="p">,</span> <span class="n">newton</span><span class="p">(</span><span class="n">cross_entropy</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;GD     :&quot;</span><span class="p">,</span> <span class="n">fit</span><span class="p">(</span><span class="n">cross_entropy</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">gradient</span><span class="p">:</span> <span class="nb">max</span> <span class="o">|</span><span class="n">AD</span> <span class="o">-</span> <span class="n">hand</span><span class="o">|</span> <span class="o">=</span> <span class="mf">2.220446049250313e-16</span>
+<span class="n">Hessian</span><span class="p">:</span>  <span class="nb">max</span> <span class="o">|</span><span class="n">AD</span> <span class="o">-</span> <span class="n">hand</span><span class="o">|</span> <span class="o">=</span> <span class="mf">3.0531133177191805e-16</span>
+<span class="n">Newton</span> <span class="p">:</span> <span class="p">[</span> <span class="mf">0.26067864</span>  <span class="mf">1.93734364</span> <span class="o">-</span><span class="mf">1.00125907</span><span class="p">]</span>
+<span class="n">GD</span>     <span class="p">:</span> <span class="p">[</span> <span class="mf">0.26067869</span>  <span class="mf">1.93734439</span> <span class="o">-</span><span class="mf">1.00125944</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>Both derivatives agree with Eqs. (5.17) and (5.19)
+to rounding, and Newton’s method built from <code class="docutils literal notranslate"><span class="pre">jax.hessian</span></code> lands in ten
+iterations where three thousand steps of gradient descent land, the two
+differing in the seventh digit only through the tiny ridge term that keeps
+the Hessian invertible.  Now the loop that
+motivated the section:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">evaluate</span><span class="p">(</span><span class="n">theta</span><span class="p">):</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="n">sigmoid</span><span class="p">(</span><span class="n">X</span> <span class="o">@</span> <span class="n">theta</span><span class="p">)</span>
+    <span class="n">accuracy</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">jnp</span><span class="o">.</span><span class="n">mean</span><span class="p">((</span><span class="n">p</span> <span class="o">&gt;</span> <span class="mf">0.5</span><span class="p">)</span> <span class="o">==</span> <span class="p">(</span><span class="n">y</span> <span class="o">&gt;</span> <span class="mf">0.5</span><span class="p">)))</span>
+    <span class="n">calibration</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">jnp</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">jnp</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">p</span> <span class="o">-</span> <span class="n">p_true</span><span class="p">)))</span>    <span class="c1"># mean |p_hat - p_true|</span>
+    <span class="k">return</span> <span class="n">accuracy</span><span class="p">,</span> <span class="n">calibration</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="s1">&#39;loss&#39;</span><span class="si">:</span><span class="s2">16s</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="s1">&#39;theta&#39;</span><span class="si">:</span><span class="s2">26s</span><span class="si">}</span><span class="s2"> accuracy   mean |p_hat - p_true|&quot;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">loss</span> <span class="ow">in</span> <span class="n">LOSSES</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+    <span class="n">theta</span> <span class="o">=</span> <span class="n">fit</span><span class="p">(</span><span class="n">loss</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+    <span class="n">acc</span><span class="p">,</span> <span class="n">cal</span> <span class="o">=</span> <span class="n">evaluate</span><span class="p">(</span><span class="n">theta</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">:</span><span class="s2">16s</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">array2string</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">theta</span><span class="p">),</span><span class="w"> </span><span class="n">precision</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span><span class="si">:</span><span class="s2">26s</span><span class="si">}</span><span class="s2">&quot;</span>
+          <span class="sa">f</span><span class="s2">&quot; </span><span class="si">{</span><span class="n">acc</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">      </span><span class="si">{</span><span class="n">cal</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;true            &quot;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">theta_true</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">loss</span>             <span class="n">theta</span>                      <span class="n">accuracy</span>   <span class="n">mean</span> <span class="o">|</span><span class="n">p_hat</span> <span class="o">-</span> <span class="n">p_true</span><span class="o">|</span>
+<span class="n">cross</span> <span class="n">entropy</span>    <span class="p">[</span> <span class="mf">0.26</span>  <span class="mf">1.94</span> <span class="o">-</span><span class="mf">1.</span>  <span class="p">]</span>        <span class="mf">0.790</span>      <span class="mf">0.032</span>
+<span class="n">squared</span> <span class="n">error</span>    <span class="p">[</span> <span class="mf">0.32</span>  <span class="mf">1.82</span> <span class="o">-</span><span class="mf">0.97</span><span class="p">]</span>        <span class="mf">0.790</span>      <span class="mf">0.024</span>
+<span class="n">hinge</span>            <span class="p">[</span> <span class="mf">0.28</span>  <span class="mf">1.53</span> <span class="o">-</span><span class="mf">0.89</span><span class="p">]</span>        <span class="mf">0.792</span>      <span class="mf">0.043</span>
+<span class="n">squared</span> <span class="n">hinge</span>    <span class="p">[</span> <span class="mf">0.1</span>   <span class="mf">0.69</span> <span class="o">-</span><span class="mf">0.36</span><span class="p">]</span>        <span class="mf">0.795</span>      <span class="mf">0.156</span>
+<span class="n">exponential</span>      <span class="p">[</span> <span class="mf">0.11</span>  <span class="mf">1.06</span> <span class="o">-</span><span class="mf">0.53</span><span class="p">]</span>        <span class="mf">0.780</span>      <span class="mf">0.103</span>
+<span class="n">focal</span> <span class="p">(</span><span class="n">gamma</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>  <span class="p">[</span> <span class="mf">0.09</span>  <span class="mf">0.74</span> <span class="o">-</span><span class="mf">0.38</span><span class="p">]</span>        <span class="mf">0.782</span>      <span class="mf">0.149</span>
+<span class="n">true</span>             <span class="p">[</span> <span class="mf">0.5</span>  <span class="mf">2.</span>  <span class="o">-</span><span class="mf">1.</span> <span class="p">]</span>
+</pre></div>
+</div>
+<p>The accuracies are all within a percent of one another, and of the Bayes rate
+of <span class="math notranslate nohighlight">\(0.79\)</span> for this problem: every loss in the table is classification-calibrated,
+as Proposition 5.1 says, and all of them find essentially
+the same decision boundary.  The probabilities are another matter, and the
+last column is Proposition 5.1 in numbers.  The two
+proper losses recover the true parameters up to sampling error.  The
+exponential loss returns <span class="math notranslate nohighlight">\((0.11,1.06,-0.53)\)</span>, which is the true vector halved
+– Eq. (5.40), <span class="math notranslate nohighlight">\(t^{*}=\tfrac12\log[\eta/(1-\eta)]\)</span> – and its
+probabilities are correct once read through <span class="math notranslate nohighlight">\(\sigma(2t)\)</span>.  The squared hinge
+and the focal loss compress the parameters by a factor of about three and
+their <span class="math notranslate nohighlight">\(\sigma(t)\)</span> is badly miscalibrated, while their accuracy is unharmed.
+Nothing about these conclusions required a derivative, and the reader can now
+add a loss to the dictionary – an asymmetric one that penalises false
+negatives more than false positives, a class-weighted cross entropy, a
+Huberised hinge – and have the answer in seconds.</p>
+<div class="tip admonition">
+<p class="admonition-title">Machine learning connection</p>
+<p>The pattern of this section is how
+loss functions are actually developed.  A practitioner writes the loss as a
+few lines of framework code, lets the framework differentiate it, and judges
+the result empirically; the theoretical questions – is it convex, is it
+proper, is it classification-calibrated – are asked afterwards, and often
+answered by exactly the pointwise argument of
+Proposition 5.1.  Every framework in the later chapters
+(<code class="docutils literal notranslate"><span class="pre">PyTorch</span></code>, <code class="docutils literal notranslate"><span class="pre">TensorFlow</span></code>, <code class="docutils literal notranslate"><span class="pre">JAX</span></code>) offers the losses of
+Table 5.1 as library functions, but nothing in them is
+special: <code class="docutils literal notranslate"><span class="pre">torch.nn.BCEWithLogitsLoss</span></code> is <code class="docutils literal notranslate"><span class="pre">softplus(t)</span> <span class="pre">-</span> <span class="pre">y*t</span></code>,
+and a loss the library does not offer is one line away.  The one practical
+rule is the one used above: write losses in terms of the logit <span class="math notranslate nohighlight">\(t\)</span> and the
+stable primitives <code class="docutils literal notranslate"><span class="pre">softplus</span></code> and <code class="docutils literal notranslate"><span class="pre">log_sigmoid</span></code>, never in terms
+of <span class="math notranslate nohighlight">\(\log\sigma(t)\)</span> computed literally, for the reasons of
+Section <em>Optimising the cross entropy</em>.</p>
+</div>
+</section>
+</section>
 <section id="kernel-logistic-regression">
-<h2><span class="section-number">5.9. </span>Kernel logistic regression<a class="headerlink" href="#kernel-logistic-regression" title="Link to this heading">#</a></h2>
+<h2><span class="section-number">5.10. </span>Kernel logistic regression<a class="headerlink" href="#kernel-logistic-regression" title="Link to this heading">#</a></h2>
 <p>Logistic regression produces a linear decision boundary, and
 Section <em>Kernel methods: regression without coordinates</em> showed how to remove that restriction from
 Ridge regression without ever constructing the enlarged feature space.  The
 same construction applies here, and it applies for the same reason: by
-Theorem 3.9 the reason had nothing to do with the squared
+Theorem 3.12 the reason had nothing to do with the squared
 error.</p>
 <section id="the-problem-and-what-the-representer-theorem-gives">
-<h3><span class="section-number">5.9.1. </span>The problem, and what the representer theorem gives<a class="headerlink" href="#the-problem-and-what-the-representer-theorem-gives" title="Link to this heading">#</a></h3>
+<h3><span class="section-number">5.10.1. </span>The problem, and what the representer theorem gives<a class="headerlink" href="#the-problem-and-what-the-representer-theorem-gives" title="Link to this heading">#</a></h3>
 <p>Replace the linear predictor <span class="math notranslate nohighlight">\(\bm{x}^{T}\bm{\theta}\)</span> by a function
 <span class="math notranslate nohighlight">\(f\in\mathcal{H}\)</span>, the reproducing kernel Hilbert space of a kernel <span class="math notranslate nohighlight">\(k\)</span>, and
 penalise its norm:</p>
@@ -1281,14 +1688,14 @@ penalise its norm:</p>
     -\sum_{i=1}^{n}\Big[y_i\ln p_i + (1-y_i)\ln(1-p_i)\Big]
     + \frac{\lambda}{2}\left\|f\right\|_{\mathcal{H}}^{2}\right\},
   \qquad
-  p_i = \sigma\!\left(f(\bm{x}_i)\right),\tag{5.35}
+  p_i = \sigma\!\left(f(\bm{x}_i)\right),\tag{5.44}
 \]</div>
 <p>with <span class="math notranslate nohighlight">\(\sigma\)</span> the logistic function (5.3) and <span class="math notranslate nohighlight">\(y_i\in\{0,1\}\)</span>.
 The data-fitting term is the cross entropy (5.13) with
 <span class="math notranslate nohighlight">\(\bm{x}_i^{T}\bm{\theta}\)</span> replaced by <span class="math notranslate nohighlight">\(f(\bm{x}_i)\)</span>, and the penalty is the
 <span class="math notranslate nohighlight">\(\ell_2\)</span> penalty of Section <em>More predictors, and regularisation</em> measured in <span class="math notranslate nohighlight">\(\mathcal{H}\)</span>
 rather than in <span class="math notranslate nohighlight">\(\mathbb{R}^{p}\)</span>.</p>
-<p>Theorem 3.9 applies immediately: the loss depends on <span class="math notranslate nohighlight">\(f\)</span>
+<p>Theorem 3.12 applies immediately: the loss depends on <span class="math notranslate nohighlight">\(f\)</span>
 only through its values at the training points, and
 <span class="math notranslate nohighlight">\(\Omega(t)=\tfrac{\lambda}{2}t^{2}\)</span> is strictly increasing.  The minimiser is
 therefore</p>
@@ -1299,7 +1706,7 @@ f(\cdot) = \sum_{j=1}^{n}\alpha_j\,k\!\left(\bm{x}_j,\cdot\right),
   \bm{f} = \bm{K}\bm{\alpha}
   \quad\text{and}\quad
   \left\|f\right\|_{\mathcal{H}}^{2}
-   = \bm{\alpha}^{T}\bm{K}\bm{\alpha},\tag{5.36}
+   = \bm{\alpha}^{T}\bm{K}\bm{\alpha},\tag{5.45}
 \]</div>
 <p>the second identity because
 <span class="math notranslate nohighlight">\(\|f\|^{2}=\sum_{ij}\alpha_i\alpha_j\langle k(\bm{x}_i,\cdot),
@@ -1312,38 +1719,38 @@ infinite-dimensional problem has become the <span class="math notranslate nohigh
     -\sum_{i=1}^{n}\Big[y_i\ln p_i+(1-y_i)\ln(1-p_i)\Big]
     + \frac{\lambda}{2}\,\bm{\alpha}^{T}\bm{K}\bm{\alpha},
   \qquad
-  \bm{p} = \sigma\!\left(\bm{K}\bm{\alpha}\right). \;}\tag{5.37}
+  \bm{p} = \sigma\!\left(\bm{K}\bm{\alpha}\right). \;}\tag{5.46}
 \]</div>
 </section>
 <section id="gradient-hessian-and-kernel-irls">
-<h3><span class="section-number">5.9.2. </span>Gradient, Hessian and kernel IRLS<a class="headerlink" href="#gradient-hessian-and-kernel-irls" title="Link to this heading">#</a></h3>
+<h3><span class="section-number">5.10.2. </span>Gradient, Hessian and kernel IRLS<a class="headerlink" href="#gradient-hessian-and-kernel-irls" title="Link to this heading">#</a></h3>
 <p>The derivatives are obtained from Section <em>Gradients, the Hessian and convexity</em> by the
 substitution <span class="math notranslate nohighlight">\(\bm{X}\rightarrow\bm{K}\)</span>, which is the whole of the work: the
 chain rule sees <span class="math notranslate nohighlight">\(\bm{K}\bm{\alpha}\)</span> exactly as it saw <span class="math notranslate nohighlight">\(\bm{X}\bm{\theta}\)</span>.
-Differentiating Eq. (5.37) and using
+Differentiating Eq. (5.46) and using
 Eq. (1.28) for the penalty,</p>
 <div class="math notranslate nohighlight">
 \[
 \frac{\partial C}{\partial\bm{\alpha}}
    = -\bm{K}\left(\bm{y}-\bm{p}\right) + \lambda\bm{K}\bm{\alpha}
-   = \bm{K}\Big[\left(\bm{p}-\bm{y}\right)+\lambda\bm{\alpha}\Big],\tag{5.38}
+   = \bm{K}\Big[\left(\bm{p}-\bm{y}\right)+\lambda\bm{\alpha}\Big],\tag{5.47}
 \]</div>
 <p>to be compared with Eq. (5.17), and</p>
 <div class="math notranslate nohighlight">
 \[
 \frac{\partial^{2}C}
        {\partial\bm{\alpha}\,\partial\bm{\alpha}^{T}}
-   = \bm{K}\bm{W}\bm{K} + \lambda\bm{K},\tag{5.39}
+   = \bm{K}\bm{W}\bm{K} + \lambda\bm{K},\tag{5.48}
 \]</div>
 <p>with <span class="math notranslate nohighlight">\(\bm{W}\)</span> the same diagonal matrix (5.18) of weights
 <span class="math notranslate nohighlight">\(p_i(1-p_i)\)</span>.  Since <span class="math notranslate nohighlight">\(\bm{K}\)</span> is positive semi-definite, so is
-Eq. (5.39) by the argument of Eq. (5.20), and
+Eq. (5.48) by the argument of Eq. (5.20), and
 the problem is convex; for <span class="math notranslate nohighlight">\(\lambda&gt;0\)</span> and <span class="math notranslate nohighlight">\(\bm{K}\)</span> positive definite it is
 strictly convex, so the minimiser is unique.</p>
 <p>Newton’s method now takes a form worth deriving, because it turns out to be the
 exact analogue of the iteratively reweighted least squares of
 Eq. (5.34).  Assume <span class="math notranslate nohighlight">\(\bm{K}\)</span> invertible and factor it out of
-Eq. (5.39) on the left,
+Eq. (5.48) on the left,
 <span class="math notranslate nohighlight">\(\bm{K}\bm{W}\bm{K}+\lambda\bm{K}=\bm{K}(\bm{W}\bm{K}+\lambda\bm{I})\)</span>.  The
 Newton step <span class="math notranslate nohighlight">\(\bm{\Delta}=-\bm{H}^{-1}\bm{g}\)</span> is then</p>
 <div class="math notranslate nohighlight">
@@ -1352,7 +1759,7 @@ Newton step <span class="math notranslate nohighlight">\(\bm{\Delta}=-\bm{H}^{-1
    = -\left(\bm{W}\bm{K}+\lambda\bm{I}\right)^{-1}\bm{K}^{-1}
       \bm{K}\Big[(\bm{p}-\bm{y})+\lambda\bm{\alpha}\Big]
    = \left(\bm{W}\bm{K}+\lambda\bm{I}\right)^{-1}
-     \Big[(\bm{y}-\bm{p})-\lambda\bm{\alpha}\Big],\tag{5.40}
+     \Big[(\bm{y}-\bm{p})-\lambda\bm{\alpha}\Big],\tag{5.49}
 \]</div>
 <p>the inverse Gram matrices cancelling.  Adding <span class="math notranslate nohighlight">\(\bm{\alpha}\)</span> and collecting,</p>
 <div class="math notranslate nohighlight">
@@ -1360,24 +1767,24 @@ Newton step <span class="math notranslate nohighlight">\(\bm{\Delta}=-\bm{H}^{-1
 \bm{\alpha}+\bm{\Delta}
    = \left(\bm{W}\bm{K}+\lambda\bm{I}\right)^{-1}
      \Big[\bm{W}\bm{K}\bm{\alpha}+(\bm{y}-\bm{p})\Big]
-   = \left(\bm{W}\bm{K}+\lambda\bm{I}\right)^{-1}\bm{W}\bm{z},\tag{5.41}
+   = \left(\bm{W}\bm{K}+\lambda\bm{I}\right)^{-1}\bm{W}\bm{z},\tag{5.50}
 \]</div>
 <p>where the <em>working response</em></p>
 <div class="math notranslate nohighlight">
 \[
-\bm{z} = \bm{K}\bm{\alpha}+\bm{W}^{-1}\left(\bm{y}-\bm{p}\right)\tag{5.42}
+\bm{z} = \bm{K}\bm{\alpha}+\bm{W}^{-1}\left(\bm{y}-\bm{p}\right)\tag{5.51}
 \]</div>
 <p>is the adjusted response defined just above Eq. (5.34), with <span class="math notranslate nohighlight">\(\bm{X}\bm{\theta}\)</span> replaced by
-<span class="math notranslate nohighlight">\(\bm{K}\bm{\alpha}\)</span>.  Multiplying Eq. (5.41) through by
+<span class="math notranslate nohighlight">\(\bm{K}\bm{\alpha}\)</span>.  Multiplying Eq. (5.50) through by
 <span class="math notranslate nohighlight">\(\bm{W}^{-1}\)</span> inside the inverse gives the form to remember,</p>
 <div class="math notranslate nohighlight">
 \[
 \boxed{\;
   \bm{\alpha} \;\leftarrow\;
-    \left(\bm{K}+\lambda\bm{W}^{-1}\right)^{-1}\bm{z} . \;}\tag{5.43}
+    \left(\bm{K}+\lambda\bm{W}^{-1}\right)^{-1}\bm{z} . \;}\tag{5.52}
 \]</div>
-<p>Compare Eq. (5.43) with the kernel ridge
-regression (3.68), <span class="math notranslate nohighlight">\(\bm{\alpha}=(\bm{K}+\lambda\bm{I})^{-1}\bm{y}\)</span>.
+<p>Compare Eq. (5.52) with the kernel ridge
+regression (3.84), <span class="math notranslate nohighlight">\(\bm{\alpha}=(\bm{K}+\lambda\bm{I})^{-1}\bm{y}\)</span>.
 They differ in two places only: the targets <span class="math notranslate nohighlight">\(\bm{y}\)</span> have become the working
 response <span class="math notranslate nohighlight">\(\bm{z}\)</span>, and the uniform penalty <span class="math notranslate nohighlight">\(\lambda\bm{I}\)</span> has become the
 per-observation penalty <span class="math notranslate nohighlight">\(\lambda\bm{W}^{-1}\)</span>, which is small where the model is
@@ -1385,7 +1792,7 @@ uncertain and large where it is confident.  <em>Kernel logistic regression is
 iteratively reweighted kernel ridge regression</em>, exactly as ordinary logistic
 regression is iteratively reweighted least squares.  The parallel of
 Section <em>Optimising the cross entropy</em> is complete, and it is not a coincidence but a
-consequence of Theorem 3.9: the same substitution that
+consequence of Theorem 3.12: the same substitution that
 turned least squares into kernel ridge regression turns each reweighted step
 into a reweighted kernel step.</p>
 <div class="cell docutils container">
@@ -1426,10 +1833,10 @@ points nearly coincide; adding <span class="math notranslate nohighlight">\(10^{
 remedy and changes nothing that matters.</p>
 </section>
 <section id="the-method-verified">
-<h3><span class="section-number">5.9.3. </span>The method, verified<a class="headerlink" href="#the-method-verified" title="Link to this heading">#</a></h3>
+<h3><span class="section-number">5.10.3. </span>The method, verified<a class="headerlink" href="#the-method-verified" title="Link to this heading">#</a></h3>
 <p>The test problem is one that no linear boundary can solve at all: <span class="math notranslate nohighlight">\(120\)</span> points
 in the plane, labelled by whether they fall inside a disc, with five per cent of
-the labels flipped.  Newton’s method on Eq. (5.43) with a Gaussian
+the labels flipped.  Newton’s method on Eq. (5.52) with a Gaussian
 kernel converges in six iterations, and the step lengths show the quadratic
 rate of Section <em>Optimising the cross entropy</em> unmistakably:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>    <span class="n">iteration</span>        <span class="n">cost</span>          <span class="o">||</span><span class="n">delta</span> <span class="n">alpha</span><span class="o">||</span>
@@ -1470,28 +1877,28 @@ Section <em>More predictors, and regularisation</em>; with it, three independent
 agree to the tolerance of the least accurate.</p>
 </section>
 <section id="what-the-coefficients-are">
-<h3><span class="section-number">5.9.4. </span>What the coefficients are<a class="headerlink" href="#what-the-coefficients-are" title="Link to this heading">#</a></h3>
-<p>Setting Eq. (5.38) to zero gives a fact about kernel logistic
+<h3><span class="section-number">5.10.4. </span>What the coefficients are<a class="headerlink" href="#what-the-coefficients-are" title="Link to this heading">#</a></h3>
+<p>Setting Eq. (5.47) to zero gives a fact about kernel logistic
 regression that is easy to miss and explains a good deal.</p>
 <div class="important admonition">
-<p class="admonition-title">Proposition 5.1 (The coefficients are the residuals)</p>
-<p>If <span class="math notranslate nohighlight">\(\bm{K}\)</span> is invertible, the minimiser of Eq. (5.37) satisfies</p>
+<p class="admonition-title">Proposition 5.2 (The coefficients are the residuals)</p>
+<p>If <span class="math notranslate nohighlight">\(\bm{K}\)</span> is invertible, the minimiser of Eq. (5.46) satisfies</p>
 <div class="math notranslate nohighlight">
 \[
 \alpha_i = \frac{y_i-p_i}{\lambda},
-  \qquad i=1,\dots,n .\tag{5.44}
+  \qquad i=1,\dots,n .\tag{5.53}
 \]</div>
 </div>
 <div class="note admonition">
 <p class="admonition-title">Proof</p>
 <p>Stationarity is
 <span class="math notranslate nohighlight">\(\bm{K}[(\bm{p}-\bm{y})+\lambda\bm{\alpha}]=\bm{0}\)</span> by
-Eq. (5.38).  Multiplying by <span class="math notranslate nohighlight">\(\bm{K}^{-1}\)</span> gives
+Eq. (5.47).  Multiplying by <span class="math notranslate nohighlight">\(\bm{K}^{-1}\)</span> gives
 <span class="math notranslate nohighlight">\(\lambda\bm{\alpha}=\bm{y}-\bm{p}\)</span>.
 \qed</p>
 </div>
 <p>The weight a training point carries in the fitted
-function (5.36) is its own residual divided by the penalty.
+function (5.45) is its own residual divided by the penalty.
 Points the model already predicts correctly and confidently have small
 residuals and contribute little; points it gets wrong contribute much.  But
 <span class="math notranslate nohighlight">\(p_i\)</span> is a logistic probability and lies strictly between zero and one, so the
@@ -1508,25 +1915,25 @@ than its two neighbours.  Prediction costs <span class="math notranslate nohighl
 how easy the problem is, where a support vector machine on the same data would
 retain a fraction of the points.  Section <em>One penalty, three losses</em> shows that this
 contrast is not an accident of the two algorithms but a theorem about their
-losses, and that Eq. (5.44) is one instance of a formula
+losses, and that Eq. (5.53) is one instance of a formula
 covering all three of the kernel methods in this book.</p>
 <div class="tip admonition">
 <p class="admonition-title">Machine learning connection</p>
 <p>What kernel logistic regression buys
 over a support vector machine is a calibrated probability.  The output of
-Eq. (5.36) passed through the sigmoid is an estimate of
+Eq. (5.45) passed through the sigmoid is an estimate of
 <span class="math notranslate nohighlight">\(p(y=1\mid\bm{x})\)</span> obtained by maximising a likelihood, so it can be
 thresholded at a cost-sensitive value, combined with other probabilities, or
 fed to a decision rule – all of which the signed distance produced by
 Eq. (6.33) cannot support without an extra calibration
 step fitted on held-out data.  Against that stands the dense <span class="math notranslate nohighlight">\(\bm{\alpha}\)</span> of
-Proposition 5.1 and the <span class="math notranslate nohighlight">\(\bigO(n^{3})\)</span> cost of each
+Proposition 5.2 and the <span class="math notranslate nohighlight">\(\bigO(n^{3})\)</span> cost of each
 Newton step.  The choice between them is the usual one in this book: a
 probability, or a sparse representation, but not both from the same fit.</p>
 </div>
 </section>
 <section id="the-penalty-measured">
-<h3><span class="section-number">5.9.5. </span>The penalty, measured<a class="headerlink" href="#the-penalty-measured" title="Link to this heading">#</a></h3>
+<h3><span class="section-number">5.10.5. </span>The penalty, measured<a class="headerlink" href="#the-penalty-measured" title="Link to this heading">#</a></h3>
 <p>Everything Section <em>More predictors, and regularisation</em> said about the penalty holds here,
 with one addition: the kernel supplies enough flexibility to interpolate the
 training data exactly, so the penalty is no longer optional.  Running the same
@@ -1551,7 +1958,7 @@ training error.</p>
 </section>
 </section>
 <section id="measuring-the-quality-of-a-classifier">
-<h2><span class="section-number">5.10. </span>Measuring the quality of a classifier<a class="headerlink" href="#measuring-the-quality-of-a-classifier" title="Link to this heading">#</a></h2>
+<h2><span class="section-number">5.11. </span>Measuring the quality of a classifier<a class="headerlink" href="#measuring-the-quality-of-a-classifier" title="Link to this heading">#</a></h2>
 <p>The mean squared error and <span class="math notranslate nohighlight">\(R^{2}\)</span> of Section <em>Measures of quality</em> are
 meaningless for a classifier.  We need measures appropriate to discrete
 outcomes, and it turns out that no single number will do.</p>
@@ -1565,7 +1972,7 @@ against the predicted one gives four counts:</p>
     \hline
     \text{true } 1 &amp; \mathrm{TP} &amp; \mathrm{FN}\\
     \text{true } 0 &amp; \mathrm{FP} &amp; \mathrm{TN}
-  \end{array}\tag{5.45}
+  \end{array}\tag{5.54}
 \end{split}\]</div>
 <p>the true positives, false negatives, false positives and true negatives.
 Every scalar measure below is a function of these four numbers, and reporting
@@ -1577,7 +1984,7 @@ The obvious measure is the fraction correctly classified,</p>
 \[
 \mathrm{accuracy} = \frac{\mathrm{TP}+\mathrm{TN}}
     {\mathrm{TP}+\mathrm{TN}+\mathrm{FP}+\mathrm{FN}}
-   = \frac{1}{n}\sum_{i=1}^{n} I\!\left(y_i=\tilde{y}_i\right),\tag{5.46}
+   = \frac{1}{n}\sum_{i=1}^{n} I\!\left(y_i=\tilde{y}_i\right),\tag{5.55}
 \]</div>
 <p>with <span class="math notranslate nohighlight">\(I\)</span> the indicator function.  Accuracy is the right measure when the
 classes are balanced and the two kinds of error are equally costly.  It is
@@ -1591,7 +1998,7 @@ Separating the two kinds of error gives</p>
 \[
 \mathrm{precision} = \frac{\mathrm{TP}}{\mathrm{TP}+\mathrm{FP}},
   \qquad
-  \mathrm{recall} = \frac{\mathrm{TP}}{\mathrm{TP}+\mathrm{FN}} .\tag{5.47}
+  \mathrm{recall} = \frac{\mathrm{TP}}{\mathrm{TP}+\mathrm{FN}} .\tag{5.56}
 \]</div>
 <p>Precision asks: of the samples flagged positive, what fraction really were?
 Recall asks: of the samples that really were positive, what fraction did we
@@ -1605,7 +2012,7 @@ The harmonic mean of the two,</p>
 <div class="math notranslate nohighlight">
 \[
 F_1 = 2\,\frac{\mathrm{precision}\cdot\mathrm{recall}}
-                {\mathrm{precision}+\mathrm{recall}},\tag{5.48}
+                {\mathrm{precision}+\mathrm{recall}},\tag{5.57}
 \]</div>
 <p>is the usual compromise; the harmonic mean rather than the arithmetic one
 because it is small unless <em>both</em> are large.</p>
@@ -1676,7 +2083,7 @@ the surrogate closer to the optimum of the metric one actually cares about.</p>
 </div>
 </section>
 <section id="the-wisconsin-breast-cancer-data">
-<h2><span class="section-number">5.11. </span>The Wisconsin breast cancer data<a class="headerlink" href="#the-wisconsin-breast-cancer-data" title="Link to this heading">#</a></h2>
+<h2><span class="section-number">5.12. </span>The Wisconsin breast cancer data<a class="headerlink" href="#the-wisconsin-breast-cancer-data" title="Link to this heading">#</a></h2>
 <p>We close with a real data set.  The Wisconsin breast cancer data contain <span class="math notranslate nohighlight">\(569\)</span>
 samples, each described by <span class="math notranslate nohighlight">\(30\)</span> features computed from a digitised image of a
 fine-needle aspirate of a breast mass – radius, texture, perimeter, area,
@@ -1813,7 +2220,7 @@ cross-validated accuracy (<span class="math notranslate nohighlight">\(0.981\)</
 <span class="math notranslate nohighlight">\(143\)</span> test samples the standard error of the latter is about <span class="math notranslate nohighlight">\(0.017\)</span> by
 Eq. (2.24), so the difference is within about one and a half
 standard errors and should not be over-interpreted.</p>
-<p>Figure 5.4 shows the two summaries that matter.  The ROC curve
+<p>Figure 5.5 shows the two summaries that matter.  The ROC curve
 hugs the top-left corner, giving an AUC of <span class="math notranslate nohighlight">\(0.9914\)</span>; because the AUC depends
 only on the ranking of the predicted probabilities, it is unaffected by the
 class imbalance that makes the raw accuracy flattering.  The confusion matrix
@@ -1821,10 +2228,10 @@ is the more actionable object: it separates the three malignant cases predicted
 benign from the three benign cases predicted malignant, and in a screening
 context those two numbers carry very different costs.</p>
 <p><img alt="Logistic regression on the Wisconsin test set.  Left the ROC curve, wi" src="_images/wisconsin_roc_confusion.png" /></p>
-<p><em>Figure 5.4: Logistic regression on the Wisconsin test set.  Left: the ROC curve, with AUC <span class="math notranslate nohighlight">\(=0.9914\)</span>.  Right: the confusion matrix, whose off-diagonal entries are the two kinds of error and are not equally costly.</em></p>
+<p><em>Figure 5.5: Logistic regression on the Wisconsin test set.  Left: the ROC curve, with AUC <span class="math notranslate nohighlight">\(=0.9914\)</span>.  Right: the confusion matrix, whose off-diagonal entries are the two kinds of error and are not equally costly.</em></p>
 </section>
 <section id="summary-and-the-programs">
-<h2><span class="section-number">5.12. </span>Summary and the programs<a class="headerlink" href="#summary-and-the-programs" title="Link to this heading">#</a></h2>
+<h2><span class="section-number">5.13. </span>Summary and the programs<a class="headerlink" href="#summary-and-the-programs" title="Link to this heading">#</a></h2>
 <p>Logistic regression is the bridge between the linear models of
 Chapter 3 and the neural networks of the next chapter, and it is
 worth setting out how little had to change and how much followed.</p>
@@ -1838,7 +2245,14 @@ maximum-likelihood argument of Section <em>Deriving least squares from a probabi
 rather than Gaussian observations produced the cross
 entropy (5.13), just as the notebox there predicted.  This
 is worth remembering as a general principle: specify the distribution of the
-target and the loss function is determined.</p>
+target and the loss function is determined.  It is not, however, the only
+usable loss: Section <em>Other loss functions, and automatic differentiation</em> placed it in the family of
+margin-based surrogates for the 0–1 loss, alongside the hinge loss of the
+coming support vector machine and the exponential loss of boosting, and
+Proposition 5.1 showed that all of them find the same
+decision boundary while only the proper ones – cross entropy and squared
+error – estimate the class probability itself.  With automatic
+differentiation, switching between them cost one line of code.</p>
 <p>The mathematics then ran parallel to Chapter 3 throughout.  The
 gradient is <span class="math notranslate nohighlight">\(-\bm{X}^{T}(\bm{y}-\bm{p})\)</span>, design matrix against residual,
 exactly as in least squares with the linear prediction replaced by the
@@ -1855,9 +2269,9 @@ squares, Eq. (5.34) – for small ones.</p>
 theorem of Section <em>Why the same trick works for any loss: the representer theorem</em> the penalised problem in a
 reproducing kernel Hilbert space has a finite solution
 <span class="math notranslate nohighlight">\(f=\sum_j\alpha_jk(\bm{x}_j,\cdot)\)</span>, and Newton’s method on it,
-Eq. (5.43), is iteratively reweighted <em>kernel</em> ridge
+Eq. (5.52), is iteratively reweighted <em>kernel</em> ridge
 regression – the same sentence as before with the design matrix replaced by
-the Gram matrix throughout.  Proposition 5.1 then says
+the Gram matrix throughout.  Proposition 5.2 then says
 that the coefficients are the residuals divided by the penalty, so they are
 never zero: kernel logistic regression buys a calibrated probability and pays
 for it with a predictor that involves every training point, which is the
@@ -1872,16 +2286,22 @@ built from it, with the standing warning that accuracy alone is uninformative
 when the classes are imbalanced.</p>
 <p>The complete programs are collected in <code class="docutils literal notranslate"><span class="pre">doc/BookML/BookPrograms</span></code>:</p>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">kernel_logistic.py</span></code> – kernel IRLS, Eq. (5.43),
+<li><p><code class="docutils literal notranslate"><span class="pre">kernel_logistic.py</span></code> – kernel IRLS, Eq. (5.52),
 against gradient descent on the same objective, against the primal
 problem in an explicit feature map and against <code class="docutils literal notranslate"><span class="pre">scikit-learn</span></code>;
 the residual identity of
-Proposition 5.1; and the penalty study of
+Proposition 5.2; and the penalty study of
 Section <em>The penalty, measured</em>.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">logistic_regression.py</span></code> – the class of
 Section <em>An implementation</em> for the binary and multiclass cases, the
 synthetic data generators, and the numerically stable sigmoid and
 softmax of Eqs. (5.3) and (5.30).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">logistic_losses_jax.py</span></code> – the loss-agnostic trainer of
+Section <em>One program for every loss</em>: the six losses of Table 5.1
+as one-line functions, gradient descent and Newton’s method with
+derivatives from JAX, the checks against Eqs. (5.17)
+and (5.19), and the accuracy-and-calibration
+comparison of Proposition 5.1.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">logreg_newton.py</span></code> – Newton-Raphson and IRLS as in
 Eqs. (5.33) and (5.34), with a comparison of
 iteration counts against gradient descent and against the adaptive
@@ -1908,9 +2328,9 @@ rule (1.51) carrying that gradient backwards through the
 preceding layers.  Almost everything in this chapter will be reused.</p>
 </section>
 <section id="exercises">
-<h2><span class="section-number">5.13. </span>Exercises<a class="headerlink" href="#exercises" title="Link to this heading">#</a></h2>
+<h2><span class="section-number">5.14. </span>Exercises<a class="headerlink" href="#exercises" title="Link to this heading">#</a></h2>
 <section id="warm-up-exercises">
-<h3><span class="section-number">5.13.1. </span>Warm-up exercises<a class="headerlink" href="#warm-up-exercises" title="Link to this heading">#</a></h3>
+<h3><span class="section-number">5.14.1. </span>Warm-up exercises<a class="headerlink" href="#warm-up-exercises" title="Link to this heading">#</a></h3>
 <ol class="arabic simple">
 <li><p><strong>Properties of the sigmoid.</strong>
 (a) Prove Eq. (5.4), <span class="math notranslate nohighlight">\(1-\sigma(t)=\sigma(-t)\)</span>.
@@ -1982,6 +2402,37 @@ class;
 against it, and identify the threshold maximising <span class="math notranslate nohighlight">\(F_1\)</span>;
 (d) verify your <code class="docutils literal notranslate"><span class="pre">roc_auc</span></code> implementation against
 <code class="docutils literal notranslate"><span class="pre">sklearn.metrics.roc_auc_score</span></code>.</p></li>
+<li><p><strong>The focal loss is not proper.</strong>
+For the focal loss (5.43) write the expected
+loss (5.37) as a function of <span class="math notranslate nohighlight">\(p=\sigma(t)\)</span>,
+<span class="math notranslate nohighlight">\(L(p)=-\eta(1-p)^{\gamma}\log p-(1-\eta)p^{\gamma}\log(1-p)\)</span>.
+(a) Show that <span class="math notranslate nohighlight">\(L'(p)=0\)</span> reduces to
+<span class="math notranslate nohighlight">\(\eta\,(1-p)^{\gamma-1}\left[\gamma p\log p+(1-p)\right]
+=(1-\eta)\,p^{\gamma-1}\left[\gamma(1-p)\log(1-p)+p\right]\)</span>,
+and that <span class="math notranslate nohighlight">\(p=\eta\)</span> solves it only for <span class="math notranslate nohighlight">\(\gamma=0\)</span>.
+(b) Solve it numerically and show that the minimiser <span class="math notranslate nohighlight">\(\hat p(\eta)\)</span> lies
+strictly between <span class="math notranslate nohighlight">\(\eta\)</span> and <span class="math notranslate nohighlight">\(\tfrac12\)</span> for every <span class="math notranslate nohighlight">\(\eta\neq\tfrac12\)</span>;
+plot <span class="math notranslate nohighlight">\(\hat p\)</span> against <span class="math notranslate nohighlight">\(\eta\)</span> for <span class="math notranslate nohighlight">\(\gamma=0,1,2,5\)</span> and compare with the
+focal curve in the right panel of Fig. 5.4.  Then fit a logistic model with the focal loss to the data
+of Section <em>One program for every loss</em>, and recalibrate its output by fitting a
+one-dimensional logistic regression of <span class="math notranslate nohighlight">\(y\)</span> on <span class="math notranslate nohighlight">\(\hat t\)</span> (Platt scaling);
+confirm that the recalibrated probabilities agree with the truth.</p></li>
+<li><p><strong>Losses by automatic differentiation (numerical).</strong>
+Using the code of Section <em>One program for every loss</em>:
+(a) add an <em>asymmetric</em> cross entropy in which a false negative costs
+<span class="math notranslate nohighlight">\(c\)</span> times a false positive, derive its pointwise minimiser as in
+Proposition 5.1, and verify numerically that the
+fitted decision boundary moves to <span class="math notranslate nohighlight">\(\eta=1/(1+c)\)</span>;
+(b) add the Huberised hinge, quadratic for <span class="math notranslate nohighlight">\(m\in[-1,1]\)</span> and linear
+outside, and check that Newton’s method with <code class="docutils literal notranslate"><span class="pre">jax.hessian</span></code>
+converges for it while it fails for the plain hinge (why?);
+(c) verify the entries of Table 5.1 by fitting each loss on
+<span class="math notranslate nohighlight">\(10^{4}\)</span> points and comparing <span class="math notranslate nohighlight">\(\hat{\bm{\theta}}\)</span> against
+<span class="math notranslate nohighlight">\(\bm{\theta}_{\mathrm{true}}\)</span>, <span class="math notranslate nohighlight">\(\tfrac12\bm{\theta}_{\mathrm{true}}\)</span>
+or neither;
+(d) flip the labels of a random <span class="math notranslate nohighlight">\(10\%\)</span> of the points with <span class="math notranslate nohighlight">\(|t|&gt;2\)</span> and
+compare how far each fitted <span class="math notranslate nohighlight">\(\hat{\bm{\theta}}\)</span> moves; relate the
+ordering to the right-hand tails of Fig. 5.4.</p></li>
 <li><p><strong>Correlated features.</strong>
 In the Wisconsin data of Section <em>The Wisconsin breast cancer data</em>:
 (a) find the pairs of features with correlation above <span class="math notranslate nohighlight">\(0.95\)</span>;
@@ -1992,12 +2443,12 @@ predictors in the notebox of Section <em>The Lasso</em>.</p></li>
 </ol>
 </section>
 <section id="project-style-exercise-classification-from-end-to-end">
-<h3><span class="section-number">5.13.2. </span>Project-style exercise: classification from end to end<a class="headerlink" href="#project-style-exercise-classification-from-end-to-end" title="Link to this heading">#</a></h3>
+<h3><span class="section-number">5.14.2. </span>Project-style exercise: classification from end to end<a class="headerlink" href="#project-style-exercise-classification-from-end-to-end" title="Link to this heading">#</a></h3>
 <p><strong>Part a: your own implementation.</strong>
 Write logistic regression from scratch, with the stable sigmoid, the
 cross-entropy cost (5.13), the analytical
 gradient (5.17) and an <span class="math notranslate nohighlight">\(\ell_2\)</span> penalty.  Verify the gradient
-against a finite difference using Eq. (4.43) and against
+against a finite difference using Eq. (4.63) and against
 automatic differentiation as in Section <em>Automatic differentiation</em>.</p>
 <p><strong>Part b: optimisers.</strong>
 Train it on the Wisconsin data using plain gradient descent, momentum,
@@ -2103,20 +2554,26 @@ applies a neural network to the same data, and the comparison is the point.</p>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#more-than-two-classes-the-softmax">5.6. More than two classes: the softmax</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#optimising-the-cross-entropy">5.7. Optimising the cross entropy</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#an-implementation">5.8. An implementation</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#kernel-logistic-regression">5.9. Kernel logistic regression</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-problem-and-what-the-representer-theorem-gives">5.9.1. The problem, and what the representer theorem gives</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gradient-hessian-and-kernel-irls">5.9.2. Gradient, Hessian and kernel IRLS</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-method-verified">5.9.3. The method, verified</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#what-the-coefficients-are">5.9.4. What the coefficients are</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-penalty-measured">5.9.5. The penalty, measured</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#other-loss-functions-and-automatic-differentiation">5.9. Other loss functions, and automatic differentiation</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#margin-based-losses">5.9.1. Margin-based losses</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#what-each-loss-estimates">5.9.2. What each loss estimates</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#one-program-for-every-loss">5.9.3. One program for every loss</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#measuring-the-quality-of-a-classifier">5.10. Measuring the quality of a classifier</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-wisconsin-breast-cancer-data">5.11. The Wisconsin breast cancer data</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#summary-and-the-programs">5.12. Summary and the programs</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercises">5.13. Exercises</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#warm-up-exercises">5.13.1. Warm-up exercises</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#project-style-exercise-classification-from-end-to-end">5.13.2. Project-style exercise: classification from end to end</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#kernel-logistic-regression">5.10. Kernel logistic regression</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-problem-and-what-the-representer-theorem-gives">5.10.1. The problem, and what the representer theorem gives</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gradient-hessian-and-kernel-irls">5.10.2. Gradient, Hessian and kernel IRLS</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-method-verified">5.10.3. The method, verified</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#what-the-coefficients-are">5.10.4. What the coefficients are</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-penalty-measured">5.10.5. The penalty, measured</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#measuring-the-quality-of-a-classifier">5.11. Measuring the quality of a classifier</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-wisconsin-breast-cancer-data">5.12. The Wisconsin breast cancer data</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#summary-and-the-programs">5.13. Summary and the programs</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercises">5.14. Exercises</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#warm-up-exercises">5.14.1. Warm-up exercises</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#project-style-exercise-classification-from-end-to-end">5.14.2. Project-style exercise: classification from end to end</a></li>
 </ul>
 </li>
 </ul>

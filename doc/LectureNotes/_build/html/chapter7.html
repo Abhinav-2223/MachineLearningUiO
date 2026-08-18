@@ -389,10 +389,11 @@ document.write(`
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#adaboost">7.12. AdaBoost</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gradient-boosting">7.13. Gradient boosting</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#xgboost-extreme-gradient-boosting">7.14. XGBoost: extreme gradient boosting</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#summary-and-the-programs">7.15. Summary and the programs</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercises">7.16. Exercises</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#warm-up-exercises">7.16.1. Warm-up exercises</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#project-style-exercise-from-one-tree-to-a-jungle">7.16.2. Project-style exercise: from one tree to a jungle</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#boosting-any-loss-automatic-differentiation">7.15. Boosting any loss: automatic differentiation</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#summary-and-the-programs">7.16. Summary and the programs</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercises">7.17. Exercises</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#warm-up-exercises">7.17.1. Warm-up exercises</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#project-style-exercise-from-one-tree-to-a-jungle">7.17.2. Project-style exercise: from one tree to a jungle</a></li>
 </ul>
 </li>
 </ul>
@@ -527,7 +528,7 @@ by a non-negative parameter <span class="math notranslate nohighlight">\(\alpha\
 belonging to the <span class="math notranslate nohighlight">\(m\)</span>-th of them.</p>
 <p>Equation (7.4) should look familiar: it is a training
 error plus <span class="math notranslate nohighlight">\(\alpha\)</span> times a complexity penalty, which is precisely the
-structure of Ridge regression in Eq. (3.27), with the
+structure of Ridge regression in Eq. (3.43), with the
 number of leaves playing the role of <span class="math notranslate nohighlight">\(\|\bm{\theta}\|^{2}\)</span>.  When <span class="math notranslate nohighlight">\(\alpha=0\)</span>
 the subtree is <span class="math notranslate nohighlight">\(T_0\)</span> itself, since the equation then measures only training
 error; as <span class="math notranslate nohighlight">\(\alpha\)</span> grows there is an increasing price for many terminal nodes
@@ -1659,7 +1660,9 @@ is exactly the early stopping of Section <em>Learning rate schedules and stoppin
 regularisation available.  The loss is chosen by the argument of
 Section <em>Deriving least squares from a probability distribution</em>: squared error for Gaussian noise, logistic
 for Bernoulli targets, and any other differentiable loss one can write down,
-including the quantile and Huber losses for robust regression.  The base
+including the quantile and Huber losses for robust regression –
+Section <em>Boosting any loss: automatic differentiation</em> does exactly that, with the derivatives supplied
+by automatic differentiation.  The base
 learner is the tree of Section <em>Implementing a decision tree</em>.  And the contrast with
 bagging is instructive: bagging averages independent deep trees to remove
 variance, boosting sums dependent shallow trees to remove bias.  Because
@@ -1703,7 +1706,7 @@ explicit complexity penalty on the tree,</p>
 \Omega(f) = \gamma T + \frac{1}{2}\lambda\sum_{j=1}^{T}w_j^{2},\tag{7.34}
 \]</div>
 <p>with <span class="math notranslate nohighlight">\(T\)</span> the number of leaves and <span class="math notranslate nohighlight">\(w_j\)</span> the value in leaf <span class="math notranslate nohighlight">\(j\)</span>.  This is
-Ridge-style regularisation, Eq. (3.27), applied to the leaf
+Ridge-style regularisation, Eq. (3.43), applied to the leaf
 weights, plus a per-leaf cost <span class="math notranslate nohighlight">\(\gamma\)</span> which is the cost-complexity penalty of
 Eq. (7.4) built into the objective rather than applied
 afterwards.</p>
@@ -1778,8 +1781,381 @@ gradient boosting machine borrows from the bagging family as well.  The
 distinction drawn in this chapter between the two approaches is real
 mathematically and blurred in practice.</p>
 </section>
+<section id="boosting-any-loss-automatic-differentiation">
+<h2><span class="section-number">7.15. </span>Boosting any loss: automatic differentiation<a class="headerlink" href="#boosting-any-loss-automatic-differentiation" title="Link to this heading">#</a></h2>
+<p>Sections <em>Gradient boosting</em> and <em>XGBoost: extreme gradient boosting</em> both needed
+derivatives of the loss – the pseudo-residual <span class="math notranslate nohighlight">\(u_{im}=-g_i\)</span> of
+Eq. (7.30), and the pair <span class="math notranslate nohighlight">\(g_i,h_i\)</span> of
+Eq. (7.33) – and both times we derived them by hand,
+Eqs. (7.31) and (7.32), for the two
+losses we happened to want.  That is exactly the situation
+Section <em>Automatic differentiation</em> was written for, and here the payoff is
+unusually clean.  A tree is not differentiable: its split decisions are
+discrete and automatic differentiation has nothing to say about them.  But a
+boosted tree never looks at the targets directly.  It looks only at <span class="math notranslate nohighlight">\(g_i\)</span> and
+<span class="math notranslate nohighlight">\(h_i\)</span>, and those are derivatives of a one-line function.  Everything that
+depends on the loss can therefore be handed to JAX, and everything that
+depends on the tree stays exactly as it was.  The result is a boosting
+machine in which the loss is an argument, as in
+Section <em>Other loss functions, and automatic differentiation</em>, and which reproduces <code class="docutils literal notranslate"><span class="pre">XGBoost</span></code> to
+single precision.</p>
+<p><strong>The losses and their derivatives.</strong>
+Each loss is written pointwise, as a function of one target <span class="math notranslate nohighlight">\(y\)</span> and one
+prediction <span class="math notranslate nohighlight">\(f\)</span>; <code class="docutils literal notranslate"><span class="pre">vmap</span></code> maps it over the data, and <code class="docutils literal notranslate"><span class="pre">grad</span></code> applied
+once and twice supplies <span class="math notranslate nohighlight">\(g_i\)</span> and <span class="math notranslate nohighlight">\(h_i\)</span>.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">jax</span>
+<span class="n">jax</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="s2">&quot;jax_enable_x64&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+<span class="kn">import</span> <span class="nn">jax.numpy</span> <span class="k">as</span> <span class="nn">jnp</span>
+<span class="kn">from</span> <span class="nn">jax</span> <span class="kn">import</span> <span class="n">grad</span><span class="p">,</span> <span class="n">vmap</span><span class="p">,</span> <span class="n">jit</span>
+<span class="kn">from</span> <span class="nn">jax.nn</span> <span class="kn">import</span> <span class="n">softplus</span><span class="p">,</span> <span class="n">sigmoid</span>
+
+<span class="c1"># Pointwise losses L(y, f).  f is the additive model: the value itself for</span>
+<span class="c1"># regression, the log-odds for classification, the log-rate for counts.</span>
+<span class="k">def</span> <span class="nf">squared</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">f</span><span class="p">):</span>
+    <span class="k">return</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">y</span> <span class="o">-</span> <span class="n">f</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span>                                <span class="c1"># Eq. (7.gbresidual)</span>
+
+<span class="k">def</span> <span class="nf">logistic</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">f</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">softplus</span><span class="p">(</span><span class="n">f</span><span class="p">)</span> <span class="o">-</span> <span class="n">y</span> <span class="o">*</span> <span class="n">f</span>                             <span class="c1"># cross entropy, f = log-odds</span>
+
+<span class="k">def</span> <span class="nf">huber</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">delta</span><span class="o">=</span><span class="mf">1.0</span><span class="p">):</span>
+    <span class="n">r</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">y</span> <span class="o">-</span> <span class="n">f</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">jnp</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">r</span> <span class="o">&lt;=</span> <span class="n">delta</span><span class="p">,</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">r</span><span class="o">**</span><span class="mi">2</span><span class="p">,</span> <span class="n">delta</span> <span class="o">*</span> <span class="p">(</span><span class="n">r</span> <span class="o">-</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">delta</span><span class="p">))</span>
+
+<span class="k">def</span> <span class="nf">quantile</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">tau</span><span class="o">=</span><span class="mf">0.9</span><span class="p">):</span>
+    <span class="n">r</span> <span class="o">=</span> <span class="n">y</span> <span class="o">-</span> <span class="n">f</span>
+    <span class="k">return</span> <span class="n">jnp</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="n">tau</span> <span class="o">*</span> <span class="n">r</span><span class="p">,</span> <span class="p">(</span><span class="n">tau</span> <span class="o">-</span> <span class="mf">1.0</span><span class="p">)</span> <span class="o">*</span> <span class="n">r</span><span class="p">)</span>           <span class="c1"># pinball loss</span>
+
+<span class="k">def</span> <span class="nf">poisson</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">f</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">jnp</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">f</span><span class="p">)</span> <span class="o">-</span> <span class="n">y</span> <span class="o">*</span> <span class="n">f</span>                              <span class="c1"># counts, f = log(rate)</span>
+
+<span class="k">def</span> <span class="nf">derivatives</span><span class="p">(</span><span class="n">loss</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;g_i = dL/df and h_i = d^2L/df^2 at every data point, from JAX.&quot;&quot;&quot;</span>
+    <span class="n">g</span> <span class="o">=</span> <span class="n">jit</span><span class="p">(</span><span class="n">vmap</span><span class="p">(</span><span class="n">grad</span><span class="p">(</span><span class="n">loss</span><span class="p">,</span> <span class="n">argnums</span><span class="o">=</span><span class="mi">1</span><span class="p">)))</span>
+    <span class="n">h</span> <span class="o">=</span> <span class="n">jit</span><span class="p">(</span><span class="n">vmap</span><span class="p">(</span><span class="n">grad</span><span class="p">(</span><span class="n">grad</span><span class="p">(</span><span class="n">loss</span><span class="p">,</span> <span class="n">argnums</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span> <span class="n">argnums</span><span class="o">=</span><span class="mi">1</span><span class="p">)))</span>
+    <span class="k">return</span> <span class="n">g</span><span class="p">,</span> <span class="n">h</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Two of these deserve a remark.  The Huber loss is quadratic for
+<span class="math notranslate nohighlight">\(|y-f|\le\delta\)</span> and linear beyond, so its gradient is the residual clipped
+to <span class="math notranslate nohighlight">\(\pm\delta\)</span>: a gross outlier pulls with bounded force.  The quantile or
+pinball loss has gradient <span class="math notranslate nohighlight">\(-\tau\)</span> for <span class="math notranslate nohighlight">\(y&gt;f\)</span> and <span class="math notranslate nohighlight">\(1-\tau\)</span> for <span class="math notranslate nohighlight">\(y&lt;f\)</span>, so its
+minimising constant is the <span class="math notranslate nohighlight">\(\tau\)</span>-quantile of the targets, and its second
+derivative is zero everywhere: JAX returns exactly that, and the second-order
+method below will therefore refuse it, which is correct – Newton’s method
+has nothing to work with on a piecewise-linear loss, and it must be boosted
+to first order.</p>
+<p><strong>The tree that sees only derivatives.</strong>
+The tree of Section <em>XGBoost: extreme gradient boosting</em> is grown on the vectors <span class="math notranslate nohighlight">\(\bm{g}\)</span> and
+<span class="math notranslate nohighlight">\(\bm{h}\)</span> alone: its split criterion is the gain (7.37) and its
+leaf values are Eq. (7.36).  It is a smaller object than the
+CART of Section <em>Implementing a decision tree</em>, because there is no impurity to choose
+and no leaf value to vote on, and it contains ordinary gradient boosting as a
+special case.  Set every <span class="math notranslate nohighlight">\(h_i=1\)</span> and <span class="math notranslate nohighlight">\(\lambda=0\)</span>; then <span class="math notranslate nohighlight">\(H_L=n_L\)</span>, <span class="math notranslate nohighlight">\(H_R=n_R\)</span>,
+and the gain becomes</p>
+<div class="math notranslate nohighlight">
+\[
+\frac{1}{2}\left[\frac{G_L^{2}}{n_L}+\frac{G_R^{2}}{n_R}
+                    -\frac{(G_L+G_R)^{2}}{n_L+n_R}\right]
+   = \frac{1}{2}\left[\sum_{i}\left(u_i-\bar u\right)^{2}
+      -\sum_{i\in L}\left(u_i-\bar u_L\right)^{2}
+      -\sum_{i\in R}\left(u_i-\bar u_R\right)^{2}\right],\tag{7.38}
+\]</div>
+<p>with <span class="math notranslate nohighlight">\(u_i=-g_i\)</span> the pseudo-residual: one half the reduction in the residual
+sum of squares obtained by splitting, which is precisely the
+criterion (7.12) of a least-squares regression tree fitted to
+<span class="math notranslate nohighlight">\(u\)</span>, and the leaf value <span class="math notranslate nohighlight">\(-G_j/H_j=\bar u_j\)</span> is the leaf mean.  (The identity
+is the analysis-of-variance decomposition of Eq. (3.20) applied
+within a node.)  So a single tree builder serves both algorithms of this
+chapter: fed <span class="math notranslate nohighlight">\(h\equiv1\)</span> it is Friedman’s base learner, fed the true second
+derivatives it is XGBoost’s.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Node</span><span class="p">:</span>
+    <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;feature&quot;</span><span class="p">,</span> <span class="s2">&quot;threshold&quot;</span><span class="p">,</span> <span class="s2">&quot;left&quot;</span><span class="p">,</span> <span class="s2">&quot;right&quot;</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span><span class="p">)</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">feature</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">threshold</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">left</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">right</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">value</span>
+
+<span class="k">class</span> <span class="nc">GradientTree</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A regression tree grown on the derivatives g_i, h_i of the loss.</span>
+
+<span class="sd">    Split criterion: the gain of Eq. (7.xgbgain); leaf value: Eq. (7.xgbweight).</span>
+<span class="sd">    With h_i = 1 and lmbda = 0 it is a least-squares tree fitted to the</span>
+<span class="sd">    pseudo-residual -g_i, Eq. (7.gainmse); with the true h_i it is XGBoost&#39;s tree.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">max_depth</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">lmbda</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">gamma</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">min_child_weight</span><span class="o">=</span><span class="mf">1.0</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">max_depth</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">lmbda</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">gamma</span> <span class="o">=</span> <span class="n">max_depth</span><span class="p">,</span> <span class="n">lmbda</span><span class="p">,</span> <span class="n">gamma</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">min_child_weight</span> <span class="o">=</span> <span class="n">min_child_weight</span>
+
+    <span class="k">def</span> <span class="nf">_build</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="n">depth</span><span class="p">):</span>
+        <span class="n">G</span><span class="p">,</span> <span class="n">H</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">sum</span><span class="p">(),</span> <span class="n">h</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+        <span class="n">node</span> <span class="o">=</span> <span class="n">Node</span><span class="p">(</span><span class="o">-</span><span class="n">G</span> <span class="o">/</span> <span class="p">(</span><span class="n">H</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">lmbda</span><span class="p">))</span>                    <span class="c1"># Eq. (7.xgbweight)</span>
+        <span class="k">if</span> <span class="n">depth</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_depth</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">g</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">node</span>
+        <span class="n">best_gain</span><span class="p">,</span> <span class="n">best_j</span><span class="p">,</span> <span class="n">best_t</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span>
+        <span class="n">parent</span> <span class="o">=</span> <span class="n">G</span><span class="o">**</span><span class="mi">2</span> <span class="o">/</span> <span class="p">(</span><span class="n">H</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">lmbda</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>
+            <span class="n">order</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">X</span><span class="p">[:,</span> <span class="n">j</span><span class="p">])</span>
+            <span class="n">xs</span><span class="p">,</span> <span class="n">gs</span><span class="p">,</span> <span class="n">hs</span> <span class="o">=</span> <span class="n">X</span><span class="p">[</span><span class="n">order</span><span class="p">,</span> <span class="n">j</span><span class="p">],</span> <span class="n">g</span><span class="p">[</span><span class="n">order</span><span class="p">],</span> <span class="n">h</span><span class="p">[</span><span class="n">order</span><span class="p">]</span>
+            <span class="n">GL</span><span class="p">,</span> <span class="n">HL</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cumsum</span><span class="p">(</span><span class="n">gs</span><span class="p">)[:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">cumsum</span><span class="p">(</span><span class="n">hs</span><span class="p">)[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>   <span class="c1"># sums left of each split</span>
+            <span class="n">GR</span><span class="p">,</span> <span class="n">HR</span> <span class="o">=</span> <span class="n">G</span> <span class="o">-</span> <span class="n">GL</span><span class="p">,</span> <span class="n">H</span> <span class="o">-</span> <span class="n">HL</span>
+            <span class="n">gain</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">GL</span><span class="o">**</span><span class="mi">2</span> <span class="o">/</span> <span class="p">(</span><span class="n">HL</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">lmbda</span><span class="p">)</span>
+                          <span class="o">+</span> <span class="n">GR</span><span class="o">**</span><span class="mi">2</span> <span class="o">/</span> <span class="p">(</span><span class="n">HR</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">lmbda</span><span class="p">)</span> <span class="o">-</span> <span class="n">parent</span><span class="p">)</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">gamma</span>
+            <span class="n">valid</span> <span class="o">=</span> <span class="p">((</span><span class="n">xs</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">xs</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">HL</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">min_child_weight</span><span class="p">)</span>
+                     <span class="o">&amp;</span> <span class="p">(</span><span class="n">HR</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">min_child_weight</span><span class="p">))</span>
+            <span class="n">gain</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">valid</span><span class="p">,</span> <span class="n">gain</span><span class="p">,</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">)</span>              <span class="c1"># Eq. (7.xgbgain)</span>
+            <span class="n">k</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">gain</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">gain</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">best_gain</span><span class="p">:</span>
+                <span class="n">best_gain</span><span class="p">,</span> <span class="n">best_j</span><span class="p">,</span> <span class="n">best_t</span> <span class="o">=</span> <span class="n">gain</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="n">j</span><span class="p">,</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">xs</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">+</span> <span class="n">xs</span><span class="p">[</span><span class="n">k</span> <span class="o">+</span> <span class="mi">1</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">best_j</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">node</span>
+        <span class="n">mask</span> <span class="o">=</span> <span class="n">X</span><span class="p">[:,</span> <span class="n">best_j</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">best_t</span>
+        <span class="n">node</span><span class="o">.</span><span class="n">feature</span><span class="p">,</span> <span class="n">node</span><span class="o">.</span><span class="n">threshold</span> <span class="o">=</span> <span class="n">best_j</span><span class="p">,</span> <span class="n">best_t</span>
+        <span class="n">node</span><span class="o">.</span><span class="n">left</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_build</span><span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="n">mask</span><span class="p">],</span> <span class="n">g</span><span class="p">[</span><span class="n">mask</span><span class="p">],</span> <span class="n">h</span><span class="p">[</span><span class="n">mask</span><span class="p">],</span> <span class="n">depth</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">node</span><span class="o">.</span><span class="n">right</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_build</span><span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="o">~</span><span class="n">mask</span><span class="p">],</span> <span class="n">g</span><span class="p">[</span><span class="o">~</span><span class="n">mask</span><span class="p">],</span> <span class="n">h</span><span class="p">[</span><span class="o">~</span><span class="n">mask</span><span class="p">],</span> <span class="n">depth</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">node</span>
+
+    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span> <span class="n">h</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">root_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_build</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="nb">float</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">g</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">h</span><span class="p">),</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span>
+
+    <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">):</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="nb">float</span><span class="p">):</span>
+            <span class="n">node</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root_</span>
+            <span class="k">while</span> <span class="n">node</span><span class="o">.</span><span class="n">feature</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">node</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">left</span> <span class="k">if</span> <span class="n">x</span><span class="p">[</span><span class="n">node</span><span class="o">.</span><span class="n">feature</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">node</span><span class="o">.</span><span class="n">threshold</span> <span class="k">else</span> <span class="n">node</span><span class="o">.</span><span class="n">right</span>
+            <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Note the cumulative sums: for each feature the candidate splits are scanned
+in sorted order and <span class="math notranslate nohighlight">\(G_L,H_L\)</span> are accumulated once, so the search costs
+<span class="math notranslate nohighlight">\(\bigO(np\log n)\)</span> per tree rather than the <span class="math notranslate nohighlight">\(\bigO(n^{2}p)\)</span> of the naive loop
+in Section <em>Implementing a decision tree</em>.  This is the “exact” split finder of the
+libraries; their “histogram” method bins the features first and is faster
+still.</p>
+<p><strong>The boosting loop.</strong>
+What remains is the loop of Section <em>Gradient boosting</em>, with two
+additions.  The initial constant <span class="math notranslate nohighlight">\(f_0\)</span> is the minimiser of
+<span class="math notranslate nohighlight">\(\sum_iL(y_i,c)\)</span>, which for a convex loss is where the monotone function
+<span class="math notranslate nohighlight">\(c\mapsto\sum_ig_i(c)\)</span> crosses zero, so a bisection finds it for every loss
+at once – the mean for the squared error, the log-odds of the class
+frequency for the logistic loss, the <span class="math notranslate nohighlight">\(\tau\)</span>-quantile for the pinball loss –
+without a case distinction.  And a switch selects first- or second-order
+boosting by deciding what the tree is fed as <span class="math notranslate nohighlight">\(\bm{h}\)</span>.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Boosting</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Gradient boosting for any pointwise loss, with all derivatives from JAX.</span>
+
+<span class="sd">    order=1: Friedman&#39;s gradient boosting -- the tree fits the negative</span>
+<span class="sd">             gradient by least squares (h_i = 1, lmbda = 0), Section 7.gradientboosting;</span>
+<span class="sd">    order=2: Newton boosting as in XGBoost -- the tree is grown on g_i, h_i</span>
+<span class="sd">             with the regularised gain and leaf weights of Section 7.xgboost.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">loss</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">n_estimators</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">learning_rate</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
+                 <span class="n">max_depth</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">lmbda</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">gamma</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">min_child_weight</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">f0</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">loss</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">order</span> <span class="o">=</span> <span class="n">loss</span><span class="p">,</span> <span class="n">order</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">g</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span> <span class="o">=</span> <span class="n">derivatives</span><span class="p">(</span><span class="n">loss</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">n_estimators</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">lr</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">f0</span> <span class="o">=</span> <span class="n">n_estimators</span><span class="p">,</span> <span class="n">learning_rate</span><span class="p">,</span> <span class="n">f0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tree_kw</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">max_depth</span><span class="o">=</span><span class="n">max_depth</span><span class="p">,</span> <span class="n">gamma</span><span class="o">=</span><span class="n">gamma</span><span class="p">,</span>
+                            <span class="n">lmbda</span><span class="o">=</span><span class="n">lmbda</span> <span class="k">if</span> <span class="n">order</span> <span class="o">==</span> <span class="mi">2</span> <span class="k">else</span> <span class="mf">0.0</span><span class="p">,</span>
+                            <span class="n">min_child_weight</span><span class="o">=</span><span class="n">min_child_weight</span> <span class="k">if</span> <span class="n">order</span> <span class="o">==</span> <span class="mi">2</span> <span class="k">else</span> <span class="mf">0.0</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_constant</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;The constant minimising sum_i L(y_i, c): bisection on the monotone sum of g.&quot;&quot;&quot;</span>
+        <span class="n">lo</span><span class="p">,</span> <span class="n">hi</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">y</span><span class="o">.</span><span class="n">min</span><span class="p">()),</span> <span class="o">-</span><span class="mf">50.0</span><span class="p">)</span> <span class="o">-</span> <span class="mf">1.0</span><span class="p">,</span> <span class="nb">max</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">y</span><span class="o">.</span><span class="n">max</span><span class="p">()),</span> <span class="mf">50.0</span><span class="p">)</span> <span class="o">+</span> <span class="mf">1.0</span>
+        <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">100</span><span class="p">):</span>
+            <span class="n">mid</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">lo</span> <span class="o">+</span> <span class="n">hi</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">float</span><span class="p">(</span><span class="n">jnp</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">g</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">jnp</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">y</span><span class="p">),</span> <span class="n">mid</span><span class="p">))))</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">hi</span> <span class="o">=</span> <span class="n">mid</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">lo</span> <span class="o">=</span> <span class="n">mid</span>
+        <span class="k">return</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">lo</span> <span class="o">+</span> <span class="n">hi</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">f0_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_constant</span><span class="p">(</span><span class="n">y</span><span class="p">)</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">f0</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">f0</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">y</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">f0_</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">trees_</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_estimators</span><span class="p">):</span>
+            <span class="n">g</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">g</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>                                    <span class="c1"># pseudo-residual is -g</span>
+            <span class="n">h</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">order</span> <span class="o">==</span> <span class="mi">2</span> <span class="k">else</span> <span class="n">jnp</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="n">g</span><span class="p">)</span>
+            <span class="n">tree</span> <span class="o">=</span> <span class="n">GradientTree</span><span class="p">(</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">tree_kw</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span> <span class="n">h</span><span class="p">)</span>
+            <span class="n">f</span> <span class="o">=</span> <span class="n">f</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">lr</span> <span class="o">*</span> <span class="n">jnp</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">tree</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X</span><span class="p">))</span>     <span class="c1"># shrunken update</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">trees_</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tree</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span>
+
+    <span class="k">def</span> <span class="nf">decision_function</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">):</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">X</span><span class="p">)</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">f0_</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">tree</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">trees_</span><span class="p">:</span>
+            <span class="n">f</span> <span class="o">=</span> <span class="n">f</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">lr</span> <span class="o">*</span> <span class="n">tree</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">f</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p><strong>Checking it against the derivations and against the library.</strong>
+First the derivatives: for the logistic loss JAX must return
+<span class="math notranslate nohighlight">\(g_i=p_i-y_i\)</span> and <span class="math notranslate nohighlight">\(h_i=p_i(1-p_i)\)</span>, Eq. (7.32) and the
+weights of Eq. (5.18).  Then the whole machine, second order,
+against <code class="docutils literal notranslate"><span class="pre">XGBoost</span></code> with the same hyperparameters on the moons data of
+Section <em>Implementing a decision tree</em>; and finally first order, against the numbers of
+Section <em>Gradient boosting</em>.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.datasets</span> <span class="kn">import</span> <span class="n">make_moons</span><span class="p">,</span> <span class="n">make_regression</span>
+<span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">train_test_split</span>
+<span class="kn">import</span> <span class="nn">xgboost</span> <span class="k">as</span> <span class="nn">xgb</span>
+
+<span class="n">g</span><span class="p">,</span> <span class="n">h</span> <span class="o">=</span> <span class="n">derivatives</span><span class="p">(</span><span class="n">logistic</span><span class="p">)</span>
+<span class="n">y0</span><span class="p">,</span> <span class="n">f0</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">1.</span><span class="p">,</span> <span class="mf">1.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">]),</span> <span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="o">-</span><span class="mf">1.</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">,</span> <span class="mf">2.</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;g - (p - y):&quot;</span><span class="p">,</span> <span class="nb">float</span><span class="p">(</span><span class="n">jnp</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">jnp</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">g</span><span class="p">(</span><span class="n">y0</span><span class="p">,</span> <span class="n">f0</span><span class="p">)</span> <span class="o">-</span> <span class="p">(</span><span class="n">sigmoid</span><span class="p">(</span><span class="n">f0</span><span class="p">)</span> <span class="o">-</span> <span class="n">y0</span><span class="p">)))))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;h - p(1-p): &quot;</span><span class="p">,</span> <span class="nb">float</span><span class="p">(</span><span class="n">jnp</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">jnp</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">h</span><span class="p">(</span><span class="n">y0</span><span class="p">,</span> <span class="n">f0</span><span class="p">)</span> <span class="o">-</span> <span class="n">sigmoid</span><span class="p">(</span><span class="n">f0</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">sigmoid</span><span class="p">(</span><span class="n">f0</span><span class="p">))))))</span>
+
+<span class="n">X</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">make_moons</span><span class="p">(</span><span class="n">n_samples</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span> <span class="n">noise</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">42</span><span class="p">)</span>
+<span class="n">X_train</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">y_test</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">42</span><span class="p">)</span>
+
+<span class="n">ours</span> <span class="o">=</span> <span class="n">Boosting</span><span class="p">(</span><span class="n">logistic</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">n_estimators</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">learning_rate</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
+                <span class="n">max_depth</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">lmbda</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">f0</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+<span class="n">lib</span> <span class="o">=</span> <span class="n">xgb</span><span class="o">.</span><span class="n">XGBClassifier</span><span class="p">(</span><span class="n">n_estimators</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">learning_rate</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">max_depth</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+                        <span class="n">reg_lambda</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">gamma</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">min_child_weight</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
+                        <span class="n">base_score</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">tree_method</span><span class="o">=</span><span class="s2">&quot;exact&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+<span class="n">p_ours</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">ours</span><span class="o">.</span><span class="n">decision_function</span><span class="p">(</span><span class="n">X_test</span><span class="p">)))</span>
+<span class="n">p_lib</span> <span class="o">=</span> <span class="n">lib</span><span class="o">.</span><span class="n">predict_proba</span><span class="p">(</span><span class="n">X_test</span><span class="p">)[:,</span> <span class="mi">1</span><span class="p">]</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;max |p_ours - p_xgboost| =&quot;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">p_ours</span> <span class="o">-</span> <span class="n">p_lib</span><span class="p">)))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;test accuracy: ours&quot;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">((</span><span class="n">p_ours</span> <span class="o">&gt;</span> <span class="mf">0.5</span><span class="p">)</span> <span class="o">==</span> <span class="n">y_test</span><span class="p">),</span>
+      <span class="s2">&quot; xgboost&quot;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">((</span><span class="n">p_lib</span> <span class="o">&gt;</span> <span class="mf">0.5</span><span class="p">)</span> <span class="o">==</span> <span class="n">y_test</span><span class="p">))</span>
+
+<span class="n">first</span> <span class="o">=</span> <span class="n">Boosting</span><span class="p">(</span><span class="n">logistic</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">n_estimators</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span> <span class="n">learning_rate</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
+                 <span class="n">max_depth</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;first-order, 200 trees of depth 2: test accuracy&quot;</span><span class="p">,</span>
+      <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">((</span><span class="n">first</span><span class="o">.</span><span class="n">decision_function</span><span class="p">(</span><span class="n">X_test</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="o">==</span> <span class="n">y_test</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">g</span> <span class="o">-</span> <span class="p">(</span><span class="n">p</span> <span class="o">-</span> <span class="n">y</span><span class="p">):</span> <span class="mf">1.1102230246251565e-16</span>
+<span class="n">h</span> <span class="o">-</span> <span class="n">p</span><span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">p</span><span class="p">):</span>  <span class="mf">2.7755575615628914e-17</span>
+<span class="nb">max</span> <span class="o">|</span><span class="n">p_ours</span> <span class="o">-</span> <span class="n">p_xgboost</span><span class="o">|</span> <span class="o">=</span> <span class="mf">1.1242810449285656e-07</span>
+<span class="n">test</span> <span class="n">accuracy</span><span class="p">:</span> <span class="n">ours</span> <span class="mf">0.896</span>  <span class="n">xgboost</span> <span class="mf">0.896</span>
+<span class="n">first</span><span class="o">-</span><span class="n">order</span><span class="p">,</span> <span class="mi">200</span> <span class="n">trees</span> <span class="n">of</span> <span class="n">depth</span> <span class="mi">2</span><span class="p">:</span> <span class="n">test</span> <span class="n">accuracy</span> <span class="mf">0.912</span>
+</pre></div>
+</div>
+<p>The derivatives are exact.  The second-order machine agrees with
+<code class="docutils literal notranslate"><span class="pre">XGBoost</span></code> to <span class="math notranslate nohighlight">\(10^{-7}\)</span> in every predicted probability, which is the
+single precision the library computes in: fifty lines of Python and the
+equations of Section <em>XGBoost: extreme gradient boosting</em> <em>are</em> the algorithm, and the
+library adds speed rather than mathematics.  And the first-order machine
+reproduces the <span class="math notranslate nohighlight">\(0.912\)</span> of the hand-written
+<code class="docutils literal notranslate"><span class="pre">GradientBoostingClassifier</span></code> of Section <em>Gradient boosting</em>,
+as Eq. (7.38) says it must.</p>
+<p><strong>Changing the loss.</strong>
+Now the point of the exercise.  A regression problem is given twenty gross
+outliers, and boosted under the squared error and under the Huber loss; then
+the same data are boosted under the pinball loss for three quantiles.  Not one
+line of the machinery changes.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">Xr</span><span class="p">,</span> <span class="n">yr</span> <span class="o">=</span> <span class="n">make_regression</span><span class="p">(</span><span class="n">n_samples</span><span class="o">=</span><span class="mi">400</span><span class="p">,</span> <span class="n">n_features</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">noise</span><span class="o">=</span><span class="mf">10.0</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">Xr_train</span><span class="p">,</span> <span class="n">Xr_test</span><span class="p">,</span> <span class="n">yr_train</span><span class="p">,</span> <span class="n">yr_test</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span><span class="n">Xr</span><span class="p">,</span> <span class="n">yr</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">yr_dirty</span> <span class="o">=</span> <span class="n">yr_train</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+<span class="n">bad</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">yr_train</span><span class="p">),</span> <span class="mi">20</span><span class="p">,</span> <span class="n">replace</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">yr_dirty</span><span class="p">[</span><span class="n">bad</span><span class="p">]</span> <span class="o">+=</span> <span class="n">rng</span><span class="o">.</span><span class="n">choice</span><span class="p">([</span><span class="o">-</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">],</span> <span class="mi">20</span><span class="p">)</span> <span class="o">*</span> <span class="mf">500.0</span>            <span class="c1"># twenty gross outliers</span>
+
+<span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">loss</span> <span class="ow">in</span> <span class="p">[(</span><span class="s2">&quot;squared error&quot;</span><span class="p">,</span> <span class="n">squared</span><span class="p">),</span>
+                   <span class="p">(</span><span class="s2">&quot;Huber, delta=20&quot;</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">y</span><span class="p">,</span> <span class="n">f</span><span class="p">:</span> <span class="n">huber</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="mf">20.0</span><span class="p">))]:</span>
+    <span class="k">for</span> <span class="n">label</span><span class="p">,</span> <span class="n">target</span> <span class="ow">in</span> <span class="p">[(</span><span class="s2">&quot;clean   &quot;</span><span class="p">,</span> <span class="n">yr_train</span><span class="p">),</span> <span class="p">(</span><span class="s2">&quot;outliers&quot;</span><span class="p">,</span> <span class="n">yr_dirty</span><span class="p">)]:</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="n">Boosting</span><span class="p">(</span><span class="n">loss</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">n_estimators</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span> <span class="n">learning_rate</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
+                         <span class="n">max_depth</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">Xr_train</span><span class="p">,</span> <span class="n">target</span><span class="p">)</span>
+        <span class="n">mse</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">((</span><span class="n">model</span><span class="o">.</span><span class="n">decision_function</span><span class="p">(</span><span class="n">Xr_test</span><span class="p">)</span> <span class="o">-</span> <span class="n">yr_test</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">:</span><span class="s2">16s</span><span class="si">}</span><span class="s2"> trained on </span><span class="si">{</span><span class="n">label</span><span class="si">}</span><span class="s2"> data: test MSE = </span><span class="si">{</span><span class="n">mse</span><span class="si">:</span><span class="s2">7.1f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="k">for</span> <span class="n">tau</span> <span class="ow">in</span> <span class="p">[</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.9</span><span class="p">]:</span>
+    <span class="n">model</span> <span class="o">=</span> <span class="n">Boosting</span><span class="p">(</span><span class="k">lambda</span> <span class="n">y</span><span class="p">,</span> <span class="n">f</span><span class="p">:</span> <span class="n">quantile</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">tau</span><span class="p">),</span> <span class="n">order</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">n_estimators</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span>
+                     <span class="n">learning_rate</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">max_depth</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">Xr_train</span><span class="p">,</span> <span class="n">yr_train</span><span class="p">)</span>
+    <span class="n">below</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">yr_test</span> <span class="o">&lt;</span> <span class="n">model</span><span class="o">.</span><span class="n">decision_function</span><span class="p">(</span><span class="n">Xr_test</span><span class="p">))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;quantile loss, tau = </span><span class="si">{</span><span class="n">tau</span><span class="si">}</span><span class="s2">: fraction of test targets below = </span><span class="si">{</span><span class="n">below</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">squared</span> <span class="n">error</span>    <span class="n">trained</span> <span class="n">on</span> <span class="n">clean</span>    <span class="n">data</span><span class="p">:</span> <span class="n">test</span> <span class="n">MSE</span> <span class="o">=</span>   <span class="mf">826.0</span>
+<span class="n">squared</span> <span class="n">error</span>    <span class="n">trained</span> <span class="n">on</span> <span class="n">outliers</span> <span class="n">data</span><span class="p">:</span> <span class="n">test</span> <span class="n">MSE</span> <span class="o">=</span>  <span class="mf">4237.1</span>
+<span class="n">Huber</span><span class="p">,</span> <span class="n">delta</span><span class="o">=</span><span class="mi">20</span>  <span class="n">trained</span> <span class="n">on</span> <span class="n">clean</span>    <span class="n">data</span><span class="p">:</span> <span class="n">test</span> <span class="n">MSE</span> <span class="o">=</span>  <span class="mf">1012.8</span>
+<span class="n">Huber</span><span class="p">,</span> <span class="n">delta</span><span class="o">=</span><span class="mi">20</span>  <span class="n">trained</span> <span class="n">on</span> <span class="n">outliers</span> <span class="n">data</span><span class="p">:</span> <span class="n">test</span> <span class="n">MSE</span> <span class="o">=</span>  <span class="mf">1053.5</span>
+<span class="n">quantile</span> <span class="n">loss</span><span class="p">,</span> <span class="n">tau</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">:</span> <span class="n">fraction</span> <span class="n">of</span> <span class="n">test</span> <span class="n">targets</span> <span class="n">below</span> <span class="o">=</span> <span class="mf">0.120</span>
+<span class="n">quantile</span> <span class="n">loss</span><span class="p">,</span> <span class="n">tau</span> <span class="o">=</span> <span class="mf">0.5</span><span class="p">:</span> <span class="n">fraction</span> <span class="n">of</span> <span class="n">test</span> <span class="n">targets</span> <span class="n">below</span> <span class="o">=</span> <span class="mf">0.530</span>
+<span class="n">quantile</span> <span class="n">loss</span><span class="p">,</span> <span class="n">tau</span> <span class="o">=</span> <span class="mf">0.9</span><span class="p">:</span> <span class="n">fraction</span> <span class="n">of</span> <span class="n">test</span> <span class="n">targets</span> <span class="n">below</span> <span class="o">=</span> <span class="mf">0.900</span>
+</pre></div>
+</div>
+<p>The squared error is the better loss on clean data and is wrecked by the
+outliers, its test error growing fivefold; the Huber loss gives up a fifth
+on clean data – its clipped gradient descends more slowly for the same
+<span class="math notranslate nohighlight">\(M\)</span> – and is essentially untouched by them, exactly as the notebox of
+Section <em>Deriving least squares from a probability distribution</em> said a heavy-tailed noise model should
+demand.  The three quantile models bracket the test targets at the
+requested levels: boosting under the pinball loss returns a conditional
+quantile rather than a conditional mean, which is how prediction intervals
+are obtained from tree ensembles.  The Poisson loss defined above, and any
+other differentiable loss the reader cares to write, works the same way.</p>
+<p><strong>Custom objectives in the libraries.</strong>
+This is exactly how the libraries expose the same freedom.  <code class="docutils literal notranslate"><span class="pre">XGBoost</span></code>
+and <code class="docutils literal notranslate"><span class="pre">LightGBM</span></code> accept a <em>custom objective</em>: a function returning
+<span class="math notranslate nohighlight">\(\bm{g}\)</span> and <span class="math notranslate nohighlight">\(\bm{h}\)</span> for the current predictions, which is all their trees
+need.  With JAX that function is a few lines, and it lets the library’s fast
+tree builder be driven by any loss one can write down.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">jax_objective</span><span class="p">(</span><span class="n">loss</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Turn a pointwise JAX loss into the (grad, hess) callback XGBoost accepts.&quot;&quot;&quot;</span>
+    <span class="n">g</span><span class="p">,</span> <span class="n">h</span> <span class="o">=</span> <span class="n">derivatives</span><span class="p">(</span><span class="n">loss</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">objective</span><span class="p">(</span><span class="n">y_true</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">):</span>
+        <span class="n">y_true</span><span class="p">,</span> <span class="n">y_pred</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">y_true</span><span class="p">,</span> <span class="nb">float</span><span class="p">),</span> <span class="n">jnp</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">y_pred</span><span class="p">,</span> <span class="nb">float</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">g</span><span class="p">(</span><span class="n">y_true</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">)),</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">h</span><span class="p">(</span><span class="n">y_true</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">objective</span>
+
+<span class="n">custom</span> <span class="o">=</span> <span class="n">xgb</span><span class="o">.</span><span class="n">XGBRegressor</span><span class="p">(</span><span class="n">objective</span><span class="o">=</span><span class="n">jax_objective</span><span class="p">(</span><span class="n">logistic</span><span class="p">),</span> <span class="n">n_estimators</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
+                          <span class="n">learning_rate</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">max_depth</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">reg_lambda</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
+                          <span class="n">base_score</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">tree_method</span><span class="o">=</span><span class="s2">&quot;exact&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+<span class="n">p_custom</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">custom</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_test</span><span class="p">)))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;JAX objective vs built-in binary:logistic: max |dp| =&quot;</span><span class="p">,</span>
+      <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">p_custom</span> <span class="o">-</span> <span class="n">lib</span><span class="o">.</span><span class="n">predict_proba</span><span class="p">(</span><span class="n">X_test</span><span class="p">)[:,</span> <span class="mi">1</span><span class="p">])))</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">JAX</span> <span class="n">objective</span> <span class="n">vs</span> <span class="n">built</span><span class="o">-</span><span class="ow">in</span> <span class="n">binary</span><span class="p">:</span><span class="n">logistic</span><span class="p">:</span> <span class="nb">max</span> <span class="o">|</span><span class="n">dp</span><span class="o">|</span> <span class="o">=</span> <span class="mf">1.1920929e-07</span>
+</pre></div>
+</div>
+<div class="tip admonition">
+<p class="admonition-title">Machine learning connection</p>
+<p>Two limits of what was done here are
+worth knowing.  Automatic differentiation reaches every part of a boosting
+machine that touches the loss and none of the parts that touch the tree:
+there is no gradient through a split, which is why trees are trained by
+search and networks by descent, and why “differentiable” or <em>soft</em>
+trees, in which the hard threshold <span class="math notranslate nohighlight">\(x_j\le t\)</span> is replaced by a sigmoid, are
+really small neural networks in disguise.  And a second-order method needs
+<span class="math notranslate nohighlight">\(h_i&gt;0\)</span>: for the pinball and hinge losses JAX correctly returns zero, and one
+must fall back on first-order boosting or, as the libraries do, on a smoothed
+version of the loss.  Within those limits the division of labour is exact –
+the loss to the differentiator, the partition to the search – and it is the
+same division that lets a neural network of Chapter 8 be trained
+with any loss from Section <em>Other loss functions, and automatic differentiation</em>.</p>
+</div>
+</section>
 <section id="summary-and-the-programs">
-<h2><span class="section-number">7.15. </span>Summary and the programs<a class="headerlink" href="#summary-and-the-programs" title="Link to this heading">#</a></h2>
+<h2><span class="section-number">7.16. </span>Summary and the programs<a class="headerlink" href="#summary-and-the-programs" title="Link to this heading">#</a></h2>
 <p>A decision tree partitions the feature space into axis-aligned boxes and
 predicts a constant in each.  Building the optimal partition is intractable,
 so CART proceeds greedily and top-down, choosing at each node the feature and
@@ -1839,12 +2215,17 @@ and classification, with the error-against-<span class="math notranslate nohighl
 <li><p><code class="docutils literal notranslate"><span class="pre">xgboost_examples.py</span></code> – the library examples of
 Section <em>XGBoost: extreme gradient boosting</em>, with a numerical check of the leaf
 weight (7.36) against a direct minimisation.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">boosting_jax.py</span></code> – the loss-agnostic machine of
+Section <em>Boosting any loss: automatic differentiation</em>: pointwise losses differentiated by JAX,
+the <code class="docutils literal notranslate"><span class="pre">GradientTree</span></code> grown on <span class="math notranslate nohighlight">\(g_i,h_i\)</span>, first- and second-order
+<code class="docutils literal notranslate"><span class="pre">Boosting</span></code>, the match against <code class="docutils literal notranslate"><span class="pre">XGBoost</span></code>, the Huber and
+quantile experiments, and the JAX custom objective.</p></li>
 </ul>
 </section>
 <section id="exercises">
-<h2><span class="section-number">7.16. </span>Exercises<a class="headerlink" href="#exercises" title="Link to this heading">#</a></h2>
+<h2><span class="section-number">7.17. </span>Exercises<a class="headerlink" href="#exercises" title="Link to this heading">#</a></h2>
 <section id="warm-up-exercises">
-<h3><span class="section-number">7.16.1. </span>Warm-up exercises<a class="headerlink" href="#warm-up-exercises" title="Link to this heading">#</a></h3>
+<h3><span class="section-number">7.17.1. </span>Warm-up exercises<a class="headerlink" href="#warm-up-exercises" title="Link to this heading">#</a></h3>
 <ol class="arabic simple">
 <li><p><strong>The optimal constant in a leaf.</strong>
 (a) Show that <span class="math notranslate nohighlight">\(\sum_i(y_i-c)^{2}\)</span> is minimised by <span class="math notranslate nohighlight">\(c=\overline{y}\)</span>.
@@ -1920,10 +2301,32 @@ the leaf shrunk by <span class="math notranslate nohighlight">\(\lambda\)</span>
 Eq. (1.130).
 (d) Verify Eq. (7.36) numerically by minimising
 Eq. (7.35) directly with a one-dimensional search.</p></li>
+<li><p><strong>The gain reduces to the MSE criterion.</strong>
+Prove Eq. (7.38) directly: with <span class="math notranslate nohighlight">\(u_i=-g_i\)</span> and <span class="math notranslate nohighlight">\(h_i=1\)</span>,
+expand <span class="math notranslate nohighlight">\(\sum_i(u_i-\bar u)^{2}\)</span> over the two children and show that the
+cross terms vanish.  Then show that with <span class="math notranslate nohighlight">\(\lambda&gt;0\)</span> the leaf value
+<span class="math notranslate nohighlight">\(-G_j/(n_j+\lambda)\)</span> is the leaf mean shrunk towards zero by
+<span class="math notranslate nohighlight">\(n_j/(n_j+\lambda)\)</span>, and relate this to the Ridge shrinkage
+factor (3.48).</p></li>
+<li><p><strong>Boosting with new losses (numerical).</strong>
+Using the code of Section <em>Boosting any loss: automatic differentiation</em>:
+(a) boost the Poisson loss on counts generated as
+<span class="math notranslate nohighlight">\(y_i\sim\mathrm{Poisson}(\exp(x_{i1}-x_{i2}))\)</span> and compare the fitted
+log-rate against the truth; explain why the natural initial constant
+is <span class="math notranslate nohighlight">\(\log\bar y\)</span> and check that the bisection finds it;
+(b) add the exponential loss <span class="math notranslate nohighlight">\(e^{-(2y-1)f}\)</span> and show that second-order
+boosting with it recovers the AdaBoost fit of Section <em>AdaBoost</em>
+up to the learning rate – what plays the role of <span class="math notranslate nohighlight">\(\alpha_m\)</span>?
+(c) run second-order boosting with the pinball loss and explain, from
+Eq. (7.36), what happens to the leaf weights when
+<span class="math notranslate nohighlight">\(h_i\equiv0\)</span>; then replace it by a smoothed pinball loss (quadratic in a
+band of width <span class="math notranslate nohighlight">\(\epsilon\)</span> around <span class="math notranslate nohighlight">\(r=0\)</span>) and compare;
+(d) pass <code class="docutils literal notranslate"><span class="pre">jax_objective(huber)</span></code> to <code class="docutils literal notranslate"><span class="pre">XGBRegressor</span></code> and compare
+with the library’s own <code class="docutils literal notranslate"><span class="pre">reg:pseudohubererror</span></code>.</p></li>
 </ol>
 </section>
 <section id="project-style-exercise-from-one-tree-to-a-jungle">
-<h3><span class="section-number">7.16.2. </span>Project-style exercise: from one tree to a jungle<a class="headerlink" href="#project-style-exercise-from-one-tree-to-a-jungle" title="Link to this heading">#</a></h3>
+<h3><span class="section-number">7.17.2. </span>Project-style exercise: from one tree to a jungle<a class="headerlink" href="#project-style-exercise-from-one-tree-to-a-jungle" title="Link to this heading">#</a></h3>
 <p><strong>Part a: your own tree.</strong>
 Implement CART from scratch for both tasks, with all three impurity measures
 and a depth limit.  Verify against <code class="docutils literal notranslate"><span class="pre">scikit-learn</span></code> at several depths.
@@ -2045,10 +2448,11 @@ matter.</p>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#adaboost">7.12. AdaBoost</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gradient-boosting">7.13. Gradient boosting</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#xgboost-extreme-gradient-boosting">7.14. XGBoost: extreme gradient boosting</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#summary-and-the-programs">7.15. Summary and the programs</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercises">7.16. Exercises</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#warm-up-exercises">7.16.1. Warm-up exercises</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#project-style-exercise-from-one-tree-to-a-jungle">7.16.2. Project-style exercise: from one tree to a jungle</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#boosting-any-loss-automatic-differentiation">7.15. Boosting any loss: automatic differentiation</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#summary-and-the-programs">7.16. Summary and the programs</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercises">7.17. Exercises</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#warm-up-exercises">7.17.1. Warm-up exercises</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#project-style-exercise-from-one-tree-to-a-jungle">7.17.2. Project-style exercise: from one tree to a jungle</a></li>
 </ul>
 </li>
 </ul>

@@ -666,7 +666,7 @@ subspace attains the minimum.  Note carefully what remains unique in that case:
 the <em>fit</em> <span class="math notranslate nohighlight">\(\bm{X}\hat{\bm{\theta}}\)</span>, since two minimisers differ by a
 vector in the null space of <span class="math notranslate nohighlight">\(\bm{X}\)</span>.  This distinction between a
 non-unique parameter and a unique prediction will return for the Lasso in
-Proposition 3.6.  <em>Third</em>, the cost rises away from the
+Proposition 3.9.  <em>Third</em>, the cost rises away from the
 optimum at a rate set by the eigenvalues of <span class="math notranslate nohighlight">\(\bm{X}^{T}\bm{X}\)</span>: sharply in the
 directions of large singular value and almost not at all in the directions of
 small ones.  That is the same statement as the variance formula of
@@ -766,6 +766,100 @@ squares is unweighted least squares on rescaled data.  Setting all
 silently assumes – that the noise is <em>homoscedastic</em>, of the same
 variance everywhere.  When it is not, OLS remains unbiased but is no longer
 the estimator of smallest variance, and Eq. (3.14) is.</p>
+<p><strong>Correlated noise: generalised least squares.</strong>
+The same rescaling handles the general case in which the noise has an
+arbitrary covariance matrix, <span class="math notranslate nohighlight">\(\var(\bm{\varepsilon})=\bm{\Omega}\)</span>, symmetric
+and positive definite.  Factor it as <span class="math notranslate nohighlight">\(\bm{\Omega}=\bm{L}\bm{L}^{T}\)</span> by the
+Cholesky decomposition of Section <em>LU and Cholesky decompositions</em> and multiply the model
+<span class="math notranslate nohighlight">\(\bm{y}=\bm{X}\bm{\theta}+\bm{\varepsilon}\)</span> by <span class="math notranslate nohighlight">\(\bm{L}^{-1}\)</span>: the transformed
+noise <span class="math notranslate nohighlight">\(\bm{L}^{-1}\bm{\varepsilon}\)</span> has covariance
+<span class="math notranslate nohighlight">\(\bm{L}^{-1}\bm{\Omega}\bm{L}^{-T}=\bm{I}\)</span>, so it is homoscedastic and
+uncorrelated, and OLS on the <em>whitened</em> data <span class="math notranslate nohighlight">\(\bm{A}=\bm{L}^{-1}\bm{X}\)</span>,
+<span class="math notranslate nohighlight">\(\bm{b}=\bm{L}^{-1}\bm{y}\)</span> gives</p>
+<div class="math notranslate nohighlight">
+\[
+\hat{\bm{\theta}}_{\mathrm{GLS}}
+   = \left(\bm{X}^{T}\bm{\Omega}^{-1}\bm{X}\right)^{-1}
+     \bm{X}^{T}\bm{\Omega}^{-1}\bm{y},
+  \qquad
+  \var\left(\hat{\bm{\theta}}_{\mathrm{GLS}}\right)
+   = \left(\bm{X}^{T}\bm{\Omega}^{-1}\bm{X}\right)^{-1},\tag{3.15}
+\]</div>
+<p>the second statement following from <span class="math notranslate nohighlight">\(\var(\bm{A}^{+}\bm{b})
+=\bm{A}^{+}\bm{I}(\bm{A}^{+})^{T}=(\bm{A}^{T}\bm{A})^{-1}\)</span>.  Weighted least
+squares is the diagonal case <span class="math notranslate nohighlight">\(\bm{\Omega}=\bm{\Sigma}^{2}\)</span>, and its variance
+is <span class="math notranslate nohighlight">\((\bm{X}^{T}\bm{\Sigma}^{-2}\bm{X})^{-1}\)</span>.  That this is the smallest
+variance attainable by any linear unbiased estimator is the Gauss-Markov
+theorem of Section <em>Statistical properties of the least-squares estimator</em> applied to the whitened problem,
+for which its hypotheses hold exactly.</p>
+<p><strong>The value of <span class="math notranslate nohighlight">\(\chi^{2}\)</span> at the minimum.</strong>
+A physicist reports not only the fitted parameters but the minimum value of
+<span class="math notranslate nohighlight">\(\chi^{2}\)</span>, and reads it as a test of the model.  The reason is a small
+calculation.  Write <span class="math notranslate nohighlight">\(\bm{b}=\bm{A}\bm{\theta}+\bm{\eta}\)</span> for the whitened
+data, with <span class="math notranslate nohighlight">\(\var(\bm{\eta})=\bm{I}\)</span>, and let
+<span class="math notranslate nohighlight">\(\bm{H}_A=\bm{A}(\bm{A}^{T}\bm{A})^{-1}\bm{A}^{T}\)</span> be its hat matrix.  The
+whitened residual is
+<span class="math notranslate nohighlight">\(\bm{b}-\bm{A}\hat{\bm{\theta}}=(\bm{I}-\bm{H}_A)\bm{b}
+=(\bm{I}-\bm{H}_A)\bm{\eta}\)</span>, because <span class="math notranslate nohighlight">\((\bm{I}-\bm{H}_A)\bm{A}=\bm{0}\)</span> removes
+the model exactly.  Then, using <span class="math notranslate nohighlight">\(\mathbb{E}[\bm{\eta}^{T}\bm{M}\bm{\eta}]
+=\mathrm{Tr}(\bm{M}\,\var(\bm{\eta}))=\mathrm{Tr}(\bm{M})\)</span> for any fixed
+matrix <span class="math notranslate nohighlight">\(\bm{M}\)</span> and the projector properties (1.9) and
+(1.10),</p>
+<div class="math notranslate nohighlight">
+\[
+\mathbb{E}\left[n\,\chi^{2}_{\min}\right]
+   = \mathbb{E}\left[\bm{\eta}^{T}(\bm{I}-\bm{H}_A)^{2}\bm{\eta}\right]
+   = \mathrm{Tr}\left(\bm{I}-\bm{H}_A\right)
+   = n-p .\tag{3.16}
+\]</div>
+<p>If the model is right and the <span class="math notranslate nohighlight">\(\sigma_i\)</span> are right, the sum of squared
+standardised residuals is on average the number of data points minus the
+number of fitted parameters, so the <em>reduced</em> <span class="math notranslate nohighlight">\(\chi^{2}\)</span>,
+<span class="math notranslate nohighlight">\(n\chi^{2}_{\min}/(n-p)\)</span>, should be close to one.  A value well above one
+says that the model does not describe the data at the stated precision; a
+value well below one says that the error bars were overestimated.  Under
+Gaussian noise <span class="math notranslate nohighlight">\(n\chi^{2}_{\min}\)</span> has exactly the <span class="math notranslate nohighlight">\(\chi^{2}\)</span> distribution
+with <span class="math notranslate nohighlight">\(n-p\)</span> degrees of freedom, which Proposition 3.3
+will establish, and the statement can then be made quantitative.  A short
+simulation confirms Eq. (3.16) and the variance
+in Eq. (3.15):</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="mi">2024</span><span class="p">)</span>
+<span class="n">n</span><span class="p">,</span> <span class="n">p</span> <span class="o">=</span> <span class="mi">50</span><span class="p">,</span> <span class="mi">3</span>
+<span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span>
+<span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">c_</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">n</span><span class="p">),</span> <span class="n">x</span><span class="p">,</span> <span class="n">x</span><span class="o">**</span><span class="mi">2</span><span class="p">]</span>
+<span class="n">theta_true</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">2.0</span><span class="p">,</span> <span class="mf">3.0</span><span class="p">])</span>
+<span class="n">sigmas</span> <span class="o">=</span> <span class="mf">0.05</span> <span class="o">+</span> <span class="mf">0.3</span> <span class="o">*</span> <span class="n">x</span>                    <span class="c1"># heteroscedastic: error grows with x</span>
+
+<span class="n">chi2_min</span><span class="p">,</span> <span class="n">theta_wls</span><span class="p">,</span> <span class="n">theta_ols</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[],</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">trial</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">20000</span><span class="p">):</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">X</span> <span class="o">@</span> <span class="n">theta_true</span> <span class="o">+</span> <span class="n">sigmas</span> <span class="o">*</span> <span class="n">rng</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">n</span><span class="p">)</span>
+    <span class="n">A</span><span class="p">,</span> <span class="n">b</span> <span class="o">=</span> <span class="n">X</span> <span class="o">/</span> <span class="n">sigmas</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">],</span> <span class="n">y</span> <span class="o">/</span> <span class="n">sigmas</span>   <span class="c1"># whitened problem, Eq. (3.chisquared)</span>
+    <span class="n">th</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">lstsq</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">rcond</span><span class="o">=</span><span class="kc">None</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">chi2_min</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">((</span><span class="n">b</span> <span class="o">-</span> <span class="n">A</span> <span class="o">@</span> <span class="n">th</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="o">/</span> <span class="n">n</span><span class="p">)</span>
+    <span class="n">theta_wls</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">th</span><span class="p">)</span>
+    <span class="n">theta_ols</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">lstsq</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">rcond</span><span class="o">=</span><span class="kc">None</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;mean of n*chi2_min:&quot;</span><span class="p">,</span> <span class="n">n</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">chi2_min</span><span class="p">),</span> <span class="s2">&quot;   n - p =&quot;</span><span class="p">,</span> <span class="n">n</span> <span class="o">-</span> <span class="n">p</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;variance of WLS  :&quot;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">var</span><span class="p">(</span><span class="n">theta_wls</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;predicted, (X^T S^-2 X)^-1:&quot;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">inv</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="p">(</span><span class="n">X</span> <span class="o">/</span> <span class="n">sigmas</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span><span class="p">))))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;variance of OLS  :&quot;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">var</span><span class="p">(</span><span class="n">theta_ols</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">mean</span> <span class="n">of</span> <span class="n">n</span><span class="o">*</span><span class="n">chi2_min</span><span class="p">:</span> <span class="mf">47.07</span>    <span class="n">n</span> <span class="o">-</span> <span class="n">p</span> <span class="o">=</span> <span class="mi">47</span>
+<span class="n">variance</span> <span class="n">of</span> <span class="n">WLS</span>  <span class="p">:</span> <span class="p">[</span><span class="mf">0.00090</span> <span class="mf">0.05706</span> <span class="mf">0.09014</span><span class="p">]</span>
+<span class="n">predicted</span><span class="p">,</span> <span class="p">(</span><span class="n">X</span><span class="o">^</span><span class="n">T</span> <span class="n">S</span><span class="o">^-</span><span class="mi">2</span> <span class="n">X</span><span class="p">)</span><span class="o">^-</span><span class="mi">1</span><span class="p">:</span> <span class="p">[</span><span class="mf">0.00088</span> <span class="mf">0.05677</span> <span class="mf">0.08989</span><span class="p">]</span>
+<span class="n">variance</span> <span class="n">of</span> <span class="n">OLS</span>  <span class="p">:</span> <span class="p">[</span><span class="mf">0.00244</span> <span class="mf">0.13275</span> <span class="mf">0.17519</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>The unweighted estimator is unbiased here too, but its variance is between
+two and three times larger: it lets the noisy points at large <span class="math notranslate nohighlight">\(x\)</span> pull the
+fit as hard as the precise ones at small <span class="math notranslate nohighlight">\(x\)</span>.</p>
 </section>
 <section id="measures-of-quality">
 <h2><span class="section-number">3.5. </span>Measures of quality<a class="headerlink" href="#measures-of-quality" title="Link to this heading">#</a></h2>
@@ -774,7 +868,7 @@ error</p>
 <div class="math notranslate nohighlight">
 \[
 \mathrm{MSE}(\bm{y},\tilde{\bm{y}})
-   = \frac{1}{n}\sum_{i=0}^{n-1}\left(y_i-\tilde{y}_i\right)^{2}\tag{3.15}
+   = \frac{1}{n}\sum_{i=0}^{n-1}\left(y_i-\tilde{y}_i\right)^{2}\tag{3.17}
 \]</div>
 <p>is the quantity we minimise and the natural quantity to report, but it carries
 the squared units of the target and its numerical value therefore says nothing
@@ -785,7 +879,7 @@ R^{2}(\bm{y},\tilde{\bm{y}})
    = 1 - \frac{\sum_{i=0}^{n-1}\left(y_i-\tilde{y}_i\right)^{2}}
               {\sum_{i=0}^{n-1}\left(y_i-\bar{y}\right)^{2}},
   \qquad
-  \bar{y}=\frac{1}{n}\sum_{i=0}^{n-1}y_i,\tag{3.16}
+  \bar{y}=\frac{1}{n}\sum_{i=0}^{n-1}y_i,\tag{3.18}
 \]</div>
 <p>is dimensionless and compares the model against the best constant prediction:
 <span class="math notranslate nohighlight">\(R^{2}=1\)</span> is a perfect fit, <span class="math notranslate nohighlight">\(R^{2}=0\)</span> means the model does no better than
@@ -793,14 +887,74 @@ predicting the mean, and negative values – entirely possible on test data –
 mean it does worse.  Note that the denominator is <span class="math notranslate nohighlight">\(n\)</span> times the sample
 variance of <span class="math notranslate nohighlight">\(\bm{y}\)</span>, so that <span class="math notranslate nohighlight">\(R^{2}\)</span> is one minus the fraction of variance
 left unexplained.</p>
+<p><strong>Where <span class="math notranslate nohighlight">\(R^{2}\)</span> comes from.</strong>
+The definition (3.18) looks like a convention, but for a
+least-squares fit with an intercept it is forced by geometry, and the
+derivation explains both its range and its most abused property.  Write
+<span class="math notranslate nohighlight">\(\bm{e}=\bm{y}-\tilde{\bm{y}}=(\bm{I}-\bm{H})\bm{y}\)</span> for the residual.  Since
+<span class="math notranslate nohighlight">\(\bm{H}\)</span> is an orthogonal projector, <span class="math notranslate nohighlight">\(\tilde{\bm{y}}=\bm{H}\bm{y}\)</span> and <span class="math notranslate nohighlight">\(\bm{e}\)</span>
+are orthogonal and Pythagoras gives</p>
+<div class="math notranslate nohighlight">
+\[
+\left\|\bm{y}\right\|_2^{2}
+   = \left\|\bm{H}\bm{y}\right\|_2^{2}
+   + \left\|(\bm{I}-\bm{H})\bm{y}\right\|_2^{2}
+   = \left\|\tilde{\bm{y}}\right\|_2^{2} + \left\|\bm{e}\right\|_2^{2}.\tag{3.19}
+\]</div>
+<p>Now suppose the design matrix contains the constant column <span class="math notranslate nohighlight">\(\bm{1}\)</span>, as it
+does whenever an intercept is fitted.  The normal equations
+<span class="math notranslate nohighlight">\(\bm{X}^{T}\bm{e}=\bm{0}\)</span> then include the row <span class="math notranslate nohighlight">\(\bm{1}^{T}\bm{e}=0\)</span>: the
+residuals sum to zero, so <span class="math notranslate nohighlight">\(\bar{\tilde{y}}=\bar{y}\)</span>, and the vector
+<span class="math notranslate nohighlight">\(\bm{y}-\bar{y}\bm{1}\)</span> decomposes as
+<span class="math notranslate nohighlight">\((\tilde{\bm{y}}-\bar{y}\bm{1})+\bm{e}\)</span> with the two parts again orthogonal,
+because <span class="math notranslate nohighlight">\(\bm{e}\perp\tilde{\bm{y}}\)</span> and <span class="math notranslate nohighlight">\(\bm{e}\perp\bm{1}\)</span>.  Applying
+Pythagoras once more,</p>
+<div class="math notranslate nohighlight">
+\[
+\underbrace{\sum_i\left(y_i-\bar{y}\right)^{2}}_{\text{TSS}}
+   = \underbrace{\sum_i\left(\tilde{y}_i-\bar{y}\right)^{2}}_{\text{ESS}}
+   + \underbrace{\sum_i\left(y_i-\tilde{y}_i\right)^{2}}_{\text{RSS}} ,\tag{3.20}
+\]</div>
+<p>the <em>analysis-of-variance identity</em>: the total sum of squares splits
+exactly into a part explained by the fit and a residual part.  Dividing by
+the left-hand side,</p>
+<div class="math notranslate nohighlight">
+\[
+R^{2} = 1-\frac{\text{RSS}}{\text{TSS}} = \frac{\text{ESS}}{\text{TSS}}
+        = \cos^{2}\!\angle\!\left(\bm{y}-\bar{y}\bm{1},\;
+                                  \tilde{\bm{y}}-\bar{y}\bm{1}\right),\tag{3.21}
+\]</div>
+<p>so on the training data <span class="math notranslate nohighlight">\(R^{2}\)</span> is the squared cosine of the angle between the
+centred targets and the centred fit, and lies in <span class="math notranslate nohighlight">\([0,1]\)</span>.  Both halves of
+that statement fail off the training set: for test data the residuals do not
+sum to zero and are not orthogonal to the fit, the identity (3.20)
+breaks, and <span class="math notranslate nohighlight">\(R^{2}\)</span> can be negative.</p>
+<p>The identity also proves the warning below.  Let <span class="math notranslate nohighlight">\(\bm{X}'=[\bm{X}\;\bm{z}]\)</span>
+be the design matrix with one further column.  Every <span class="math notranslate nohighlight">\(\bm{\theta}\)</span> available
+to <span class="math notranslate nohighlight">\(\bm{X}\)</span> is available to <span class="math notranslate nohighlight">\(\bm{X}'\)</span> with a zero in the last place, so
+<span class="math notranslate nohighlight">\(\min_{\bm{\theta}'}\|\bm{y}-\bm{X}'\bm{\theta}'\|^{2}
+\le\min_{\bm{\theta}}\|\bm{y}-\bm{X}\bm{\theta}\|^{2}\)</span>: the training RSS can
+only fall when a column is added, and by Eq. (3.21) the
+training <span class="math notranslate nohighlight">\(R^{2}\)</span> can only rise.  When <span class="math notranslate nohighlight">\(p=n\)</span> the column space is all of
+<span class="math notranslate nohighlight">\(\mathbb{R}^{n}\)</span>, <span class="math notranslate nohighlight">\(\bm{H}=\bm{I}\)</span>, the RSS is zero and <span class="math notranslate nohighlight">\(R^{2}=1\)</span> whatever the
+columns contain.  The <em>adjusted</em> coefficient</p>
+<div class="math notranslate nohighlight">
+\[
+\bar{R}^{2} = 1-\frac{\text{RSS}/(n-p)}{\text{TSS}/(n-1)}
+              = 1-\left(1-R^{2}\right)\frac{n-1}{n-p}\tag{3.22}
+\]</div>
+<p>replaces the two sums of squares by unbiased variance estimates – the
+divisor <span class="math notranslate nohighlight">\(n-p\)</span> will be justified in Proposition 3.2 – and
+can decrease when a useless column is added, but it is a palliative and not a
+cure: only data the model has not seen measure what we actually care about.</p>
 <p>Two further measures appear in the sources of this book.  The <em>mean
 absolute error</em></p>
 <div class="math notranslate nohighlight">
 \[
 \mathrm{MAE}(\bm{y},\tilde{\bm{y}})
-   = \frac{1}{n}\sum_{i=0}^{n-1}\left|y_i-\tilde{y}_i\right|\tag{3.17}
+   = \frac{1}{n}\sum_{i=0}^{n-1}\left|y_i-\tilde{y}_i\right|\tag{3.23}
 \]</div>
-<p>is the <span class="math notranslate nohighlight">\(1\)</span>-norm counterpart of Eq. (3.15) and is far less sensitive
+<p>is the <span class="math notranslate nohighlight">\(1\)</span>-norm counterpart of Eq. (3.17) and is far less sensitive
 to outliers, for the reason discussed in Section <em>Vector and matrix norms</em>: squaring
 gives a point at ten standard deviations a hundred times the weight of one at
 a single standard deviation, whereas the absolute value gives it ten times.
@@ -841,10 +995,10 @@ design matrix are not stochastic, the target <span class="math notranslate nohig
 y_i \sim \mathcal{N}\left(\bm{X}_{i,\ast}\bm{\theta},\,\sigma^{2}\right)
    = \frac{1}{\sqrt{2\pi\sigma^{2}}}
      \exp\left[-\frac{\left(y_i-\bm{X}_{i,\ast}\bm{\theta}\right)^{2}}
-                     {2\sigma^{2}}\right],\tag{3.18}
+                     {2\sigma^{2}}\right],\tag{3.24}
 \]</div>
 <p>which is Eq. (2.39) written out in full.  Reading
-Eq. (3.18) as a function of the parameters rather than of the
+Eq. (3.24) as a function of the parameters rather than of the
 data gives the <em>likelihood</em> of observing <span class="math notranslate nohighlight">\(y_i\)</span> given <span class="math notranslate nohighlight">\(\bm{\theta}\)</span>, and
 since the observations are independent and identically distributed the
 likelihood of the whole data set <span class="math notranslate nohighlight">\(\bm{D}\)</span> is the product</p>
@@ -853,14 +1007,14 @@ likelihood of the whole data set <span class="math notranslate nohighlight">\(\b
 p(\bm{D}\mid\bm{\theta})
    = \prod_{i=0}^{n-1}\frac{1}{\sqrt{2\pi\sigma^{2}}}
      \exp\left[-\frac{\left(y_i-\bm{X}_{i,\ast}\bm{\theta}\right)^{2}}
-                     {2\sigma^{2}}\right],\tag{3.19}
+                     {2\sigma^{2}}\right],\tag{3.25}
 \]</div>
 <p>where <span class="math notranslate nohighlight">\(\bm{D}\)</span> denotes the domain of events, inputs and targets together; in
 the one-dimensional case
 <span class="math notranslate nohighlight">\(\bm{D}=[(x_0,y_0),(x_1,y_1),\dots,(x_{n-1},y_{n-1})]\)</span>.</p>
 <p><em>Maximum likelihood estimation</em> chooses the parameters making the
 observed data most probable, that is maximising
-Eq. (3.19).  Differentiating a product of <span class="math notranslate nohighlight">\(n\)</span> terms is
+Eq. (3.25).  Differentiating a product of <span class="math notranslate nohighlight">\(n\)</span> terms is
 awkward and numerically hazardous, since the product of many small numbers
 underflows.  Because the logarithm is monotonically increasing, maximising the
 likelihood is equivalent to maximising its logarithm, and we prefer to
@@ -868,13 +1022,13 @@ minimise the negative of that:</p>
 <div class="math notranslate nohighlight">
 \[
 C(\bm{\theta}) = -\log\prod_{i=0}^{n-1}p(y_i,\bm{X}\mid\bm{\theta})
-                 = -\sum_{i=0}^{n-1}\log p(y_i,\bm{X}\mid\bm{\theta}).\tag{3.20}
+                 = -\sum_{i=0}^{n-1}\log p(y_i,\bm{X}\mid\bm{\theta}).\tag{3.26}
 \]</div>
-<p>Inserting Eq. (3.18) the sum evaluates to</p>
+<p>Inserting Eq. (3.24) the sum evaluates to</p>
 <div class="math notranslate nohighlight">
 \[
 C(\bm{\theta}) = \frac{n}{2}\log\left(2\pi\sigma^{2}\right)
-   + \frac{\left\|\bm{y}-\bm{X}\bm{\theta}\right\|_2^{2}}{2\sigma^{2}} .\tag{3.21}
+   + \frac{\left\|\bm{y}-\bm{X}\bm{\theta}\right\|_2^{2}}{2\sigma^{2}} .\tag{3.27}
 \]</div>
 <p>The first term does not involve <span class="math notranslate nohighlight">\(\bm{\theta}\)</span>, and the second is the
 least-squares cost (3.6) up to a positive constant.
@@ -883,16 +1037,67 @@ Differentiating therefore returns
 <div class="math notranslate nohighlight">
 \[
 \hat{\bm{\theta}}_{\mathrm{OLS}}
-   = \left(\bm{X}^{T}\bm{X}\right)^{-1}\bm{X}^{T}\bm{y}\tag{3.22}
+   = \left(\bm{X}^{T}\bm{X}\right)^{-1}\bm{X}^{T}\bm{y}\tag{3.28}
 \]</div>
 <p>once more.</p>
+<p><strong>The noise variance by maximum likelihood.</strong>
+The likelihood (3.27) also depends on <span class="math notranslate nohighlight">\(\sigma^{2}\)</span>, and
+maximising over it as well is instructive.  Differentiating
+Eq. (3.27) with respect to <span class="math notranslate nohighlight">\(\sigma^{2}\)</span>,</p>
+<div class="math notranslate nohighlight">
+\[
+\frac{\partial C}{\partial\sigma^{2}}
+   = \frac{n}{2\sigma^{2}}
+   - \frac{\left\|\bm{y}-\bm{X}\bm{\theta}\right\|_2^{2}}{2\sigma^{4}} = 0
+  \quad\Longrightarrow\quad
+  \hat{\sigma}^{2}_{\mathrm{ML}}
+   = \frac{\left\|\bm{y}-\bm{X}\hat{\bm{\theta}}\right\|_2^{2}}{n},\tag{3.29}
+\]</div>
+<p>the training mean squared error.  This estimator is <em>biased</em>: it divides
+by <span class="math notranslate nohighlight">\(n\)</span> where Proposition 3.2 will show that <span class="math notranslate nohighlight">\(n-p\)</span> is
+required, because the residuals of a fitted model are systematically smaller
+than the noise that produced them.  Maximum likelihood is a principle for
+choosing estimators, not a guarantee that they are unbiased, and this is the
+simplest example of the difference.</p>
+<p><strong>Fisher information and the Cram’er-Rao bound.</strong></p>
+<p>The Gaussian likelihood delivers one more result, and it puts the variance
+formula that Section <em>Statistical properties of the least-squares estimator</em> will use into a wider frame.  The
+<em>Fisher information</em> is the expected negative Hessian of the
+log-likelihood with respect to the parameters,</p>
+<div class="math notranslate nohighlight">
+\[
+\bm{\mathcal{I}}(\bm{\theta})
+   = -\mathbb{E}\left[\frac{\partial^{2}\log p(\bm{D}\mid\bm{\theta})}
+                          {\partial\bm{\theta}\,\partial\bm{\theta}^{T}}\right]
+   = \frac{\partial^{2}C}{\partial\bm{\theta}\,\partial\bm{\theta}^{T}}
+   = \frac{\bm{X}^{T}\bm{X}}{\sigma^{2}},\tag{3.30}
+\]</div>
+<p>where the second equality uses <span class="math notranslate nohighlight">\(C=-\log p\)</span> and the third differentiates
+Eq. (3.27) twice, as in Section <em>The Hessian matrix</em>; the
+expectation is trivial because the Hessian does not depend on the data.  It
+measures how sharply the data pin down the parameters – how curved the
+log-likelihood is at its peak.  The Cram’er-Rao inequality, proved in any
+text on mathematical statistics, states that <em>every</em> unbiased estimator
+<span class="math notranslate nohighlight">\(\tilde{\bm{\theta}}\)</span> of <span class="math notranslate nohighlight">\(\bm{\theta}\)</span> satisfies</p>
+<div class="math notranslate nohighlight">
+\[
+\var\left(\tilde{\bm{\theta}}\right) \succeq \bm{\mathcal{I}}(\bm{\theta})^{-1}
+   = \sigma^{2}\left(\bm{X}^{T}\bm{X}\right)^{-1},\tag{3.31}
+\]</div>
+<p>in the sense that the difference is positive semi-definite.  Comparing with
+the variance of the least-squares estimator, Eq. (3.32) below,
+the bound is attained: under Gaussian noise OLS is <em>efficient</em>, of
+minimum variance among all unbiased estimators, linear or not.  This is
+stronger than the Gauss-Markov theorem, which restricts the competition to
+linear estimators but in return needs no Gaussian assumption; the two results
+bracket the same estimator from different sides.</p>
 <div class="tip admonition">
 <p class="admonition-title">Machine learning connection</p>
-<p>Equation (3.21) says
+<p>Equation (3.27) says
 that <em>least squares is maximum likelihood for Gaussian noise</em>, and the
 converse statement is the useful one: a different noise model gives a
 different loss function.  Laplace-distributed noise gives the mean absolute
-error (3.17); Bernoulli-distributed targets give the cross-entropy
+error (3.23); Bernoulli-distributed targets give the cross-entropy
 loss of logistic regression; Poisson counts give the Poisson deviance.  When
 we later write down a loss function for a neural network we are, whether or
 not we say so, making an assumption about the distribution of the residuals.
@@ -911,7 +1116,7 @@ moments:</p>
 \mathbb{E}[\hat{\bm{\theta}}_{\mathrm{OLS}}] = \bm{\theta},
   \qquad
   \var(\hat{\bm{\theta}}_{\mathrm{OLS}})
-   = \sigma^{2}\left(\bm{X}^{T}\bm{X}\right)^{-1}.\tag{3.23}
+   = \sigma^{2}\left(\bm{X}^{T}\bm{X}\right)^{-1}.\tag{3.32}
 \]</div>
 <p>The estimator is unbiased <em>provided the linear model is correct</em>, and its
 covariance matrix is the inverse Hessian scaled by the noise variance.  Since
@@ -919,7 +1124,7 @@ covariance matrix is the inverse Hessian scaled by the noise variance.  Since
 <div class="math notranslate nohighlight">
 \[
 \hat{\sigma}^{2}
-   = \frac{\left\|\bm{y}-\bm{X}\hat{\bm{\theta}}\right\|_2^{2}}{n-p},\tag{3.24}
+   = \frac{\left\|\bm{y}-\bm{X}\hat{\bm{\theta}}\right\|_2^{2}}{n-p},\tag{3.33}
 \]</div>
 <p>the divisor <span class="math notranslate nohighlight">\(n-p\)</span> accounting for the <span class="math notranslate nohighlight">\(p\)</span> degrees of freedom consumed by the
 fit, in the manner of Bessel’s correction (2.28).  The
@@ -929,17 +1134,329 @@ interval follows,</p>
 <div class="math notranslate nohighlight">
 \[
 \hat{\theta}_j \pm t_{\alpha/2,\,n-p}\;
-    \hat{\sigma}\sqrt{\left[(\bm{X}^{T}\bm{X})^{-1}\right]_{jj}},\tag{3.25}
+    \hat{\sigma}\sqrt{\left[(\bm{X}^{T}\bm{X})^{-1}\right]_{jj}},\tag{3.34}
 \]</div>
 <p>with <span class="math notranslate nohighlight">\(t\)</span> the appropriate quantile of Student’s distribution, which for
 <span class="math notranslate nohighlight">\(n-p\)</span> large is simply the Gaussian quantile, <span class="math notranslate nohighlight">\(1.96\)</span> for <span class="math notranslate nohighlight">\(95\%\)</span>.</p>
+<p>Each of these statements is used constantly and each deserves a proof; the
+proofs are short and they introduce the residual projector
+<span class="math notranslate nohighlight">\(\bm{I}-\bm{H}\)</span>, which is the key to everything in this section.  Throughout,
+<span class="math notranslate nohighlight">\(\bm{y}=\bm{X}\bm{\theta}+\bm{\varepsilon}\)</span> with <span class="math notranslate nohighlight">\(\mathbb{E}[\bm{\varepsilon}]
+=\bm{0}\)</span> and <span class="math notranslate nohighlight">\(\var(\bm{\varepsilon})=\sigma^{2}\bm{I}\)</span>, and <span class="math notranslate nohighlight">\(\bm{X}\)</span> has full
+column rank.</p>
+<div class="important admonition">
+<p class="admonition-title">Proposition 3.2 (The residual variance estimator is unbiased)</p>
+<p>The residual vector is <span class="math notranslate nohighlight">\(\bm{e}=\bm{y}-\bm{X}\hat{\bm{\theta}}
+=(\bm{I}-\bm{H})\bm{\varepsilon}\)</span>, and
+<span class="math notranslate nohighlight">\(\mathbb{E}\big[\|\bm{e}\|_2^{2}\big]=(n-p)\sigma^{2}\)</span>.  Hence
+<span class="math notranslate nohighlight">\(\hat{\sigma}^{2}\)</span> of Eq. (3.33) satisfies
+<span class="math notranslate nohighlight">\(\mathbb{E}[\hat{\sigma}^{2}]=\sigma^{2}\)</span>.</p>
+</div>
+<div class="note admonition">
+<p class="admonition-title">Proof</p>
+<p>Since <span class="math notranslate nohighlight">\(\bm{H}\bm{X}=\bm{X}\)</span>, we have <span class="math notranslate nohighlight">\((\bm{I}-\bm{H})\bm{y}
+=(\bm{I}-\bm{H})\bm{X}\bm{\theta}+(\bm{I}-\bm{H})\bm{\varepsilon}
+=(\bm{I}-\bm{H})\bm{\varepsilon}\)</span>: the residual projector annihilates the
+model and sees only the noise.  Then, because <span class="math notranslate nohighlight">\(\bm{I}-\bm{H}\)</span> is symmetric and
+idempotent,</p>
+<div class="math notranslate nohighlight">
+\[
+\mathbb{E}\left[\|\bm{e}\|_2^{2}\right]
+   = \mathbb{E}\left[\bm{\varepsilon}^{T}(\bm{I}-\bm{H})\bm{\varepsilon}\right]
+   = \mathrm{Tr}\left[(\bm{I}-\bm{H})\,\mathbb{E}[\bm{\varepsilon}\bm{\varepsilon}^{T}]\right]
+   = \sigma^{2}\,\mathrm{Tr}(\bm{I}-\bm{H})
+   = \sigma^{2}(n-p),
+\]</div>
+<p>using <span class="math notranslate nohighlight">\(\mathbb{E}[\bm{z}^{T}\bm{M}\bm{z}]=\mathrm{Tr}(\bm{M}\var(\bm{z}))\)</span> for
+a zero-mean vector <span class="math notranslate nohighlight">\(\bm{z}\)</span> and <span class="math notranslate nohighlight">\(\mathrm{Tr}(\bm{H})=p\)</span> from
+Eq. (1.10).
+\qed</p>
+</div>
+<p>The projector <span class="math notranslate nohighlight">\(\bm{I}-\bm{H}\)</span> has <span class="math notranslate nohighlight">\(n-p\)</span> eigenvalues equal to one and <span class="math notranslate nohighlight">\(p\)</span> equal
+to zero, so the residual lives in an <span class="math notranslate nohighlight">\((n-p)\)</span>-dimensional subspace: that is the
+precise sense in which the fit “consumes <span class="math notranslate nohighlight">\(p\)</span> degrees of freedom”.  Under
+Gaussian noise the same projector gives the full distribution theory behind
+the confidence interval (3.34).</p>
+<div class="important admonition">
+<p class="admonition-title">Proposition 3.3 (Distribution of the least-squares estimator)</p>
+<p>Assume in addition that the noise is Gaussian,
+<span class="math notranslate nohighlight">\(\bm{\varepsilon}\sim\mathcal{N}(\bm{0},\sigma^{2}\bm{I})\)</span>.  Then</p>
+<ol class="arabic simple">
+<li><p><span class="math notranslate nohighlight">\(\hat{\bm{\theta}}\sim\mathcal{N}\!\left(\bm{\theta},
+\sigma^{2}(\bm{X}^{T}\bm{X})^{-1}\right)\)</span>;</p></li>
+<li><p><span class="math notranslate nohighlight">\(\hat{\bm{\theta}}\)</span> and the residual <span class="math notranslate nohighlight">\(\bm{e}\)</span> are independent;</p></li>
+<li><p><span class="math notranslate nohighlight">\((n-p)\hat{\sigma}^{2}/\sigma^{2}=\|\bm{e}\|_2^{2}/\sigma^{2}\)</span> has the
+<span class="math notranslate nohighlight">\(\chi^{2}\)</span> distribution with <span class="math notranslate nohighlight">\(n-p\)</span> degrees of freedom;</p></li>
+<li><p>for each <span class="math notranslate nohighlight">\(j\)</span>, the ratio
+<span class="math notranslate nohighlight">\((\hat{\theta}_j-\theta_j)\big/\big(\hat{\sigma}
+\sqrt{[(\bm{X}^{T}\bm{X})^{-1}]_{jj}}\big)\)</span> has Student’s
+<span class="math notranslate nohighlight">\(t\)</span> distribution with <span class="math notranslate nohighlight">\(n-p\)</span> degrees of freedom.</p></li>
+</ol>
+</div>
+<div class="note admonition">
+<p class="admonition-title">Proof</p>
+<p>(i) <span class="math notranslate nohighlight">\(\hat{\bm{\theta}}=\bm{\theta}+(\bm{X}^{T}\bm{X})^{-1}\bm{X}^{T}\bm{\varepsilon}\)</span>
+is an affine map of a Gaussian vector and hence Gaussian, with the moments of
+Eq. (3.32).
+(ii) Both are linear in <span class="math notranslate nohighlight">\(\bm{\varepsilon}\)</span>, so joint Gaussianity holds and
+independence is equivalent to zero cross-covariance:</p>
+<div class="math notranslate nohighlight">
+\[
+\cov\left(\hat{\bm{\theta}},\bm{e}\right)
+   = (\bm{X}^{T}\bm{X})^{-1}\bm{X}^{T}\,\sigma^{2}\bm{I}\,(\bm{I}-\bm{H})
+   = \sigma^{2}(\bm{X}^{T}\bm{X})^{-1}\left(\bm{X}^{T}-\bm{X}^{T}\bm{H}\right)
+   = \bm{0},
+\]</div>
+<p>because <span class="math notranslate nohighlight">\(\bm{X}^{T}\bm{H}=(\bm{H}\bm{X})^{T}=\bm{X}^{T}\)</span>.
+(iii) By the spectral decomposition of Section <em>The spectral decomposition of symmetric matrices</em>,
+<span class="math notranslate nohighlight">\(\bm{I}-\bm{H}=\bm{Q}\bm{D}\bm{Q}^{T}\)</span> with <span class="math notranslate nohighlight">\(\bm{Q}\)</span> orthogonal and <span class="math notranslate nohighlight">\(\bm{D}\)</span>
+diagonal with <span class="math notranslate nohighlight">\(n-p\)</span> ones and <span class="math notranslate nohighlight">\(p\)</span> zeros.  Put <span class="math notranslate nohighlight">\(\bm{w}=\bm{Q}^{T}\bm{\varepsilon}/\sigma\)</span>;
+an orthogonal map of <span class="math notranslate nohighlight">\(\mathcal{N}(\bm{0},\bm{I})\)</span> is again
+<span class="math notranslate nohighlight">\(\mathcal{N}(\bm{0},\bm{I})\)</span>, so the <span class="math notranslate nohighlight">\(w_k\)</span> are independent standard normals,
+and <span class="math notranslate nohighlight">\(\|\bm{e}\|_2^{2}/\sigma^{2}=\bm{w}^{T}\bm{D}\bm{w}\)</span> is the sum of <span class="math notranslate nohighlight">\(n-p\)</span>
+of their squares, which is the definition of <span class="math notranslate nohighlight">\(\chi^{2}_{n-p}\)</span>.
+(iv) By (i), <span class="math notranslate nohighlight">\(z_j=(\hat{\theta}_j-\theta_j)/(\sigma\sqrt{[(\bm{X}^{T}\bm{X})^{-1}]_{jj}})\)</span>
+is standard normal; by (iii), <span class="math notranslate nohighlight">\(u=(n-p)\hat{\sigma}^{2}/\sigma^{2}\)</span> is
+<span class="math notranslate nohighlight">\(\chi^{2}_{n-p}\)</span>; by (ii) they are independent; and <span class="math notranslate nohighlight">\(z_j/\sqrt{u/(n-p)}\)</span>,
+which is exactly the ratio in (iv), is by definition Student’s <span class="math notranslate nohighlight">\(t\)</span> with <span class="math notranslate nohighlight">\(n-p\)</span>
+degrees of freedom.
+\qed</p>
+</div>
+<p>Statement (iv) is the confidence interval (3.34): the interval
+<span class="math notranslate nohighlight">\(\hat{\theta}_j\pm t_{\alpha/2,n-p}\,\hat{\sigma}\sqrt{[(\bm{X}^{T}\bm{X})^{-1}]_{jj}}\)</span>
+covers the true <span class="math notranslate nohighlight">\(\theta_j\)</span> with probability exactly <span class="math notranslate nohighlight">\(1-\alpha\)</span>, not
+approximately, and the Student quantile rather than the Gaussian one is what
+pays for having estimated <span class="math notranslate nohighlight">\(\sigma\)</span> from the same data.  Statement (iii) is
+also the promised justification of the reduced-<span class="math notranslate nohighlight">\(\chi^{2}\)</span> test of
+Section <em>Weighted least squares and the <span class="math notranslate nohighlight">\(\chi^2\)</span> function</em>.  All four statements can be checked by
+simulation, and the check is worth running once because it also exposes what
+the confidence interval does <em>not</em> promise – see the last line of the
+output.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">scipy</span> <span class="kn">import</span> <span class="n">stats</span>
+
+<span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="mi">2024</span><span class="p">)</span>
+<span class="n">n</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">sigma</span> <span class="o">=</span> <span class="mi">30</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mf">0.5</span>
+<span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span>
+<span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vander</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">increasing</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>                 <span class="c1"># cubic polynomial</span>
+<span class="n">theta_true</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="o">-</span><span class="mf">2.0</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">])</span>
+<span class="n">XtX_inv</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">inv</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">X</span><span class="p">)</span>
+<span class="n">t_q</span> <span class="o">=</span> <span class="n">stats</span><span class="o">.</span><span class="n">t</span><span class="o">.</span><span class="n">ppf</span><span class="p">(</span><span class="mf">0.975</span><span class="p">,</span> <span class="n">n</span> <span class="o">-</span> <span class="n">p</span><span class="p">)</span>                      <span class="c1"># 2.056 for n-p = 26</span>
+
+<span class="n">s2</span><span class="p">,</span> <span class="n">covered</span><span class="p">,</span> <span class="n">joint</span><span class="p">,</span> <span class="n">train</span><span class="p">,</span> <span class="n">test</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[],</span> <span class="p">[],</span> <span class="p">[],</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">trial</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">20000</span><span class="p">):</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">X</span> <span class="o">@</span> <span class="n">theta_true</span> <span class="o">+</span> <span class="n">sigma</span> <span class="o">*</span> <span class="n">rng</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">n</span><span class="p">)</span>
+    <span class="n">theta</span> <span class="o">=</span> <span class="n">XtX_inv</span> <span class="o">@</span> <span class="n">X</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">y</span>
+    <span class="n">e</span> <span class="o">=</span> <span class="n">y</span> <span class="o">-</span> <span class="n">X</span> <span class="o">@</span> <span class="n">theta</span>
+    <span class="n">s2</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">e</span> <span class="o">@</span> <span class="n">e</span> <span class="o">/</span> <span class="p">(</span><span class="n">n</span> <span class="o">-</span> <span class="n">p</span><span class="p">))</span>                        <span class="c1"># Eq. (3.sigmahat)</span>
+    <span class="n">se</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">s2</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">XtX_inv</span><span class="p">))</span>
+    <span class="n">inside</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">theta</span> <span class="o">-</span> <span class="n">theta_true</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">t_q</span> <span class="o">*</span> <span class="n">se</span>  <span class="c1"># Eq. (3.confint)</span>
+    <span class="n">covered</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">inside</span><span class="p">);</span> <span class="n">joint</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">inside</span><span class="o">.</span><span class="n">all</span><span class="p">())</span>
+    <span class="n">train</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">e</span> <span class="o">@</span> <span class="n">e</span> <span class="o">/</span> <span class="n">n</span><span class="p">)</span>                           <span class="c1"># training MSE</span>
+    <span class="n">y_new</span> <span class="o">=</span> <span class="n">X</span> <span class="o">@</span> <span class="n">theta_true</span> <span class="o">+</span> <span class="n">sigma</span> <span class="o">*</span> <span class="n">rng</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">n</span><span class="p">)</span>
+    <span class="n">test</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">((</span><span class="n">y_new</span> <span class="o">-</span> <span class="n">X</span> <span class="o">@</span> <span class="n">theta</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">))</span>     <span class="c1"># fresh targets, same X</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;E[sigma_hat^2] =&quot;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">s2</span><span class="p">),</span> <span class="s2">&quot;  sigma^2 =&quot;</span><span class="p">,</span> <span class="n">sigma</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;coverage per coefficient:&quot;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">covered</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;all four covered at once:&quot;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">joint</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;E[train MSE] =&quot;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">train</span><span class="p">),</span> <span class="s2">&quot;  sigma^2 (1 - p/n) =&quot;</span><span class="p">,</span> <span class="n">sigma</span><span class="o">**</span><span class="mi">2</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">p</span><span class="o">/</span><span class="n">n</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;E[test  MSE] =&quot;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">test</span><span class="p">),</span>  <span class="s2">&quot;  sigma^2 (1 + p/n) =&quot;</span><span class="p">,</span> <span class="n">sigma</span><span class="o">**</span><span class="mi">2</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">p</span><span class="o">/</span><span class="n">n</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">E</span><span class="p">[</span><span class="n">sigma_hat</span><span class="o">^</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.24999</span>   <span class="n">sigma</span><span class="o">^</span><span class="mi">2</span> <span class="o">=</span> <span class="mf">0.25</span>
+<span class="n">coverage</span> <span class="n">per</span> <span class="n">coefficient</span><span class="p">:</span> <span class="p">[</span><span class="mf">0.9499</span> <span class="mf">0.9498</span> <span class="mf">0.9510</span> <span class="mf">0.9492</span><span class="p">]</span>
+<span class="nb">all</span> <span class="n">four</span> <span class="n">covered</span> <span class="n">at</span> <span class="n">once</span><span class="p">:</span> <span class="mf">0.861</span>
+<span class="n">E</span><span class="p">[</span><span class="n">train</span> <span class="n">MSE</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.21666</span>   <span class="n">sigma</span><span class="o">^</span><span class="mi">2</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">p</span><span class="o">/</span><span class="n">n</span><span class="p">)</span> <span class="o">=</span> <span class="mf">0.21667</span>
+<span class="n">E</span><span class="p">[</span><span class="n">test</span>  <span class="n">MSE</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.28420</span>   <span class="n">sigma</span><span class="o">^</span><span class="mi">2</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">p</span><span class="o">/</span><span class="n">n</span><span class="p">)</span> <span class="o">=</span> <span class="mf">0.28333</span>
+</pre></div>
+</div>
+<p>The first three lines are Propositions 3.2 and
+3.3: the variance estimate is unbiased and each
+interval covers its coefficient <span class="math notranslate nohighlight">\(95\%\)</span> of the time.  The probability that all
+four intervals cover simultaneously is only <span class="math notranslate nohighlight">\(86\%\)</span> – individual confidence
+statements do not combine into a joint one, and a table of <span class="math notranslate nohighlight">\(p\)</span> separate
+intervals says less than it appears to.  The last two lines are a result we
+have not yet derived, and it is the quantitative form of the warning in
+Section <em>Measures of quality</em>.</p>
+<p><strong>Why the training error is optimistic.</strong></p>
+<p>Suppose the linear model is correct.  By Proposition 3.2
+the expected training error is</p>
+<div class="math notranslate nohighlight">
+\[
+\mathbb{E}\left[\frac{1}{n}\|\bm{y}-\bm{X}\hat{\bm{\theta}}\|_2^{2}\right]
+   = \sigma^{2}\left(1-\frac{p}{n}\right):\tag{3.35}
+\]</div>
+<p><em>smaller</em> than the noise level, by exactly the fraction of the noise
+that the fit has absorbed.  Now draw fresh targets
+<span class="math notranslate nohighlight">\(\bm{y}'=\bm{X}\bm{\theta}+\bm{\varepsilon}'\)</span> at the same inputs, with
+<span class="math notranslate nohighlight">\(\bm{\varepsilon}'\)</span> independent of <span class="math notranslate nohighlight">\(\bm{\varepsilon}\)</span>, and score the fitted
+model on them.  Since <span class="math notranslate nohighlight">\(\bm{y}'-\bm{X}\hat{\bm{\theta}}
+=\bm{\varepsilon}'-\bm{H}\bm{\varepsilon}\)</span> and the two terms are independent
+with zero mean,</p>
+<div class="math notranslate nohighlight">
+\[
+\mathbb{E}\left[\frac{1}{n}\|\bm{y}'-\bm{X}\hat{\bm{\theta}}\|_2^{2}\right]
+   = \frac{1}{n}\left(\mathbb{E}\|\bm{\varepsilon}'\|_2^{2}
+       +\mathbb{E}\|\bm{H}\bm{\varepsilon}\|_2^{2}\right)
+   = \frac{1}{n}\left(n\sigma^{2}+\sigma^{2}\mathrm{Tr}(\bm{H})\right)
+   = \sigma^{2}\left(1+\frac{p}{n}\right).\tag{3.36}
+\]</div>
+<p>The difference,</p>
+<div class="math notranslate nohighlight">
+\[
+\text{optimism} = \frac{2p\sigma^{2}}{n},\tag{3.37}
+\]</div>
+<p>is the amount by which the training error flatters every least-squares fit,
+and it grows linearly with the number of parameters.  A model that adds
+columns will always look better in training and, once the added columns stop
+carrying signal, will look worse in test by exactly this margin: that is the
+bias-variance curve of Section <em>The bias-variance tradeoff</em> for the case in which
+the bias is already zero, and the variance term is <span class="math notranslate nohighlight">\(p\sigma^{2}/n\)</span>.  Adding
+<span class="math notranslate nohighlight">\(2p\hat{\sigma}^{2}/n\)</span> to the training error to correct for it is Mallows’
+<span class="math notranslate nohighlight">\(C_p\)</span> statistic, and the same correction with <span class="math notranslate nohighlight">\(\hat{\sigma}^{2}\)</span> replaced by
+the likelihood is Akaike’s information criterion; both are attempts to
+estimate the test error from training quantities.  Cross-validation, to which
+we now turn, estimates it directly.</p>
+<p><strong>Leave-one-out cross-validation in closed form.</strong></p>
+<p>The most thorough version of the cross-validation of
+Section <em>Cross-validation</em> is leave-one-out: fit <span class="math notranslate nohighlight">\(n\)</span> times, each time
+omitting one observation, and predict the omitted point.  For linear
+regression it need not be done <span class="math notranslate nohighlight">\(n\)</span> times, and the derivation is a small
+classic.  Let <span class="math notranslate nohighlight">\(\bm{x}_i^{T}\)</span> be row <span class="math notranslate nohighlight">\(i\)</span> of <span class="math notranslate nohighlight">\(\bm{X}\)</span>, let <span class="math notranslate nohighlight">\(\hat{\bm{\theta}}_{(-i)}\)</span>
+be the estimator without observation <span class="math notranslate nohighlight">\(i\)</span>, and let <span class="math notranslate nohighlight">\(h_{ii}=\bm{x}_i^{T}
+(\bm{X}^{T}\bm{X})^{-1}\bm{x}_i\)</span> be the <span class="math notranslate nohighlight">\(i\)</span>th diagonal element of the hat
+matrix, the <em>leverage</em> of point <span class="math notranslate nohighlight">\(i\)</span>.  Removing a row changes
+<span class="math notranslate nohighlight">\(\bm{X}^{T}\bm{X}\)</span> by a rank-one term, <span class="math notranslate nohighlight">\(\bm{X}^{T}\bm{X}-\bm{x}_i\bm{x}_i^{T}\)</span>,
+and the Sherman-Morrison formula</p>
+<div class="math notranslate nohighlight">
+\[
+\left(\bm{M}-\bm{u}\bm{v}^{T}\right)^{-1}
+   = \bm{M}^{-1}+\frac{\bm{M}^{-1}\bm{u}\bm{v}^{T}\bm{M}^{-1}}
+                      {1-\bm{v}^{T}\bm{M}^{-1}\bm{u}}\tag{3.38}
+\]</div>
+<p>– verified by multiplying both sides by <span class="math notranslate nohighlight">\(\bm{M}-\bm{u}\bm{v}^{T}\)</span> – gives
+the inverse without a new factorisation.  Applying it with
+<span class="math notranslate nohighlight">\(\bm{M}=\bm{X}^{T}\bm{X}\)</span> and <span class="math notranslate nohighlight">\(\bm{u}=\bm{v}=\bm{x}_i\)</span> to
+<span class="math notranslate nohighlight">\(\hat{\bm{\theta}}_{(-i)}=(\bm{X}^{T}\bm{X}-\bm{x}_i\bm{x}_i^{T})^{-1}
+(\bm{X}^{T}\bm{y}-\bm{x}_iy_i)\)</span> and simplifying – the exercises at the end of the chapter ask for the
+algebra – yields</p>
+<div class="math notranslate nohighlight">
+\[
+\hat{\bm{\theta}}_{(-i)}
+   = \hat{\bm{\theta}}
+   - \frac{(\bm{X}^{T}\bm{X})^{-1}\bm{x}_i\,e_i}{1-h_{ii}},
+  \qquad
+  y_i-\bm{x}_i^{T}\hat{\bm{\theta}}_{(-i)} = \frac{e_i}{1-h_{ii}},\tag{3.39}
+\]</div>
+<p>where <span class="math notranslate nohighlight">\(e_i=y_i-\bm{x}_i^{T}\hat{\bm{\theta}}\)</span> is the ordinary residual of the
+full fit.  The leave-one-out prediction error is therefore the ordinary
+residual inflated by <span class="math notranslate nohighlight">\(1/(1-h_{ii})\)</span>: a point with high leverage pulls the fit
+towards itself, its residual is deceptively small, and Eq. (3.39)
+undoes exactly that.  Summing gives the leave-one-out estimate of the test
+error from a single fit,</p>
+<div class="math notranslate nohighlight">
+\[
+\mathrm{CV}_{\mathrm{LOO}}
+   = \frac{1}{n}\sum_{i=0}^{n-1}
+     \left(\frac{e_i}{1-h_{ii}}\right)^{2},\tag{3.40}
+\]</div>
+<p>Allen’s PRESS statistic.  Nothing in the derivation used the particular form
+of <span class="math notranslate nohighlight">\(\bm{H}\)</span> beyond <span class="math notranslate nohighlight">\(\tilde{\bm{y}}=\bm{H}\bm{y}\)</span> being linear in <span class="math notranslate nohighlight">\(\bm{y}\)</span>, and
+the same identity holds for any <em>linear smoother</em>
+<span class="math notranslate nohighlight">\(\tilde{\bm{y}}=\bm{S}\bm{y}\)</span> with <span class="math notranslate nohighlight">\(h_{ii}\)</span> replaced by <span class="math notranslate nohighlight">\(S_{ii}\)</span>; in
+particular for Ridge regression with
+<span class="math notranslate nohighlight">\(\bm{S}_\lambda=\bm{X}(\bm{X}^{T}\bm{X}+\lambda\bm{I})^{-1}\bm{X}^{T}\)</span>, so
+that the penalty can be chosen by leave-one-out at the price of one fit per
+candidate <span class="math notranslate nohighlight">\(\lambda\)</span>.  Replacing each <span class="math notranslate nohighlight">\(S_{ii}\)</span> by their average
+<span class="math notranslate nohighlight">\(\mathrm{Tr}(\bm{S})/n\)</span> gives the <em>generalised cross-validation</em>
+criterion</p>
+<div class="math notranslate nohighlight">
+\[
+\mathrm{GCV}(\lambda)
+   = \frac{\tfrac{1}{n}\|\bm{y}-\bm{S}_\lambda\bm{y}\|_2^{2}}
+          {\left(1-\mathrm{df}(\lambda)/n\right)^{2}},
+  \qquad
+  \mathrm{df}(\lambda)=\mathrm{Tr}(\bm{S}_\lambda)
+   =\sum_i\frac{\sigma_i^{2}}{\sigma_i^{2}+\lambda},\tag{3.41}
+\]</div>
+<p>which is invariant under rotations of the data and depends on the design
+only through the effective degrees of freedom of Section <em>Ridge regression</em>.
+The following code checks Eq. (3.40) against <span class="math notranslate nohighlight">\(n\)</span> explicit refits,
+for OLS and for Ridge, and uses it to choose <span class="math notranslate nohighlight">\(\lambda\)</span>.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="mi">7</span><span class="p">)</span>
+<span class="n">n</span> <span class="o">=</span> <span class="mi">40</span>
+<span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">rng</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">n</span><span class="p">))</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">x</span><span class="p">)</span> <span class="o">+</span> <span class="mf">0.3</span> <span class="o">*</span> <span class="n">rng</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">n</span><span class="p">)</span>
+<span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vander</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="mi">11</span><span class="p">,</span> <span class="n">increasing</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>                <span class="c1"># degree-10 polynomial</span>
+
+<span class="k">def</span> <span class="nf">loo_explicit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">lmbda</span><span class="o">=</span><span class="mf">0.0</span><span class="p">):</span>
+    <span class="c1"># leave-one-out by n separate fits</span>
+    <span class="n">n</span><span class="p">,</span> <span class="n">p</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span>
+    <span class="n">errs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+        <span class="n">keep</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">n</span><span class="p">)</span> <span class="o">!=</span> <span class="n">i</span>
+        <span class="n">theta</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="n">keep</span><span class="p">]</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">X</span><span class="p">[</span><span class="n">keep</span><span class="p">]</span> <span class="o">+</span> <span class="n">lmbda</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">p</span><span class="p">),</span>
+                                <span class="n">X</span><span class="p">[</span><span class="n">keep</span><span class="p">]</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">y</span><span class="p">[</span><span class="n">keep</span><span class="p">])</span>
+        <span class="n">errs</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">y</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="n">X</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">@</span> <span class="n">theta</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">errs</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">loo_closed_form</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">lmbda</span><span class="o">=</span><span class="mf">0.0</span><span class="p">):</span>
+    <span class="c1"># the same number from one fit, Eq. (3.press)</span>
+    <span class="n">n</span><span class="p">,</span> <span class="n">p</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span>
+    <span class="n">S</span> <span class="o">=</span> <span class="n">X</span> <span class="o">@</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">X</span> <span class="o">+</span> <span class="n">lmbda</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">p</span><span class="p">),</span> <span class="n">X</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>   <span class="c1"># smoother matrix</span>
+    <span class="n">e</span> <span class="o">=</span> <span class="n">y</span> <span class="o">-</span> <span class="n">S</span> <span class="o">@</span> <span class="n">y</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">((</span><span class="n">e</span> <span class="o">/</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">S</span><span class="p">)))</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">gcv</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">lmbda</span><span class="o">=</span><span class="mf">0.0</span><span class="p">):</span>
+    <span class="c1"># generalised cross-validation, Eq. (3.gcv)</span>
+    <span class="n">n</span><span class="p">,</span> <span class="n">p</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span>
+    <span class="n">S</span> <span class="o">=</span> <span class="n">X</span> <span class="o">@</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">X</span> <span class="o">+</span> <span class="n">lmbda</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">p</span><span class="p">),</span> <span class="n">X</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
+    <span class="n">e</span> <span class="o">=</span> <span class="n">y</span> <span class="o">-</span> <span class="n">S</span> <span class="o">@</span> <span class="n">y</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">e</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">trace</span><span class="p">(</span><span class="n">S</span><span class="p">)</span> <span class="o">/</span> <span class="n">n</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span>
+
+<span class="k">for</span> <span class="n">lmbda</span> <span class="ow">in</span> <span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">1e-4</span><span class="p">,</span> <span class="mf">1e-2</span><span class="p">]:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;lambda = </span><span class="si">{</span><span class="n">lmbda</span><span class="si">:</span><span class="s2">&lt;6</span><span class="si">}</span><span class="s2">  explicit </span><span class="si">{</span><span class="n">loo_explicit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span><span class="w"> </span><span class="n">y</span><span class="p">,</span><span class="w"> </span><span class="n">lmbda</span><span class="p">)</span><span class="si">:</span><span class="s2">.6f</span><span class="si">}</span><span class="s2">&quot;</span>
+          <span class="sa">f</span><span class="s2">&quot;  closed form </span><span class="si">{</span><span class="n">loo_closed_form</span><span class="p">(</span><span class="n">X</span><span class="p">,</span><span class="w"> </span><span class="n">y</span><span class="p">,</span><span class="w"> </span><span class="n">lmbda</span><span class="p">)</span><span class="si">:</span><span class="s2">.6f</span><span class="si">}</span><span class="s2">&quot;</span>
+          <span class="sa">f</span><span class="s2">&quot;  GCV </span><span class="si">{</span><span class="n">gcv</span><span class="p">(</span><span class="n">X</span><span class="p">,</span><span class="w"> </span><span class="n">y</span><span class="p">,</span><span class="w"> </span><span class="n">lmbda</span><span class="p">)</span><span class="si">:</span><span class="s2">.6f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="n">lambdas</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logspace</span><span class="p">(</span><span class="o">-</span><span class="mi">8</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">81</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;lambda chosen by LOO:&quot;</span><span class="p">,</span> <span class="n">lambdas</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">argmin</span><span class="p">([</span><span class="n">loo_closed_form</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">l</span><span class="p">)</span> <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">lambdas</span><span class="p">])])</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;lambda chosen by GCV:&quot;</span><span class="p">,</span> <span class="n">lambdas</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">argmin</span><span class="p">([</span><span class="n">gcv</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">l</span><span class="p">)</span> <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">lambdas</span><span class="p">])])</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">lambda</span> <span class="o">=</span> <span class="mf">0.0</span>     <span class="n">explicit</span> <span class="mf">0.107484</span>  <span class="n">closed</span> <span class="n">form</span> <span class="mf">0.107485</span>  <span class="n">GCV</span> <span class="mf">0.108301</span>
+<span class="k">lambda</span> <span class="o">=</span> <span class="mf">0.0001</span>  <span class="n">explicit</span> <span class="mf">0.080349</span>  <span class="n">closed</span> <span class="n">form</span> <span class="mf">0.080349</span>  <span class="n">GCV</span> <span class="mf">0.084748</span>
+<span class="k">lambda</span> <span class="o">=</span> <span class="mf">0.01</span>    <span class="n">explicit</span> <span class="mf">0.125840</span>  <span class="n">closed</span> <span class="n">form</span> <span class="mf">0.125840</span>  <span class="n">GCV</span> <span class="mf">0.127780</span>
+<span class="k">lambda</span> <span class="n">chosen</span> <span class="n">by</span> <span class="n">LOO</span><span class="p">:</span> <span class="mf">0.0006309573444801943</span>
+<span class="k">lambda</span> <span class="n">chosen</span> <span class="n">by</span> <span class="n">GCV</span><span class="p">:</span> <span class="mf">0.0006309573444801943</span>
+</pre></div>
+</div>
+<p>The closed form reproduces the forty explicit refits to every printed digit
+– the difference of one unit in the last place at <span class="math notranslate nohighlight">\(\lambda=0\)</span> is the
+rounding of the unpenalised solve on a badly conditioned Vandermonde matrix,
+Section <em>Ordinary least squares</em> – at a fortieth of the cost.  Both criteria have a
+clear interior minimum, at a penalty that lowers the leave-one-out error from
+<span class="math notranslate nohighlight">\(0.107\)</span> for the unpenalised degree-ten fit to <span class="math notranslate nohighlight">\(0.080\)</span>, and here they pick the
+same <span class="math notranslate nohighlight">\(\lambda\)</span>; in general GCV differs a little because averaging the
+leverages discounts the high-leverage points at the ends of the interval that
+dominate the leave-one-out sum for a polynomial fit.</p>
 <p><strong>Reading the variance through the SVD.</strong>
-Substituting Eq. (1.115) into Eq. (3.23) gives</p>
+Substituting Eq. (1.115) into Eq. (3.32) gives</p>
 <div class="math notranslate nohighlight">
 \[
 \var(\hat{\bm{\theta}}_{\mathrm{OLS}})
    = \sigma^{2}\bm{V}\tilde{\bm{\Sigma}}^{-2}\bm{V}^{T}
-   = \sigma^{2}\sum_{i=0}^{p-1}\frac{\bm{v}_i\bm{v}_i^{T}}{\sigma_i^{2}},\tag{3.26}
+   = \sigma^{2}\sum_{i=0}^{p-1}\frac{\bm{v}_i\bm{v}_i^{T}}{\sigma_i^{2}},\tag{3.42}
 \]</div>
 <p>so the variance along the <span class="math notranslate nohighlight">\(i\)</span>th right singular direction is
 <span class="math notranslate nohighlight">\(\sigma^{2}/\sigma_i^{2}\)</span>.  Together with the
@@ -955,8 +1472,44 @@ simply do not determine that combination.</p>
 Among all estimators that are both linear in <span class="math notranslate nohighlight">\(\bm{y}\)</span> and unbiased, OLS has
 the smallest variance.  This is the Gauss-Markov theorem, and it requires only
 that the noise have zero mean, constant variance and be uncorrelated – not
-that it be Gaussian.  The theorem is often quoted as though it settled the
-matter.  It does not, and the reason is
+that it be Gaussian.  Its proof is a few lines and shows exactly where the
+competing estimators lose.</p>
+<div class="important admonition">
+<p class="admonition-title">Theorem 3.4 (Gauss-Markov)</p>
+<p>Let <span class="math notranslate nohighlight">\(\bm{y}=\bm{X}\bm{\theta}+\bm{\varepsilon}\)</span> with
+<span class="math notranslate nohighlight">\(\mathbb{E}[\bm{\varepsilon}]=\bm{0}\)</span>, <span class="math notranslate nohighlight">\(\var(\bm{\varepsilon})=\sigma^{2}\bm{I}\)</span>
+and <span class="math notranslate nohighlight">\(\bm{X}\)</span> of full column rank.  If <span class="math notranslate nohighlight">\(\tilde{\bm{\theta}}=\bm{C}\bm{y}\)</span> is
+any estimator linear in <span class="math notranslate nohighlight">\(\bm{y}\)</span> with <span class="math notranslate nohighlight">\(\mathbb{E}[\tilde{\bm{\theta}}]=\bm{\theta}\)</span>
+for every <span class="math notranslate nohighlight">\(\bm{\theta}\)</span>, then
+<span class="math notranslate nohighlight">\(\var(\tilde{\bm{\theta}})-\var(\hat{\bm{\theta}}_{\mathrm{OLS}})\)</span> is
+positive semi-definite.</p>
+</div>
+<div class="note admonition">
+<p class="admonition-title">Proof</p>
+<p>Unbiasedness for every <span class="math notranslate nohighlight">\(\bm{\theta}\)</span> means
+<span class="math notranslate nohighlight">\(\mathbb{E}[\bm{C}\bm{y}]=\bm{C}\bm{X}\bm{\theta}=\bm{\theta}\)</span> for all
+<span class="math notranslate nohighlight">\(\bm{\theta}\)</span>, hence <span class="math notranslate nohighlight">\(\bm{C}\bm{X}=\bm{I}\)</span>.  Write
+<span class="math notranslate nohighlight">\(\bm{C}=(\bm{X}^{T}\bm{X})^{-1}\bm{X}^{T}+\bm{D}\)</span>, which defines <span class="math notranslate nohighlight">\(\bm{D}\)</span>;
+then <span class="math notranslate nohighlight">\(\bm{C}\bm{X}=\bm{I}+\bm{D}\bm{X}\)</span>, so <span class="math notranslate nohighlight">\(\bm{D}\bm{X}=\bm{0}\)</span>.  Now</p>
+<div class="math notranslate nohighlight">
+\[
+\var\left(\tilde{\bm{\theta}}\right)
+   = \sigma^{2}\bm{C}\bm{C}^{T}
+   = \sigma^{2}\left[(\bm{X}^{T}\bm{X})^{-1}
+      + (\bm{X}^{T}\bm{X})^{-1}\bm{X}^{T}\bm{D}^{T}
+      + \bm{D}\bm{X}(\bm{X}^{T}\bm{X})^{-1}
+      + \bm{D}\bm{D}^{T}\right]
+   = \sigma^{2}(\bm{X}^{T}\bm{X})^{-1} + \sigma^{2}\bm{D}\bm{D}^{T},
+\]</div>
+<p>the two cross terms vanishing because <span class="math notranslate nohighlight">\(\bm{D}\bm{X}=\bm{0}\)</span> and
+<span class="math notranslate nohighlight">\(\bm{X}^{T}\bm{D}^{T}=(\bm{D}\bm{X})^{T}=\bm{0}\)</span>.  The first term is
+<span class="math notranslate nohighlight">\(\var(\hat{\bm{\theta}}_{\mathrm{OLS}})\)</span> and the second is a Gram matrix,
+positive semi-definite, with equality if and only if <span class="math notranslate nohighlight">\(\bm{D}=\bm{0}\)</span>.
+\qed</p>
+</div>
+<p>Every linear unbiased competitor is OLS plus a piece <span class="math notranslate nohighlight">\(\bm{D}\bm{y}\)</span> that
+averages to zero and only adds variance.  The theorem is often quoted as
+though it settled the matter.  It does not, and the reason is
 Eq. (2.27): the mean squared error counts bias and variance
 equally, and Gauss-Markov restricts attention to the unbiased estimators only.
 The moment we admit biased estimators, better ones exist.  The rest of this
@@ -970,7 +1523,7 @@ chapter constructs them.</p>
 \min_{\bm{\theta}\in\mathbb{R}^{p}}
     \left\{\frac{1}{n}\left\|\bm{y}-\bm{X}\bm{\theta}\right\|_2^{2}
       + \lambda\left\|\bm{\theta}\right\|_2^{2}\right\},
-  \qquad \lambda\ge0,\tag{3.27}
+  \qquad \lambda\ge0,\tag{3.43}
 \]</div>
 <p>with <span class="math notranslate nohighlight">\(\|\bm{\theta}\|_2^{2}=\sum_j\theta_j^{2}\)</span>.  We derived the solution in
 Eq. (1.42); dropping the factor <span class="math notranslate nohighlight">\(1/n\)</span> so that <span class="math notranslate nohighlight">\(\lambda\)</span> has
@@ -979,7 +1532,7 @@ its conventional scaling,</p>
 \[
 \boxed{\;
   \hat{\bm{\theta}}_{\mathrm{Ridge}}
-   = \left(\bm{X}^{T}\bm{X}+\lambda\bm{I}\right)^{-1}\bm{X}^{T}\bm{y} \;}\tag{3.28}
+   = \left(\bm{X}^{T}\bm{X}+\lambda\bm{I}\right)^{-1}\bm{X}^{T}\bm{y} \;}\tag{3.44}
 \]</div>
 <p>with <span class="math notranslate nohighlight">\(\bm{I}\)</span> the <span class="math notranslate nohighlight">\(p\times p\)</span> identity.  Ridge regression is therefore
 ordinary least squares with a modified diagonal – a fact which
@@ -990,11 +1543,11 @@ the central defect of Eq. (3.8): whatever the rank of
 least <span class="math notranslate nohighlight">\(\lambda\)</span> and is invertible for every <span class="math notranslate nohighlight">\(\lambda&gt;0\)</span>.  The estimator exists
 even when <span class="math notranslate nohighlight">\(p&gt;n\)</span>.</p>
 <p><strong>The constrained form.</strong>
-Equation (3.27) is the Lagrangian form of a constrained
+Equation (3.43) is the Lagrangian form of a constrained
 problem: minimising the squared error subject to</p>
 <div class="math notranslate nohighlight">
 \[
-\sum_{j=0}^{p-1}\theta_j^{2}\le t\tag{3.29}
+\sum_{j=0}^{p-1}\theta_j^{2}\le t\tag{3.45}
 \]</div>
 <p>for a finite <span class="math notranslate nohighlight">\(t&gt;0\)</span> gives the same solutions, with a one-to-one decreasing
 correspondence between <span class="math notranslate nohighlight">\(t\)</span> and <span class="math notranslate nohighlight">\(\lambda\)</span>.  The constraint region is a ball in
@@ -1002,13 +1555,13 @@ parameter space, and this geometric picture is what will distinguish Ridge
 from the Lasso in Section <em>The Lasso</em>.</p>
 <p><strong>Shrinkage, through the SVD.</strong>
 The analytical content of Ridge regression is best seen in the singular basis.
-Section <em>Ridge regression through the singular value decomposition</em> showed that Eq. (3.28) is</p>
+Section <em>Ridge regression through the singular value decomposition</em> showed that Eq. (3.44) is</p>
 <div class="math notranslate nohighlight">
 \[
 \hat{\bm{\theta}}_{\mathrm{Ridge}}
    = \sum_{i=0}^{p-1}
      \frac{\sigma_i}{\sigma_i^{2}+\lambda}
-     \left(\bm{u}_i^{T}\bm{y}\right)\bm{v}_i ,\tag{3.30}
+     \left(\bm{u}_i^{T}\bm{y}\right)\bm{v}_i ,\tag{3.46}
 \]</div>
 <p>to be compared with the OLS expansion (3.11) in which the
 coefficient was <span class="math notranslate nohighlight">\(1/\sigma_i\)</span>.  The fitted values follow from
@@ -1017,20 +1570,20 @@ Eq. (1.131),</p>
 \[
 \tilde{\bm{y}}_{\mathrm{Ridge}}
    = \sum_{i=0}^{p-1}\bm{u}_i\bm{u}_i^{T}
-     \frac{\sigma_i^{2}}{\sigma_i^{2}+\lambda}\,\bm{y} ,\tag{3.31}
+     \frac{\sigma_i^{2}}{\sigma_i^{2}+\lambda}\,\bm{y} ,\tag{3.47}
 \]</div>
 <p>whereas for OLS the same expression holds with every factor replaced by one,
 <span class="math notranslate nohighlight">\(\tilde{\bm{y}}_{\mathrm{OLS}}=\bm{U}\bm{U}^{T}\bm{y}\)</span>, which is the hat
 matrix (3.9) in the singular basis.  Since <span class="math notranslate nohighlight">\(\lambda\ge0\)</span>,</p>
 <div class="math notranslate nohighlight">
 \[
-\frac{\sigma_i^{2}}{\sigma_i^{2}+\lambda}\le 1 ,\tag{3.32}
+\frac{\sigma_i^{2}}{\sigma_i^{2}+\lambda}\le 1 ,\tag{3.48}
 \]</div>
 <p>so Ridge regression expresses <span class="math notranslate nohighlight">\(\bm{y}\)</span> in the orthonormal basis <span class="math notranslate nohighlight">\(\bm{U}\)</span> and
 then <em>shrinks</em> each coordinate.  Because the singular values are ordered
 descendingly, the shrinkage is mild for the leading directions and severe for
 the trailing ones: precisely the directions whose coefficients
-Eq. (3.26) showed to have the largest variance are the ones
+Eq. (3.42) showed to have the largest variance are the ones
 suppressed.  The effective number of parameters is
 <span class="math notranslate nohighlight">\(\mathrm{df}(\lambda)=\sum_i\sigma_i^{2}/(\sigma_i^{2}+\lambda)\)</span> from
 Eq. (1.132), falling smoothly from <span class="math notranslate nohighlight">\(p\)</span> to zero.</p>
@@ -1042,8 +1595,8 @@ the transition is centred on <span class="math notranslate nohighlight">\(\sigma
 slides the switch to the right, discarding progressively more of the spectrum.
 Truncated SVD regression replaces this smooth curve by a step, which is the
 only difference between the two methods.</p>
-<p><img alt="The Ridge shrinkage factor sigmai2sigmai2lambda of Eq. 3.32 against th" src="_images/ridge_shrinkage.png" /></p>
-<p><em>Figure 3.1: The Ridge shrinkage factor <span class="math notranslate nohighlight">\(\sigma_i^{2}/(\sigma_i^{2}+\lambda)\)</span> of Eq. (3.32) against the singular value, for four penalties.  The transition is centred on <span class="math notranslate nohighlight">\(\sigma_i=\sqrt{\lambda}\)</span>.</em></p>
+<p><img alt="The Ridge shrinkage factor sigmai2sigmai2lambda of Eq. 3.48 against th" src="_images/ridge_shrinkage.png" /></p>
+<p><em>Figure 3.1: The Ridge shrinkage factor <span class="math notranslate nohighlight">\(\sigma_i^{2}/(\sigma_i^{2}+\lambda)\)</span> of Eq. (3.48) against the singular value, for four penalties.  The transition is centred on <span class="math notranslate nohighlight">\(\sigma_i=\sqrt{\lambda}\)</span>.</em></p>
 <p><strong>An instructive special case.</strong>
 Suppose the design matrix is orthonormal, <span class="math notranslate nohighlight">\(\bm{X}^{T}\bm{X}=\bm{I}\)</span>.  Then
 <span class="math notranslate nohighlight">\(\hat{\bm{\theta}}_{\mathrm{OLS}}=\bm{X}^{T}\bm{y}\)</span> and</p>
@@ -1051,7 +1604,7 @@ Suppose the design matrix is orthonormal, <span class="math notranslate nohighli
 \[
 \hat{\bm{\theta}}_{\mathrm{Ridge}}
    = \left(\bm{I}+\lambda\bm{I}\right)^{-1}\bm{X}^{T}\bm{y}
-   = \frac{1}{1+\lambda}\,\hat{\bm{\theta}}_{\mathrm{OLS}} ,\tag{3.33}
+   = \frac{1}{1+\lambda}\,\hat{\bm{\theta}}_{\mathrm{OLS}} ,\tag{3.49}
 \]</div>
 <p>so every coefficient is scaled by the same factor <span class="math notranslate nohighlight">\(1/(1+\lambda)\)</span> and the
 estimator tends to zero as <span class="math notranslate nohighlight">\(\lambda\to\infty\)</span>.  Ridge shrinks all
@@ -1059,25 +1612,25 @@ coefficients <em>proportionally</em>; it never sets any of them exactly to zero.
 Remember this when we reach the Lasso.</p>
 <p><strong>Bias and variance.</strong>
 Ridge regression is biased.  Taking the expectation of
-Eq. (3.28) and using
+Eq. (3.44) and using
 <span class="math notranslate nohighlight">\(\mathbb{E}[\bm{y}]=\bm{X}\bm{\theta}\)</span>,</p>
 <div class="math notranslate nohighlight">
 \[
 \mathbb{E}\left[\hat{\bm{\theta}}_{\mathrm{Ridge}}\right]
    = \left(\bm{X}^{T}\bm{X}+\lambda\bm{I}\right)^{-1}
      \left(\bm{X}^{T}\bm{X}\right)\bm{\theta}
-   \neq \bm{\theta}\tag{3.34}
+   \neq \bm{\theta}\tag{3.50}
 \]</div>
 <p>for any <span class="math notranslate nohighlight">\(\lambda&gt;0\)</span>, the bias growing towards <span class="math notranslate nohighlight">\(-\bm{\theta}\)</span> as
 <span class="math notranslate nohighlight">\(\lambda\to\infty\)</span>.  Applying the transformation rule
 <span class="math notranslate nohighlight">\(\var(\bm{A}\bm{y})=\bm{A}\var(\bm{y})\bm{A}^{T}\)</span> to
-Eq. (3.28) gives the variance,</p>
+Eq. (3.44) gives the variance,</p>
 <div class="math notranslate nohighlight">
 \[
 \var\left(\hat{\bm{\theta}}_{\mathrm{Ridge}}\right)
    = \sigma^{2}\left[\bm{X}^{T}\bm{X}+\lambda\bm{I}\right]^{-1}
      \bm{X}^{T}\bm{X}
-     \left\{\left[\bm{X}^{T}\bm{X}+\lambda\bm{I}\right]^{-1}\right\}^{T},\tag{3.35}
+     \left\{\left[\bm{X}^{T}\bm{X}+\lambda\bm{I}\right]^{-1}\right\}^{T},\tag{3.51}
 \]</div>
 <p>which vanishes as <span class="math notranslate nohighlight">\(\lambda\to\infty\)</span>.  Subtracting the two variances,</p>
 <div class="math notranslate nohighlight">
@@ -1087,7 +1640,7 @@ Eq. (3.28) gives the variance,</p>
    = \sigma^{2}\left[\bm{X}^{T}\bm{X}+\lambda\bm{I}\right]^{-1}
      \left[2\lambda\bm{I}
        +\lambda^{2}\left(\bm{X}^{T}\bm{X}\right)^{-1}\right]
-     \left\{\left[\bm{X}^{T}\bm{X}+\lambda\bm{I}\right]^{-1}\right\}^{T},\tag{3.36}
+     \left\{\left[\bm{X}^{T}\bm{X}+\lambda\bm{I}\right]^{-1}\right\}^{T},\tag{3.52}
 \]</div>
 <p>and the middle bracket is non-negative definite for <span class="math notranslate nohighlight">\(\lambda&gt;0\)</span>, hence so is
 the whole product.  The variance of the Ridge estimator is therefore
@@ -1102,19 +1655,19 @@ contradicted – the Ridge estimator is not unbiased, so it was never in the
 competition.  Both of the assertions just made can be proved, and the rest of
 this section does so.</p>
 <p><strong>The constrained form, exactly.</strong>
-The correspondence between Eq. (3.27) and the
-constraint (3.29) is worth stating precisely rather than
+The correspondence between Eq. (3.43) and the
+constraint (3.45) is worth stating precisely rather than
 by assertion, because it is the first appearance of the
 Karush-Kuhn-Tucker conditions that Chapter 6 will lean on
 throughout.</p>
 <div class="important admonition">
-<p class="admonition-title">Proposition 3.2 (Penalty and constraint)</p>
+<p class="admonition-title">Proposition 3.5 (Penalty and constraint)</p>
 <p>Let <span class="math notranslate nohighlight">\(t&gt;0\)</span> and let <span class="math notranslate nohighlight">\(\hat{\bm{\theta}}_t\)</span> solve
 <span class="math notranslate nohighlight">\(\min\|\bm{y}-\bm{X}\bm{\theta}\|_2^{2}\)</span> subject to
 <span class="math notranslate nohighlight">\(\|\bm{\theta}\|_2^{2}\le t\)</span>.  If the constraint is active, there is a unique
 <span class="math notranslate nohighlight">\(\lambda&gt;0\)</span> for which <span class="math notranslate nohighlight">\(\hat{\bm{\theta}}_t\)</span> also
-solves (3.27), namely the multiplier of the constraint; and
-conversely, the solution of (3.27) at penalty <span class="math notranslate nohighlight">\(\lambda\)</span>
+solves (3.43), namely the multiplier of the constraint; and
+conversely, the solution of (3.43) at penalty <span class="math notranslate nohighlight">\(\lambda\)</span>
 solves the constrained problem with
 <span class="math notranslate nohighlight">\(t=\|\hat{\bm{\theta}}_{\mathrm{Ridge}}(\lambda)\|_2^{2}\)</span>.  The map
 <span class="math notranslate nohighlight">\(\lambda\mapsto\|\hat{\bm{\theta}}_{\mathrm{Ridge}}(\lambda)\|_2^{2}\)</span> is
@@ -1125,18 +1678,18 @@ strictly decreasing.</p>
 <p>The Lagrangian of the constrained problem is
 <span class="math notranslate nohighlight">\(\|\bm{y}-\bm{X}\bm{\theta}\|_2^{2}+\lambda(\|\bm{\theta}\|_2^{2}-t)\)</span>, whose
 stationarity condition in <span class="math notranslate nohighlight">\(\bm{\theta}\)</span> is exactly that
-of (3.27); the term <span class="math notranslate nohighlight">\(-\lambda t\)</span> does not involve
+of (3.43); the term <span class="math notranslate nohighlight">\(-\lambda t\)</span> does not involve
 <span class="math notranslate nohighlight">\(\bm{\theta}\)</span> and cannot change the minimiser.  Complementary slackness gives
 <span class="math notranslate nohighlight">\(\lambda&gt;0\)</span> when the constraint is active and <span class="math notranslate nohighlight">\(\lambda=0\)</span> when it is not, and
 the problem is convex with a strictly feasible point, so the
 conditions are sufficient as well as necessary.  For the monotonicity,
-Eq. (3.30) gives</p>
+Eq. (3.46) gives</p>
 <div class="math notranslate nohighlight">
 \[
 \left\|\hat{\bm{\theta}}_{\mathrm{Ridge}}(\lambda)\right\|_2^{2}
    = \sum_{i=0}^{p-1}
      \frac{\sigma_i^{2}\left(\bm{u}_i^{T}\bm{y}\right)^{2}}
-          {\left(\sigma_i^{2}+\lambda\right)^{2}},\tag{3.37}
+          {\left(\sigma_i^{2}+\lambda\right)^{2}},\tag{3.53}
 \]</div>
 <p>in which every term is strictly decreasing in <span class="math notranslate nohighlight">\(\lambda\)</span>.
 \qed</p>
@@ -1148,7 +1701,7 @@ to Hoerl and Kennard and it can be proved in half a page, which is worth doing
 because the proof shows <em>why</em> the effect is unavoidable rather than
 fortunate.</p>
 <p>Work in the singular basis.  Put <span class="math notranslate nohighlight">\(\bm{b}=\bm{V}^{T}\bm{\theta}\)</span> for the true
-parameter and recall from Eq. (3.30) that the <span class="math notranslate nohighlight">\(i\)</span>th
+parameter and recall from Eq. (3.46) that the <span class="math notranslate nohighlight">\(i\)</span>th
 coefficient of the estimator in that basis is
 <span class="math notranslate nohighlight">\(\sigma_i(\bm{u}_i^{T}\bm{y})/(\sigma_i^{2}+\lambda)\)</span>.  With
 <span class="math notranslate nohighlight">\(\bm{y}=\bm{X}\bm{\theta}+\bm{\varepsilon}\)</span> and
@@ -1161,7 +1714,7 @@ coefficient of the estimator in that basis is
    = \frac{\sigma_i^{2}}{\sigma_i^{2}+\lambda}\,b_i,
   \qquad
   \var\left(\hat{b}_i\right)
-   = \frac{\sigma^{2}\sigma_i^{2}}{\left(\sigma_i^{2}+\lambda\right)^{2}} .\tag{3.38}
+   = \frac{\sigma^{2}\sigma_i^{2}}{\left(\sigma_i^{2}+\lambda\right)^{2}} .\tag{3.54}
 \]</div>
 <p>Because <span class="math notranslate nohighlight">\(\bm{V}\)</span> is orthogonal the total mean squared error of the estimator is
 the sum over <span class="math notranslate nohighlight">\(i\)</span> of squared bias plus variance,</p>
@@ -1172,12 +1725,12 @@ M(\lambda)
        -\bm{\theta}\right\|_2^{2}
    = \sum_{i=0}^{p-1}
      \frac{\lambda^{2}b_i^{2}+\sigma^{2}\sigma_i^{2}}
-          {\left(\sigma_i^{2}+\lambda\right)^{2}} ,\tag{3.39}
+          {\left(\sigma_i^{2}+\lambda\right)^{2}} ,\tag{3.55}
 \]</div>
 <p>the first term in the numerator being the squared bias
 <span class="math notranslate nohighlight">\([\lambda/(\sigma_i^{2}+\lambda)]^{2}b_i^{2}\)</span> and the second the variance.</p>
 <div class="important admonition">
-<p class="admonition-title">Theorem 3.3 (Hoerl and Kennard)</p>
+<p class="admonition-title">Theorem 3.6 (Hoerl and Kennard)</p>
 <p>Suppose <span class="math notranslate nohighlight">\(\bm{X}\)</span> has full column rank and <span class="math notranslate nohighlight">\(\sigma^{2}&gt;0\)</span>.  Then
 <span class="math notranslate nohighlight">\(M'(0)&lt;0\)</span>, and consequently there exists <span class="math notranslate nohighlight">\(\lambda&gt;0\)</span> with
 <span class="math notranslate nohighlight">\(M(\lambda)&lt;M(0)\)</span>: some Ridge estimator has a strictly smaller mean squared
@@ -1185,7 +1738,7 @@ error than ordinary least squares, whatever the true <span class="math notransla
 </div>
 <div class="note admonition">
 <p class="admonition-title">Proof</p>
-<p>Differentiate Eq. (3.39) term by term.  Writing
+<p>Differentiate Eq. (3.55) term by term.  Writing
 <span class="math notranslate nohighlight">\(N_i(\lambda)=\lambda^{2}b_i^{2}+\sigma^{2}\sigma_i^{2}\)</span> and
 <span class="math notranslate nohighlight">\(D_i(\lambda)=(\sigma_i^{2}+\lambda)^{2}\)</span>,</p>
 <div class="math notranslate nohighlight">
@@ -1204,7 +1757,7 @@ error than ordinary least squares, whatever the true <span class="math notransla
 =-2\sigma^{2}/\sigma_i^{4}\)</span>, so</p>
 <div class="math notranslate nohighlight">
 \[
-M'(0) = -2\sigma^{2}\sum_{i=0}^{p-1}\frac{1}{\sigma_i^{4}} \;&lt;\; 0 .\tag{3.40}
+M'(0) = -2\sigma^{2}\sum_{i=0}^{p-1}\frac{1}{\sigma_i^{4}} \;&lt;\; 0 .\tag{3.56}
 \]</div>
 <p>Since <span class="math notranslate nohighlight">\(M\)</span> is differentiable at <span class="math notranslate nohighlight">\(0\)</span> with a strictly negative derivative, it is
 strictly smaller than <span class="math notranslate nohighlight">\(M(0)\)</span> for all sufficiently small <span class="math notranslate nohighlight">\(\lambda&gt;0\)</span>.
@@ -1215,7 +1768,7 @@ strictly smaller than <span class="math notranslate nohighlight">\(M(0)\)</span>
 derivative at the origin, while the variance falls linearly.  That asymmetry is
 the whole content of the theorem, and it is Eq. (2.27)
 speaking again – a little bias is free to second order, and the variance it
-buys is not.  And Eq. (3.40) says the effect is largest exactly
+buys is not.  And Eq. (3.56) says the effect is largest exactly
 when the design is badly conditioned, since the sum is dominated by the
 smallest singular value.  The worse the collinearity, the more Ridge has to
 offer, which is the practical rule the theorem underwrites.  Running the
@@ -1228,14 +1781,14 @@ arithmetic on four designs:</p>
 </pre></div>
 </div>
 <p>The minimising penalty is strictly positive in every case, and the numerically
-measured slope at the origin agrees with Eq. (3.40).  The
+measured slope at the origin agrees with Eq. (3.56).  The
 theorem is an existence statement and not a recipe: the optimal <span class="math notranslate nohighlight">\(\lambda\)</span>
 depends on the unknown <span class="math notranslate nohighlight">\(\bm{b}\)</span> and <span class="math notranslate nohighlight">\(\sigma^{2}\)</span>, which is why in practice it is
 chosen by the cross-validation of Section <em>Cross-validation</em>.</p>
 </section>
 <section id="the-lasso">
 <h2><span class="section-number">3.9. </span>The Lasso<a class="headerlink" href="#the-lasso" title="Link to this heading">#</a></h2>
-<p>Replacing the <span class="math notranslate nohighlight">\(2\)</span>-norm penalty of Eq. (3.27) by a <span class="math notranslate nohighlight">\(1\)</span>-norm
+<p>Replacing the <span class="math notranslate nohighlight">\(2\)</span>-norm penalty of Eq. (3.43) by a <span class="math notranslate nohighlight">\(1\)</span>-norm
 gives</p>
 <div class="math notranslate nohighlight">
 \[
@@ -1243,15 +1796,15 @@ gives</p>
     \left\{\frac{1}{n}\left\|\bm{y}-\bm{X}\bm{\theta}\right\|_2^{2}
       + \lambda\left\|\bm{\theta}\right\|_1\right\},
   \qquad
-  \left\|\bm{\theta}\right\|_1 = \sum_{j=0}^{p-1}\left|\theta_j\right| ,\tag{3.41}
+  \left\|\bm{\theta}\right\|_1 = \sum_{j=0}^{p-1}\left|\theta_j\right| ,\tag{3.57}
 \]</div>
 <p>which is the Lasso – least absolute shrinkage and selection operator.  The
 change looks slight and its consequences are not: the Lasso sets coefficients
 exactly to zero, and thereby performs variable selection as part of the
-fitting, which Ridge regression by Eq. (3.33) never
+fitting, which Ridge regression by Eq. (3.49) never
 does.</p>
 <p><strong>No closed form.</strong>
-Differentiating Eq. (3.41) requires the derivative of the
+Differentiating Eq. (3.57) requires the derivative of the
 absolute value,</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}
@@ -1259,7 +1812,7 @@ absolute value,</p>
   \begin{cases}
     +1 &amp; \theta&gt;0,\\
     -1 &amp; \theta&lt;0,
-  \end{cases}\tag{3.42}
+  \end{cases}\tag{3.58}
 \end{split}\]</div>
 <p>which is undefined at the origin.  Ignoring that difficulty for a moment and
 dropping the <span class="math notranslate nohighlight">\(1/n\)</span>, the stationarity condition reads</p>
@@ -1269,12 +1822,12 @@ dropping the <span class="math notranslate nohighlight">\(1/n\)</span>, the stat
     + \lambda\,\mathrm{sgn}(\bm{\theta}) = \bm{0},
   \qquad\text{that is}\qquad
   2\bm{X}^{T}\bm{X}\bm{\theta} + \lambda\,\mathrm{sgn}(\bm{\theta})
-   = 2\bm{X}^{T}\bm{y} .\tag{3.43}
+   = 2\bm{X}^{T}\bm{y} .\tag{3.59}
 \]</div>
 <p>Because <span class="math notranslate nohighlight">\(\mathrm{sgn}(\bm{\theta})\)</span> depends on the unknown in a
-non-differentiable way, Eq. (3.43) cannot be solved by
+non-differentiable way, Eq. (3.59) cannot be solved by
 a matrix inversion, and no analogue of Eqs. (3.8) or
-(3.28) exists.  The problem is nonetheless <em>convex</em> –
+(3.44) exists.  The problem is nonetheless <em>convex</em> –
 a sum of a convex quadratic and a convex norm – so it has a global minimum
 and can be solved reliably; it is the closed form that is lost, not the
 solution.</p>
@@ -1286,7 +1839,7 @@ problem decouples completely into <span class="math notranslate nohighlight">\(p
 \[
 C(\bm{\theta}) = \sum_{i=0}^{p-1}\left(y_i-\theta_i\right)^{2},
   \qquad
-  \hat{\theta}_i^{\mathrm{OLS}} = y_i .\tag{3.44}
+  \hat{\theta}_i^{\mathrm{OLS}} = y_i .\tag{3.60}
 \]</div>
 <p>For Ridge,</p>
 <div class="math notranslate nohighlight">
@@ -1294,13 +1847,13 @@ C(\bm{\theta}) = \sum_{i=0}^{p-1}\left(y_i-\theta_i\right)^{2},
 C(\bm{\theta}) = \sum_{i}\left(y_i-\theta_i\right)^{2}
                  + \lambda\sum_{i}\theta_i^{2},
   \qquad
-  \hat{\theta}_i^{\mathrm{Ridge}} = \frac{y_i}{1+\lambda},\tag{3.45}
+  \hat{\theta}_i^{\mathrm{Ridge}} = \frac{y_i}{1+\lambda},\tag{3.61}
 \]</div>
-<p>in agreement with Eq. (3.33).  For the Lasso,</p>
+<p>in agreement with Eq. (3.49).  For the Lasso,</p>
 <div class="math notranslate nohighlight">
 \[
 C(\bm{\theta}) = \sum_{i}\left(y_i-\theta_i\right)^{2}
-                 + \lambda\sum_{i}\left|\theta_i\right| ,\tag{3.46}
+                 + \lambda\sum_{i}\left|\theta_i\right| ,\tag{3.62}
 \]</div>
 <p>and treating each <span class="math notranslate nohighlight">\(i\)</span> separately, the derivative for <span class="math notranslate nohighlight">\(\theta_i\neq0\)</span> is
 <span class="math notranslate nohighlight">\(-2(y_i-\theta_i)+\lambda\,\mathrm{sgn}(\theta_i)=0\)</span>.  If <span class="math notranslate nohighlight">\(\theta_i&gt;0\)</span> this
@@ -1316,12 +1869,12 @@ is consistent and the minimum lies at the kink <span class="math notranslate noh
     y_i - \lambda/2 &amp; y_i &gt; \lambda/2,\\[2pt]
     y_i + \lambda/2 &amp; y_i &lt; -\lambda/2,\\[2pt]
     0               &amp; \left|y_i\right| \le \lambda/2 .
-  \end{cases} \;}\tag{3.47}
+  \end{cases} \;}\tag{3.63}
 \end{split}\]</div>
 <p>This is the <em>soft thresholding</em> operator, written compactly as</p>
 <div class="math notranslate nohighlight">
 \[
-S_{\lambda/2}(y) = \mathrm{sgn}(y)\,\max\left(|y|-\lambda/2,\;0\right).\tag{3.48}
+S_{\lambda/2}(y) = \mathrm{sgn}(y)\,\max\left(|y|-\lambda/2,\;0\right).\tag{3.64}
 \]</div>
 <p>Compare the three results.  OLS leaves the coefficient alone.  Ridge
 multiplies it by <span class="math notranslate nohighlight">\(1/(1+\lambda)\)</span>, shrinking it towards zero but reaching zero
@@ -1344,7 +1897,7 @@ coefficient.  In <span class="math notranslate nohighlight">\(p\)</span> dimensi
 of every dimension, each corresponding to a different set of variables being
 eliminated.</p>
 <p><strong>Optimality conditions, done properly.</strong>
-Equation (3.43) was obtained by ignoring the point at
+Equation (3.59) was obtained by ignoring the point at
 which <span class="math notranslate nohighlight">\(\mathrm{sgn}\)</span> is undefined.  The difficulty is removed rather than
 ignored by the <em>subdifferential</em>: for a convex function <span class="math notranslate nohighlight">\(g\)</span>, the
 subdifferential at a point is the set of slopes of all lines lying below the
@@ -1356,15 +1909,15 @@ graph and touching it there, and for the absolute value</p>
     \{+1\} &amp; \theta&gt;0,\\
     \{-1\} &amp; \theta&lt;0,\\
     [-1,1] &amp; \theta=0 .
-  \end{cases}\tag{3.49}
+  \end{cases}\tag{3.65}
 \end{split}\]</div>
 <p>A convex function is minimised exactly where <span class="math notranslate nohighlight">\(0\)</span> belongs to its
 subdifferential, which is the generalisation of “the derivative vanishes” and
 reduces to it wherever the function is differentiable.</p>
 <div class="important admonition">
-<p class="admonition-title">Proposition 3.4 (Lasso optimality)</p>
+<p class="admonition-title">Proposition 3.7 (Lasso optimality)</p>
 <p>A vector <span class="math notranslate nohighlight">\(\hat{\bm{\theta}}\)</span> minimises the Lasso
-objective (3.41) if and only if, writing
+objective (3.57) if and only if, writing
 <span class="math notranslate nohighlight">\(\bm{r}=\bm{y}-\bm{X}\hat{\bm{\theta}}\)</span> for the residual and <span class="math notranslate nohighlight">\(\bm{x}_j\)</span> for the
 <span class="math notranslate nohighlight">\(j\)</span>th column,</p>
 <div class="math notranslate nohighlight">
@@ -1374,7 +1927,7 @@ objective (3.41) if and only if, writing
    \quad\text{if }\hat{\theta}_j\neq0,
   \qquad
   \left|\frac{2}{n}\,\bm{x}_j^{T}\bm{r}\right| \le \lambda
-   \quad\text{if }\hat{\theta}_j=0 .\tag{3.50}
+   \quad\text{if }\hat{\theta}_j=0 .\tag{3.66}
 \]</div>
 </div>
 <div class="note admonition">
@@ -1382,44 +1935,44 @@ objective (3.41) if and only if, writing
 <p>The objective is the sum of the differentiable term
 <span class="math notranslate nohighlight">\(\|\bm{y}-\bm{X}\bm{\theta}\|_2^{2}/n\)</span>, whose gradient is
 <span class="math notranslate nohighlight">\(-\tfrac{2}{n}\bm{X}^{T}\bm{r}\)</span>, and of <span class="math notranslate nohighlight">\(\lambda\|\bm{\theta}\|_1\)</span>, whose
-subdifferential is the product of the sets (3.49) taken
+subdifferential is the product of the sets (3.65) taken
 coordinatewise.  For a sum of a differentiable convex function and a convex
 one the subdifferential is the sum of the two, so <span class="math notranslate nohighlight">\(\bm{0}\)</span> lies in it exactly
 when <span class="math notranslate nohighlight">\(\tfrac{2}{n}\bm{x}_j^{T}\bm{r}\in\lambda\,\partial|\hat{\theta}_j|\)</span> for
-every <span class="math notranslate nohighlight">\(j\)</span>, which is Eq. (3.50).
+every <span class="math notranslate nohighlight">\(j\)</span>, which is Eq. (3.66).
 \qed</p>
 </div>
-<p>Read the second half of Eq. (3.50) again, because it is the
+<p>Read the second half of Eq. (3.66) again, because it is the
 selection property in its exact form.  A coefficient is zero not by accident
 but because its column’s correlation with the residual is <em>too small to
 pay the price</em> <span class="math notranslate nohighlight">\(\lambda\)</span>; the variable is excluded as long as it fails to earn
 its penalty.  Two corollaries follow immediately.</p>
 <div class="important admonition">
-<p class="admonition-title">Proposition 3.5 (The penalty that kills everything)</p>
+<p class="admonition-title">Proposition 3.8 (The penalty that kills everything)</p>
 <p>The solution is <span class="math notranslate nohighlight">\(\hat{\bm{\theta}}=\bm{0}\)</span> if and only if</p>
 <div class="math notranslate nohighlight">
 \[
 \lambda \;\ge\; \lambda_{\max}
    = \frac{2}{n}\left\|\bm{X}^{T}\bm{y}\right\|_\infty
-   = \frac{2}{n}\max_j\left|\bm{x}_j^{T}\bm{y}\right| .\tag{3.51}
+   = \frac{2}{n}\max_j\left|\bm{x}_j^{T}\bm{y}\right| .\tag{3.67}
 \]</div>
 </div>
 <div class="note admonition">
 <p class="admonition-title">Proof</p>
-<p>Put <span class="math notranslate nohighlight">\(\hat{\bm{\theta}}=\bm{0}\)</span> in Eq. (3.50).  The residual is
+<p>Put <span class="math notranslate nohighlight">\(\hat{\bm{\theta}}=\bm{0}\)</span> in Eq. (3.66).  The residual is
 then <span class="math notranslate nohighlight">\(\bm{y}\)</span>, every coefficient is zero, and the second condition reads
 <span class="math notranslate nohighlight">\(|\tfrac{2}{n}\bm{x}_j^{T}\bm{y}|\le\lambda\)</span> for all <span class="math notranslate nohighlight">\(j\)</span>, which is
-Eq. (3.51).  Since the conditions are necessary and sufficient,
+Eq. (3.67).  Since the conditions are necessary and sufficient,
 the equivalence is exact.
 \qed</p>
 </div>
-<p>Equation (3.51) is why every Lasso implementation computes a
+<p>Equation (3.67) is why every Lasso implementation computes a
 path of solutions on a geometric grid running down from <span class="math notranslate nohighlight">\(\lambda_{\max}\)</span>: above
 it there is nothing to compute, and below it the solution changes continuously.</p>
 <div class="important admonition">
-<p class="admonition-title">Proposition 3.6 (The fit is unique even when the coefficients are not)</p>
+<p class="admonition-title">Proposition 3.9 (The fit is unique even when the coefficients are not)</p>
 <p>If <span class="math notranslate nohighlight">\(\hat{\bm{\theta}}^{(1)}\)</span> and <span class="math notranslate nohighlight">\(\hat{\bm{\theta}}^{(2)}\)</span> both minimise
-Eq. (3.41), then
+Eq. (3.57), then
 <span class="math notranslate nohighlight">\(\bm{X}\hat{\bm{\theta}}^{(1)}=\bm{X}\hat{\bm{\theta}}^{(2)}\)</span> and
 <span class="math notranslate nohighlight">\(\|\hat{\bm{\theta}}^{(1)}\|_1=\|\hat{\bm{\theta}}^{(2)}\|_1\)</span>.</p>
 </div>
@@ -1444,13 +1997,13 @@ identical columns the Lasso may place all the weight on either, or split it,
 and every such choice has the same <span class="math notranslate nohighlight">\(1\)</span>-norm and gives the same fitted values;
 what is arbitrary is the attribution, not the answer.</p>
 <p><strong>Coordinate descent.</strong>
-Equation (3.47) is exact only for an orthonormal design,
+Equation (3.63) is exact only for an orthonormal design,
 but it suggests the algorithm that solves the general problem.  Suppose we fix
 all coefficients but one and minimise over <span class="math notranslate nohighlight">\(\theta_j\)</span> alone.  Writing the
 partial residual with the <span class="math notranslate nohighlight">\(j\)</span>th contribution removed,</p>
 <div class="math notranslate nohighlight">
 \[
-\bm{r}^{(j)} = \bm{y} - \sum_{k\neq j}\bm{x}_k\theta_k ,\tag{3.52}
+\bm{r}^{(j)} = \bm{y} - \sum_{k\neq j}\bm{x}_k\theta_k ,\tag{3.68}
 \]</div>
 <p>where <span class="math notranslate nohighlight">\(\bm{x}_k\)</span> is column <span class="math notranslate nohighlight">\(k\)</span>, the one-dimensional problem is exactly of the
 form solved above, and its answer is</p>
@@ -1458,7 +2011,7 @@ form solved above, and its answer is</p>
 \[
 \theta_j \leftarrow
     \frac{S_{\lambda/2}\left(\bm{x}_j^{T}\bm{r}^{(j)}\right)}
-         {\bm{x}_j^{T}\bm{x}_j} ,\tag{3.53}
+         {\bm{x}_j^{T}\bm{x}_j} ,\tag{3.69}
 \]</div>
 <p>which for standardised columns has <span class="math notranslate nohighlight">\(\bm{x}_j^{T}\bm{x}_j=n\)</span>.  Cycling through
 the coordinates until the parameters stop changing is <em>coordinate
@@ -1531,7 +2084,7 @@ targets and design matrix</p>
 \[\begin{split}
 \bm{y}=\begin{bmatrix}4\\2\\3\end{bmatrix},
   \qquad
-  \bm{X}=\begin{bmatrix}2&amp;0\\0&amp;1\\0&amp;0\end{bmatrix},\tag{3.54}
+  \bm{X}=\begin{bmatrix}2&amp;0\\0&amp;1\\0&amp;0\end{bmatrix},\tag{3.70}
 \end{split}\]</div>
 <p>so that there are three observations, two features and two parameters.  The
 third row contributes nothing to the fit but does contribute to the error,
@@ -1540,14 +2093,14 @@ which is what makes the example non-trivial.  Since
 <div class="math notranslate nohighlight">
 \[
 C(\bm{\theta}) = \left(4-2\theta_0\right)^{2}
-                 + \left(2-\theta_1\right)^{2} + 3^{2},\tag{3.55}
+                 + \left(2-\theta_1\right)^{2} + 3^{2},\tag{3.71}
 \]</div>
 <p>minimised at</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}
 \hat{\bm{\theta}}_{\mathrm{OLS}}
    = \left(\bm{X}^{T}\bm{X}\right)^{-1}\bm{X}^{T}\bm{y}
-   = \begin{bmatrix}2\\2\end{bmatrix}.\tag{3.56}
+   = \begin{bmatrix}2\\2\end{bmatrix}.\tag{3.72}
 \end{split}\]</div>
 <p>Adding the Ridge penalty gives
 <span class="math notranslate nohighlight">\(C(\bm{\theta})=(4-2\theta_0)^{2}+(2-\theta_1)^{2}
@@ -1559,18 +2112,18 @@ with respect to each parameter separately,</p>
    = \begin{bmatrix}
        \dfrac{8}{4+\lambda}\\[8pt]
        \dfrac{2}{1+\lambda}
-     \end{bmatrix},\tag{3.57}
+     \end{bmatrix},\tag{3.73}
 \end{split}\]</div>
-<p>which reproduces Eq. (3.56) at <span class="math notranslate nohighlight">\(\lambda=0\)</span> and decays to zero as
+<p>which reproduces Eq. (3.72) at <span class="math notranslate nohighlight">\(\lambda=0\)</span> and decays to zero as
 <span class="math notranslate nohighlight">\(\lambda\)</span> grows.  Notice that the two coefficients are shrunk by
 <em>different</em> factors, <span class="math notranslate nohighlight">\(4/(4+\lambda)\)</span> and <span class="math notranslate nohighlight">\(1/(1+\lambda)\)</span>: the penalty is
 applied uniformly in parameter space, but the curvature of the cost differs
 between directions, so the coefficient belonging to the better-determined
 feature resists shrinkage more strongly.  This is
-Eq. (3.32) with <span class="math notranslate nohighlight">\(\sigma_0^2=4\)</span> and <span class="math notranslate nohighlight">\(\sigma_1^2=1\)</span>.  Neither
+Eq. (3.48) with <span class="math notranslate nohighlight">\(\sigma_0^2=4\)</span> and <span class="math notranslate nohighlight">\(\sigma_1^2=1\)</span>.  Neither
 coefficient ever becomes exactly zero.</p>
 <p>The Lasso behaves differently.  Because the problem is diagonal, each
-coefficient can be treated separately as in Eq. (3.47):
+coefficient can be treated separately as in Eq. (3.63):
 differentiating <span class="math notranslate nohighlight">\((2-\theta_1)^{2}+\lambda|\theta_1|\)</span> gives
 <span class="math notranslate nohighlight">\(\theta_1=\max(2-\lambda/2,\,0)\)</span>, while <span class="math notranslate nohighlight">\((4-2\theta_0)^{2}+\lambda|\theta_0|\)</span>
 gives <span class="math notranslate nohighlight">\(\theta_0=\max\left((16-\lambda)/8,\,0\right)\)</span>.  The first coefficient is
@@ -1579,8 +2132,8 @@ eliminated at <span class="math notranslate nohighlight">\(\lambda=4\)</span> an
 three coefficient paths against <span class="math notranslate nohighlight">\(\lambda\)</span> shows the distinction at a glance:
 the Ridge curves approach the axis asymptotically, the Lasso curves reach it
 and stop.</p>
-<p><img alt="Coefficient paths for the toy problem 3.54.  The Ridge coefficients le" src="_images/ridge_lasso_paths.png" /></p>
-<p><em>Figure 3.2: Coefficient paths for the toy problem (3.54).  The Ridge coefficients (left) follow the analytical result (3.57), shown dotted, and approach zero only asymptotically.  The Lasso coefficients (right) reach zero at the finite thresholds <span class="math notranslate nohighlight">\(\lambda=4\)</span> and <span class="math notranslate nohighlight">\(\lambda=16\)</span> predicted by Eq. (3.47).</em></p>
+<p><img alt="Coefficient paths for the toy problem 3.70.  The Ridge coefficients le" src="_images/ridge_lasso_paths.png" /></p>
+<p><em>Figure 3.2: Coefficient paths for the toy problem (3.70).  The Ridge coefficients (left) follow the analytical result (3.73), shown dotted, and approach zero only asymptotically.  The Lasso coefficients (right) reach zero at the finite thresholds <span class="math notranslate nohighlight">\(\lambda=4\)</span> and <span class="math notranslate nohighlight">\(\lambda=16\)</span> predicted by Eq. (3.63).</em></p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
@@ -1627,7 +2180,7 @@ the trap warned against in Section <em>Scaling, centring and the intercept</em>.
 Lasso – the same library uses <em>different</em> conventions for the two
 methods, so <span class="math notranslate nohighlight">\(\alpha=\lambda\)</span> in one case and <span class="math notranslate nohighlight">\(\alpha=\lambda/(2n)\)</span> in the
 other.  With the conversions in place the computed paths agree with the
-analytical results (3.57) and (3.47) to
+analytical results (3.73) and (3.63) to
 machine precision, which is what the assertion checks.  Such factors differ
 between every implementation and every textbook, and reconciling one’s own
 code with a library means checking them explicitly rather than assuming.</p>
@@ -1645,13 +2198,13 @@ From the product rule for joint probabilities,
 \[
 p(\bm{\theta}\mid\bm{D})
    = \frac{p(\bm{D}\mid\bm{\theta})\,p(\bm{\theta})}{p(\bm{D})}
-   \;\propto\; p(\bm{D}\mid\bm{\theta})\,p(\bm{\theta}),\tag{3.58}
+   \;\propto\; p(\bm{D}\mid\bm{\theta})\,p(\bm{\theta}),\tag{3.74}
 \]</div>
 <p>dropping the normalisation <span class="math notranslate nohighlight">\(p(\bm{D})\)</span>, which does not depend on
 <span class="math notranslate nohighlight">\(\bm{\theta}\)</span>.  The left-hand side is the <em>posterior</em>, the probability of
 the parameters given the data; on the right are the <em>likelihood</em>
 <span class="math notranslate nohighlight">\(p(\bm{D}\mid\bm{\theta})\)</span>, which we already modelled in
-Eq. (3.19), and the <em>prior</em> <span class="math notranslate nohighlight">\(p(\bm{\theta})\)</span>, which
+Eq. (3.25), and the <em>prior</em> <span class="math notranslate nohighlight">\(p(\bm{\theta})\)</span>, which
 encodes what we believed about the parameters before seeing any data.
 Choosing the <span class="math notranslate nohighlight">\(\bm{\theta}\)</span> that maximises the posterior is
 <em>maximum-a-posteriori</em> (MAP) estimation.</p>
@@ -1661,36 +2214,36 @@ independent, zero-mean Gaussians of variance <span class="math notranslate nohig
 <div class="math notranslate nohighlight">
 \[
 p(\bm{\theta}) = \prod_{j=0}^{p-1}
-    \exp\left(-\frac{\theta_j^{2}}{2\tau^{2}}\right).\tag{3.59}
+    \exp\left(-\frac{\theta_j^{2}}{2\tau^{2}}\right).\tag{3.75}
 \]</div>
-<p>The posterior is then the product of Eq. (3.19) and
-Eq. (3.59).  Taking the negative logarithm and discarding
+<p>The posterior is then the product of Eq. (3.25) and
+Eq. (3.75).  Taking the negative logarithm and discarding
 terms independent of <span class="math notranslate nohighlight">\(\bm{\theta}\)</span>,</p>
 <div class="math notranslate nohighlight">
 \[
 C(\bm{\theta})
    = \frac{\left\|\bm{y}-\bm{X}\bm{\theta}\right\|_2^{2}}{2\sigma^{2}}
-   + \frac{1}{2\tau^{2}}\left\|\bm{\theta}\right\|_2^{2},\tag{3.60}
+   + \frac{1}{2\tau^{2}}\left\|\bm{\theta}\right\|_2^{2},\tag{3.76}
 \]</div>
 <p>which, on identifying <span class="math notranslate nohighlight">\(\lambda=\sigma^{2}/\tau^{2}\)</span> after multiplying through
 by <span class="math notranslate nohighlight">\(2\sigma^2\)</span>, is exactly the Ridge cost
-function (3.27).</p>
+function (3.43).</p>
 <p><strong>A Laplace prior gives the Lasso.</strong>
 Replace the Gaussian prior by a Laplace (double exponential) distribution with
 zero mean,</p>
 <div class="math notranslate nohighlight">
 \[
 p(\bm{\theta}) = \prod_{j=0}^{p-1}
-    \exp\left(-\frac{\left|\theta_j\right|}{\tau}\right).\tag{3.61}
+    \exp\left(-\frac{\left|\theta_j\right|}{\tau}\right).\tag{3.77}
 \]</div>
 <p>The same steps give</p>
 <div class="math notranslate nohighlight">
 \[
 C(\bm{\theta})
    = \frac{\left\|\bm{y}-\bm{X}\bm{\theta}\right\|_2^{2}}{2\sigma^{2}}
-   + \frac{1}{\tau}\left\|\bm{\theta}\right\|_1,\tag{3.62}
+   + \frac{1}{\tau}\left\|\bm{\theta}\right\|_1,\tag{3.78}
 \]</div>
-<p>the Lasso cost function (3.41).  A flat prior, expressing
+<p>the Lasso cost function (3.57).  A flat prior, expressing
 no preference at all, leaves only the likelihood and returns ordinary least
 squares.</p>
 <p><strong>What the unification tells us.</strong>
@@ -1702,13 +2255,13 @@ Lasso is now visibly a difference between two prior <em>shapes</em>: the Laplace
 density has a sharp peak at the origin and heavier tails than the Gaussian, so
 it simultaneously expresses a stronger belief that coefficients are exactly
 zero and a greater tolerance for the few that are large.  That is precisely
-the behaviour of Eq. (3.47).</p>
+the behaviour of Eq. (3.63).</p>
 <p>It should be said that MAP estimation is not the whole of Bayesian inference.
 It returns a single point, the mode of the posterior, and discards the
 distribution around it – which is the part a Bayesian would consider the
 answer.  A full treatment would report the posterior itself, giving credible
 intervals directly rather than through the sampling argument of
-Eq. (3.25), and would integrate over <span class="math notranslate nohighlight">\(\bm{\theta}\)</span> when making
+Eq. (3.34), and would integrate over <span class="math notranslate nohighlight">\(\bm{\theta}\)</span> when making
 predictions instead of fixing it at the mode.  We return to this when we
 discuss Bayesian neural networks and the Gaussian processes for which the
 Cholesky factorisation of Section <em>LU and Cholesky decompositions</em> was introduced.</p>
@@ -1731,12 +2284,12 @@ the device does <em>not</em> work for the Lasso.</p>
 <h3><span class="section-number">3.12.1. </span>An identity that moves the problem<a class="headerlink" href="#an-identity-that-moves-the-problem" title="Link to this heading">#</a></h3>
 <p>Everything rests on one line of algebra.</p>
 <div class="important admonition">
-<p class="admonition-title">Lemma 3.7 (The push-through identity)</p>
+<p class="admonition-title">Lemma 3.10 (The push-through identity)</p>
 <p>For any <span class="math notranslate nohighlight">\(\bm{X}\in\mathbb{R}^{n\times p}\)</span> and any <span class="math notranslate nohighlight">\(\lambda&gt;0\)</span>,</p>
 <div class="math notranslate nohighlight">
 \[
 \left(\bm{X}^{T}\bm{X}+\lambda\bm{I}_p\right)^{-1}\bm{X}^{T}
-   = \bm{X}^{T}\left(\bm{X}\bm{X}^{T}+\lambda\bm{I}_n\right)^{-1} .\tag{3.63}
+   = \bm{X}^{T}\left(\bm{X}\bm{X}^{T}+\lambda\bm{I}_n\right)^{-1} .\tag{3.79}
 \]</div>
 <p>Both inverses exist, the left of a <span class="math notranslate nohighlight">\(p\times p\)</span> matrix and the right of an
 <span class="math notranslate nohighlight">\(n\times n\)</span> one.</p>
@@ -1749,12 +2302,12 @@ hence invertible.  Start from the trivial identity</p>
 \[
 \bm{X}^{T}\left(\bm{X}\bm{X}^{T}+\lambda\bm{I}_n\right)
    = \bm{X}^{T}\bm{X}\bm{X}^{T}+\lambda\bm{X}^{T}
-   = \left(\bm{X}^{T}\bm{X}+\lambda\bm{I}_p\right)\bm{X}^{T},\tag{3.64}
+   = \left(\bm{X}^{T}\bm{X}+\lambda\bm{I}_p\right)\bm{X}^{T},\tag{3.80}
 \]</div>
 <p>in which the middle expression is read in two ways.  Multiplying on the left by
 <span class="math notranslate nohighlight">\((\bm{X}^{T}\bm{X}+\lambda\bm{I}_p)^{-1}\)</span> and on the right by
 <span class="math notranslate nohighlight">\((\bm{X}\bm{X}^{T}+\lambda\bm{I}_n)^{-1}\)</span> gives
-Eq. (3.63).
+Eq. (3.79).
 \qed</p>
 </div>
 <p>The name is descriptive: <span class="math notranslate nohighlight">\(\bm{X}^{T}\)</span> is pushed through the inverse, and in
@@ -1762,33 +2315,33 @@ doing so the matrix that must be inverted changes size from <span class="math no
 identity fails for <span class="math notranslate nohighlight">\(\lambda=0\)</span>, which is the first hint that a penalty is not
 optional here.</p>
 <div class="important admonition">
-<p class="admonition-title">Theorem 3.8 (The dual form of Ridge regression)</p>
-<p>The Ridge estimator (3.28) satisfies</p>
+<p class="admonition-title">Theorem 3.11 (The dual form of Ridge regression)</p>
+<p>The Ridge estimator (3.44) satisfies</p>
 <div class="math notranslate nohighlight">
 \[
 \hat{\bm{\theta}}_{\mathrm{Ridge}} = \bm{X}^{T}\bm{\alpha},
   \qquad
   \bm{\alpha} = \left(\bm{K}+\lambda\bm{I}_n\right)^{-1}\bm{y},
   \qquad
-  \bm{K} = \bm{X}\bm{X}^{T},\tag{3.65}
+  \bm{K} = \bm{X}\bm{X}^{T},\tag{3.81}
 \]</div>
 <p>so that the fitted function at a new point is</p>
 <div class="math notranslate nohighlight">
 \[
 \tilde{y}(\bm{x}) = \bm{x}^{T}\hat{\bm{\theta}}_{\mathrm{Ridge}}
-   = \sum_{i=0}^{n-1}\alpha_i\,\bm{x}_i^{T}\bm{x} .\tag{3.66}
+   = \sum_{i=0}^{n-1}\alpha_i\,\bm{x}_i^{T}\bm{x} .\tag{3.82}
 \]</div>
 </div>
 <div class="note admonition">
 <p class="admonition-title">Proof</p>
-<p>Apply Lemma 3.7 to Eq. (3.28):
+<p>Apply Lemma 3.10 to Eq. (3.44):
 <span class="math notranslate nohighlight">\(\hat{\bm{\theta}}=(\bm{X}^{T}\bm{X}+\lambda\bm{I})^{-1}\bm{X}^{T}\bm{y}
 =\bm{X}^{T}(\bm{X}\bm{X}^{T}+\lambda\bm{I})^{-1}\bm{y}=\bm{X}^{T}\bm{\alpha}\)</span>.
-Equation (3.66) is then
+Equation (3.82) is then
 <span class="math notranslate nohighlight">\(\bm{x}^{T}\bm{X}^{T}\bm{\alpha}\)</span> written out.
 \qed</p>
 </div>
-<p>Look at what Eqs. (3.65) and (3.66)
+<p>Look at what Eqs. (3.81) and (3.82)
 contain.  The matrix <span class="math notranslate nohighlight">\(\bm{K}\)</span> has entries <span class="math notranslate nohighlight">\(K_{ij}=\bm{x}_i^{T}\bm{x}_j\)</span>; the
 prediction needs <span class="math notranslate nohighlight">\(\bm{x}_i^{T}\bm{x}\)</span>.  <em>The data enter only through inner
 products.</em>  The individual vectors <span class="math notranslate nohighlight">\(\bm{x}_i\)</span> are never needed once the
@@ -1810,12 +2363,12 @@ feature.</p>
 <h3><span class="section-number">3.12.2. </span>Kernels<a class="headerlink" href="#kernels" title="Link to this heading">#</a></h3>
 <p>Now perform the basis expansion.  Fitting Ridge regression to the expanded
 design matrix <span class="math notranslate nohighlight">\(\bm{\Phi}\)</span> with rows <span class="math notranslate nohighlight">\(\bm{\phi}(\bm{x}_i)^{T}\)</span>,
-Theorem 3.8 gives the same formulas with
+Theorem 3.11 gives the same formulas with
 <span class="math notranslate nohighlight">\(K_{ij}=\bm{\phi}(\bm{x}_i)^{T}\bm{\phi}(\bm{x}_j)\)</span>.  Define the
 <em>kernel</em></p>
 <div class="math notranslate nohighlight">
 \[
-k(\bm{x},\bm{x}') = \bm{\phi}(\bm{x})^{T}\bm{\phi}(\bm{x}') ,\tag{3.67}
+k(\bm{x},\bm{x}') = \bm{\phi}(\bm{x})^{T}\bm{\phi}(\bm{x}') ,\tag{3.83}
 \]</div>
 <p>which is the same object as Eq. (6.30) in the chapter on
 support vector machines.  Then</p>
@@ -1827,7 +2380,7 @@ support vector machines.  Then</p>
   K_{ij} = k\!\left(\bm{x}_i,\bm{x}_j\right),
   \qquad
   \tilde{y}(\bm{x}) = \sum_{i=0}^{n-1}\alpha_i\,k\!\left(\bm{x}_i,\bm{x}\right)
-  \;}\tag{3.68}
+  \;}\tag{3.84}
 \]</div>
 <p>is <em>kernel ridge regression</em>.  Its cost is the <span class="math notranslate nohighlight">\(\bigO(n^{3})\)</span> of one
 linear solve, whatever the dimension of <span class="math notranslate nohighlight">\(\bm{\phi}\)</span> – including infinite.</p>
@@ -1881,7 +2434,7 @@ with its \verb!alpha! playing the part of our <span class="math notranslate nohi
 </div>
 <div class="tip admonition">
 <p class="admonition-title">Which side to solve</p>
-<p>Theorem 3.8 gives two routes
+<p>Theorem 3.11 gives two routes
 to the same estimator, and the choice between them is arithmetic.  The primal
 system is <span class="math notranslate nohighlight">\(p\times p\)</span> and the dual <span class="math notranslate nohighlight">\(n\times n\)</span>, so the primal wins whenever
 <span class="math notranslate nohighlight">\(p&lt;n\)</span> and the dual whenever <span class="math notranslate nohighlight">\(p&gt;n\)</span>; with a thousand observations and ten
@@ -1897,7 +2450,7 @@ improvement; it is a different trade.</p>
 </section>
 <section id="why-the-same-trick-works-for-any-loss-the-representer-theorem">
 <h3><span class="section-number">3.12.3. </span>Why the same trick works for any loss: the representer theorem<a class="headerlink" href="#why-the-same-trick-works-for-any-loss-the-representer-theorem" title="Link to this heading">#</a></h3>
-<p>Theorem 3.8 was proved by an algebraic identity special to
+<p>Theorem 3.11 was proved by an algebraic identity special to
 the squared error.  The result is far more general, and stating it in the
 general form is what allows Chapters 5 and 6 to
 use it without repeating the derivation.</p>
@@ -1909,19 +2462,19 @@ essential property, that
 <span class="math notranslate nohighlight">\(\langle f,k(\bm{x},\cdot)\rangle=f(\bm{x})\)</span> for every <span class="math notranslate nohighlight">\(f\in\mathcal{H}\)</span>:
 evaluation at a point is an inner product.</p>
 <div class="important admonition">
-<p class="admonition-title">Theorem 3.9 (Representer theorem)</p>
+<p class="admonition-title">Theorem 3.12 (Representer theorem)</p>
 <p>Let <span class="math notranslate nohighlight">\(L\)</span> be any function of its arguments and let <span class="math notranslate nohighlight">\(\Omega\)</span> be strictly
 increasing on <span class="math notranslate nohighlight">\([0,\infty)\)</span>.  Then every minimiser of</p>
 <div class="math notranslate nohighlight">
 \[
 \min_{f\in\mathcal{H}}\;
     \sum_{i=0}^{n-1}L\!\left(y_i,f(\bm{x}_i)\right)
-    + \Omega\!\left(\left\|f\right\|_{\mathcal{H}}\right)\tag{3.69}
+    + \Omega\!\left(\left\|f\right\|_{\mathcal{H}}\right)\tag{3.85}
 \]</div>
 <p>admits the finite expansion</p>
 <div class="math notranslate nohighlight">
 \[
-f(\cdot) = \sum_{i=0}^{n-1}\alpha_i\,k\!\left(\bm{x}_i,\cdot\right)\tag{3.70}
+f(\cdot) = \sum_{i=0}^{n-1}\alpha_i\,k\!\left(\bm{x}_i,\cdot\right)\tag{3.86}
 \]</div>
 <p>for some <span class="math notranslate nohighlight">\(\bm{\alpha}\in\mathbb{R}^{n}\)</span>.</p>
 </div>
@@ -1946,7 +2499,7 @@ orthogonality
 equality only when <span class="math notranslate nohighlight">\(f_{\perp}=0\)</span>.  Since <span class="math notranslate nohighlight">\(\Omega\)</span> is strictly increasing,
 deleting <span class="math notranslate nohighlight">\(f_{\perp}\)</span> leaves the loss unchanged and strictly decreases the
 penalty unless it was already zero.  A minimiser therefore has <span class="math notranslate nohighlight">\(f_{\perp}=0\)</span>,
-that is <span class="math notranslate nohighlight">\(f\in\mathcal{S}\)</span>, which is Eq. (3.70).
+that is <span class="math notranslate nohighlight">\(f\in\mathcal{S}\)</span>, which is Eq. (3.86).
 \qed</p>
 </div>
 <p>This is a remarkable statement and it is worth pausing on.  The minimisation is
@@ -1954,11 +2507,11 @@ over an infinite-dimensional space of functions; the answer is guaranteed to
 lie in the <span class="math notranslate nohighlight">\(n\)</span>-dimensional subspace spanned by the kernel evaluated at the
 training points.  <em>The data determine the dimension of the problem, not
 the model.</em>  With the squared loss and <span class="math notranslate nohighlight">\(\Omega(t)=\tfrac{\lambda}{2}t^{2}\)</span> the
-theorem reproduces Eq. (3.68); with the logistic loss it gives the
+theorem reproduces Eq. (3.84); with the logistic loss it gives the
 kernel logistic regression of Section <em>Kernel logistic regression</em>; with the hinge
 loss it gives the support vector machine of Chapter 6, whose
 expansion (6.33) over support vectors is
-Eq. (3.70) with most coefficients equal to zero.  Why the
+Eq. (3.86) with most coefficients equal to zero.  Why the
 hinge loss and only the hinge loss produces those zeros is
 Theorem 6.1.</p>
 </section>
@@ -1969,12 +2522,12 @@ appears in the literature under the name <em>kernel Lasso</em>.  The honest
 answer is that the construction that works for Ridge regression does not exist
 here, and it is worth being precise about why, because the reason is
 instructive rather than technical.</p>
-<p>Theorem 3.9 requires the penalty to be a strictly
+<p>Theorem 3.12 requires the penalty to be a strictly
 increasing function of <span class="math notranslate nohighlight">\(\|f\|_{\mathcal{H}}\)</span>.  The Lasso penalty is
 <span class="math notranslate nohighlight">\(\|\bm{\theta}\|_1\)</span>, a function not of <span class="math notranslate nohighlight">\(f\)</span> but of the <em>coordinates</em> of <span class="math notranslate nohighlight">\(f\)</span>
 in the feature space – and those coordinates are not determined by the kernel.</p>
 <div class="important admonition">
-<p class="admonition-title">Proposition 3.10 (The <span class="math notranslate nohighlight">\(1\)</span>-norm is not a property of the function)</p>
+<p class="admonition-title">Proposition 3.13 (The <span class="math notranslate nohighlight">\(1\)</span>-norm is not a property of the function)</p>
 <p>Let <span class="math notranslate nohighlight">\(\bm{\phi}\)</span> be a feature map for <span class="math notranslate nohighlight">\(k\)</span> and let <span class="math notranslate nohighlight">\(\bm{R}\)</span> be any orthogonal
 matrix on the feature space.  Then <span class="math notranslate nohighlight">\(\bm{R}\bm{\phi}\)</span> is also a feature map for
 <span class="math notranslate nohighlight">\(k\)</span>, the two parameterisations <span class="math notranslate nohighlight">\(\bm{\theta}\)</span> and <span class="math notranslate nohighlight">\(\bm{R}\bm{\theta}\)</span> describe
@@ -1984,7 +2537,7 @@ the same function, and</p>
 \left\|\bm{R}\bm{\theta}\right\|_2 = \left\|\bm{\theta}\right\|_2
   \quad\text{always}, \qquad
   \left\|\bm{R}\bm{\theta}\right\|_1 \neq \left\|\bm{\theta}\right\|_1
-  \quad\text{in general}.\tag{3.71}
+  \quad\text{in general}.\tag{3.87}
 \]</div>
 <p>Consequently <span class="math notranslate nohighlight">\(\|\bm{\theta}\|_1\)</span> is not a functional of <span class="math notranslate nohighlight">\(f\)</span>, and no penalty
 built from it can be expressed through the kernel alone.</p>
@@ -2022,18 +2575,18 @@ square root of <span class="math notranslate nohighlight">\(\bm{K}\)</span> one 
 supplies no canonical choice.  Two repairs are available, and they do different
 things.</p>
 <p><strong>Repair one: penalise the dual coefficients.</strong>
-Take the representation (3.70) as given and put the <span class="math notranslate nohighlight">\(1\)</span>-norm
+Take the representation (3.86) as given and put the <span class="math notranslate nohighlight">\(1\)</span>-norm
 on <span class="math notranslate nohighlight">\(\bm{\alpha}\)</span> instead of on <span class="math notranslate nohighlight">\(\bm{\theta}\)</span>:</p>
 <div class="math notranslate nohighlight">
 \[
 \min_{\bm{\alpha}\in\mathbb{R}^{n}}
     \left\{\frac{1}{n}\left\|\bm{y}-\bm{K}\bm{\alpha}\right\|_2^{2}
-      + \mu\left\|\bm{\alpha}\right\|_1\right\} .\tag{3.72}
+      + \mu\left\|\bm{\alpha}\right\|_1\right\} .\tag{3.88}
 \]</div>
 <p>This is well posed – <span class="math notranslate nohighlight">\(\bm{\alpha}\)</span> is determined by the kernel – and it is
 nothing more mysterious than an ordinary Lasso whose design matrix happens to
 be the Gram matrix.  Everything proved in Section <em>The Lasso</em> therefore
-applies unchanged: Proposition 3.4 gives the optimality
+applies unchanged: Proposition 3.7 gives the optimality
 conditions with <span class="math notranslate nohighlight">\(\bm{x}_j\)</span> replaced by the <span class="math notranslate nohighlight">\(j\)</span>th column
 <span class="math notranslate nohighlight">\(\bm{k}_j\)</span> of <span class="math notranslate nohighlight">\(\bm{K}\)</span>,</p>
 <div class="math notranslate nohighlight">
@@ -2042,13 +2595,13 @@ conditions with <span class="math notranslate nohighlight">\(\bm{x}_j\)</span> r
    = -\mu\,\mathrm{sgn}(\alpha_j) \ \text{ if }\alpha_j\neq0,
   \qquad
   \left|\frac{2}{n}\bm{k}_j^{T}\left(\bm{K}\bm{\alpha}-\bm{y}\right)\right|
-   \le \mu \ \text{ if }\alpha_j=0,\tag{3.73}
+   \le \mu \ \text{ if }\alpha_j=0,\tag{3.89}
 \]</div>
-<p>Proposition 3.5 gives
+<p>Proposition 3.8 gives
 <span class="math notranslate nohighlight">\(\mu_{\max}=\tfrac{2}{n}\|\bm{K}^{T}\bm{y}\|_\infty\)</span>, and the coordinate
-descent of Eq. (3.53) solves it.</p>
+descent of Eq. (3.69) solves it.</p>
 <p>What must be understood is <em>what</em> is being selected.  The columns of
-<span class="math notranslate nohighlight">\(\bm{K}\)</span> are indexed by training points, so Eq. (3.72) is sparse
+<span class="math notranslate nohighlight">\(\bm{K}\)</span> are indexed by training points, so Eq. (3.88) is sparse
 in the <em>examples</em> and not in the features: it discards data points, not
 variables.  That is a useful thing – it produces a prediction rule that
 evaluates the kernel at a handful of points rather than all <span class="math notranslate nohighlight">\(n\)</span>, which is
@@ -2088,12 +2641,12 @@ same name has caused a good deal of confusion.</p>
 </div>
 </div>
 <p>The last column above is the largest violation of
-Eq. (3.73) at the returned solution, and it is the check that
+Eq. (3.89) at the returned solution, and it is the check that
 should accompany any implementation of a non-differentiable problem: an
 optimality condition that can be evaluated is worth more than a convergence
 message.  The measured <span class="math notranslate nohighlight">\(\mu_{\max}\)</span> for this problem is <span class="math notranslate nohighlight">\(0.290436\)</span>, and the
 solver returns exactly zero non-zero coefficients just above it, as
-Proposition 3.5 requires.</p>
+Proposition 3.8 requires.</p>
 <p><strong>Repair two: build the feature map explicitly, then use the Lasso.</strong>
 If sparsity in <em>features</em> is what is wanted, the honest route is to
 construct an explicit finite map <span class="math notranslate nohighlight">\(\bm{z}(\bm{x})\in\mathbb{R}^{m}\)</span> whose inner
@@ -2173,7 +2726,7 @@ the design matrix altogether and the penalty then applies only to the genuine
 slopes.  The intercept is recovered afterwards from</p>
 <div class="math notranslate nohighlight">
 \[
-\hat{\theta}_0 = \bar{y} - \sum_{j=1}^{p-1}\bar{x}_j\hat{\theta}_j ,\tag{3.74}
+\hat{\theta}_0 = \bar{y} - \sum_{j=1}^{p-1}\bar{x}_j\hat{\theta}_j ,\tag{3.90}
 \]</div>
 <p>with <span class="math notranslate nohighlight">\(\bar{y}\)</span> and <span class="math notranslate nohighlight">\(\bar{x}_j\)</span> the training means.  This is what
 <code class="docutils literal notranslate"><span class="pre">scikit-learn</span></code> does internally when the intercept is fitted, and it is
@@ -2254,8 +2807,8 @@ cannot be captured by a low-order polynomial and is well captured by a
 moderate one.  Adding Gaussian noise gives us a problem with a known truth, a
 known noise level and a tunable complexity – everything needed to see the
 bias-variance trade-off of Section <em>The bias-variance tradeoff</em> in action.</p>
-<p><img alt="The Franke function 3.75 on the unit square left and a contour view wi" src="_images/franke_function.png" /></p>
-<p><em>Figure 3.3: The Franke function (3.75) on the unit square (left) and a contour view with the <span class="math notranslate nohighlight">\(n=100\)</span> noisy samples used in this section marked (right).  Two peaks, a saddle and a depression make it too rich for a low-order polynomial and well within reach of a moderate one.</em></p>
+<p><img alt="The Franke function 3.91 on the unit square left and a contour view wi" src="_images/franke_function.png" /></p>
+<p><em>Figure 3.3: The Franke function (3.91) on the unit square (left) and a contour view with the <span class="math notranslate nohighlight">\(n=100\)</span> noisy samples used in this section marked (right).  Two peaks, a saddle and a depression make it too rich for a low-order polynomial and well within reach of a moderate one.</em></p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
@@ -2363,8 +2916,8 @@ degree fourteen there are <span class="math notranslate nohighlight">\(119\)</sp
 and Eq. (3.11) divides by them.  The penalised errors, by
 contrast, rise from <span class="math notranslate nohighlight">\(0.060\)</span> to <span class="math notranslate nohighlight">\(0.067\)</span> and from <span class="math notranslate nohighlight">\(0.061\)</span> to <span class="math notranslate nohighlight">\(0.064\)</span>: they
 barely move.  Cross-validation increases <span class="math notranslate nohighlight">\(\lambda\)</span> as the degree grows, and
-the shrinkage factors (3.32) suppress precisely the
-directions in which Eq. (3.26) shows the variance to be
+the shrinkage factors (3.48) suppress precisely the
+directions in which Eq. (3.42) shows the variance to be
 unbounded.  What regularisation buys is not a better optimum but insensitivity
 to choosing the complexity badly – which matters, because in a real problem
 the right complexity is not known.</p>
@@ -2431,24 +2984,24 @@ nearest-neighbour Hamiltonian</p>
 <div class="math notranslate nohighlight">
 \[
 H(\bm{s}) \;=\; -J\sum_{j=1}^{L}s_j s_{j+1},
-  \qquad s_{L+1}\equiv s_1 .\tag{3.76}
+  \qquad s_{L+1}\equiv s_1 .\tag{3.92}
 \]</div>
 <p>This is the one-dimensional Ising model, and <span class="math notranslate nohighlight">\(J&gt;0\)</span> favours aligned neighbours.
-Now forget that we know Eq. (3.76) and suppose instead that we are
+Now forget that we know Eq. (3.92) and suppose instead that we are
 handed a pile of configurations <span class="math notranslate nohighlight">\(\bm{s}^{(i)}\)</span> together with their energies
 <span class="math notranslate nohighlight">\(y_i=H(\bm{s}^{(i)})\)</span>, and are asked to discover the physics.  A reasonable
 thing to assume is that the interaction is pairwise but otherwise unrestricted,</p>
 <div class="math notranslate nohighlight">
 \[
-H(\bm{s}) \;=\; -\sum_{j=1}^{L}\sum_{k=1}^{L}J_{jk}\,s_j s_k ,\tag{3.77}
+H(\bm{s}) \;=\; -\sum_{j=1}^{L}\sum_{k=1}^{L}J_{jk}\,s_j s_k ,\tag{3.93}
 \]</div>
 <p>with an unknown coupling matrix <span class="math notranslate nohighlight">\(\bm{J}\)</span>.  The point of writing it this way is
-that Eq. (3.77) is <em>linear in the unknowns</em>: the
+that Eq. (3.93) is <em>linear in the unknowns</em>: the
 <span class="math notranslate nohighlight">\(L^{2}\)</span> numbers <span class="math notranslate nohighlight">\(J_{jk}\)</span> enter multiplied by the observable products
 <span class="math notranslate nohighlight">\(s_js_k\)</span>.  Setting <span class="math notranslate nohighlight">\(\theta_{jL+k}=-J_{jk}\)</span> and</p>
 <div class="math notranslate nohighlight">
 \[
-X_{i,\,jL+k} \;=\; s^{(i)}_j s^{(i)}_k\tag{3.78}
+X_{i,\,jL+k} \;=\; s^{(i)}_j s^{(i)}_k\tag{3.94}
 \]</div>
 <p>turns the problem into <span class="math notranslate nohighlight">\(\bm{y}=\bm{X}\bm{\theta}\)</span>, an ordinary linear model
 with <span class="math notranslate nohighlight">\(p=L^{2}\)</span> features, and every tool of this chapter applies unchanged.
@@ -2470,15 +3023,15 @@ the phrase <em>feature engineering</em> means.</p>
 </div>
 </div>
 <p>There is a price for the convenience, and it is paid immediately.  The design
-matrix (3.78) is not of full column rank, and not by a
+matrix (3.94) is not of full column rank, and not by a
 little.</p>
 <div class="important admonition">
-<p class="admonition-title">Proposition 3.11 (The Ising design matrix is exactly rank deficient)</p>
-<p>Let <span class="math notranslate nohighlight">\(\bm{X}\)</span> be given by Eq. (3.78) for spins
+<p class="admonition-title">Proposition 3.14 (The Ising design matrix is exactly rank deficient)</p>
+<p>Let <span class="math notranslate nohighlight">\(\bm{X}\)</span> be given by Eq. (3.94) for spins
 <span class="math notranslate nohighlight">\(s_j\in\{-1,+1\}\)</span>.  Then</p>
 <div class="math notranslate nohighlight">
 \[
-\operatorname{rank}\bm{X} \;\le\; \frac{L(L-1)}{2}+1\tag{3.79}
+\operatorname{rank}\bm{X} \;\le\; \frac{L(L-1)}{2}+1\tag{3.95}
 \]</div>
 <p>for every sample size <span class="math notranslate nohighlight">\(n\)</span>, whereas the number of columns is <span class="math notranslate nohighlight">\(L^{2}\)</span>.</p>
 </div>
@@ -2521,18 +3074,18 @@ denominators are zero, and the pseudoinverse of
 Section <em>Ordinary least squares</em> handles them by declaring the corresponding coefficients
 to be zero – the minimum-norm choice.  That convention is about to have a
 visible physical consequence.</p>
-<p><img alt="Singular values of the 10000times1600 Ising design matrix 3.78 for L40" src="_images/ising_spectrum.png" /></p>
-<p><em>Figure 3.5: Singular values of the <span class="math notranslate nohighlight">\(10000\times1600\)</span> Ising design matrix (3.78) for <span class="math notranslate nohighlight">\(L=40\)</span>.  The spectrum collapses precisely at the index <span class="math notranslate nohighlight">\(L(L-1)/2+1=781\)</span> predicted by Proposition 3.11: the rank deficiency is a property of the features, not of the sample.</em></p>
+<p><img alt="Singular values of the 10000times1600 Ising design matrix 3.94 for L40" src="../BookML/BookFigures/chapter03_linear_regression/ising_spectrum.png" /></p>
+<p><em>Figure 3.5: Singular values of the <span class="math notranslate nohighlight">\(10000\times1600\)</span> Ising design matrix (3.94) for <span class="math notranslate nohighlight">\(L=40\)</span>.  The spectrum collapses precisely at the index <span class="math notranslate nohighlight">\(L(L-1)/2+1=781\)</span> predicted by Proposition 3.14: the rank deficiency is a property of the features, not of the sample.</em></p>
 </section>
 <section id="fitting-with-p-four-times-n">
 <h3><span class="section-number">3.15.2. </span>Fitting with <span class="math notranslate nohighlight">\(p\)</span> four times <span class="math notranslate nohighlight">\(n\)</span><a class="headerlink" href="#fitting-with-p-four-times-n" title="Link to this heading">#</a></h3>
 <p>We use <span class="math notranslate nohighlight">\(n_{\mathrm{train}}=400\)</span> configurations to fit <span class="math notranslate nohighlight">\(p=1600\)</span> coefficients
 and keep the remaining <span class="math notranslate nohighlight">\(9600\)</span> for testing.  The problem is therefore
 underdetermined twice over: once because <span class="math notranslate nohighlight">\(p&gt;n\)</span>, and once more because of
-Proposition 3.11.  Ridge regression is solved in the dual
-form of Theorem 3.8, which here means a <span class="math notranslate nohighlight">\(400\times400\)</span>
+Proposition 3.14.  Ridge regression is solved in the dual
+form of Theorem 3.11, which here means a <span class="math notranslate nohighlight">\(400\times400\)</span>
 system instead of a <span class="math notranslate nohighlight">\(1600\times1600\)</span> one, and the Lasso by the coordinate
-descent of Eq. (3.53).</p>
+descent of Eq. (3.69).</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>   <span class="n">estimator</span>            <span class="n">R</span><span class="o">^</span><span class="mi">2</span> <span class="n">train</span>  <span class="n">R</span><span class="o">^</span><span class="mi">2</span> <span class="n">test</span>  <span class="o">||</span><span class="n">theta</span><span class="o">||</span><span class="n">_2</span>  <span class="o">||</span><span class="n">theta</span><span class="o">||</span><span class="n">_1</span>  <span class="n">non</span><span class="o">-</span><span class="n">zero</span>
    <span class="n">OLS</span> <span class="p">(</span><span class="n">pseudoinverse</span><span class="p">)</span>    <span class="mf">1.000000</span>  <span class="mf">0.522863</span>       <span class="mf">3.2610</span>      <span class="mf">88.9391</span>      <span class="mi">1600</span>
    <span class="n">Ridge</span><span class="p">,</span> <span class="k">lambda</span> <span class="o">=</span> <span class="mf">0.01</span>   <span class="mf">1.000000</span>  <span class="mf">0.522863</span>       <span class="mf">3.2609</span>      <span class="mf">88.9379</span>      <span class="mi">1600</span>
@@ -2549,8 +3102,8 @@ data it has never seen, using <span class="math notranslate nohighlight">\(78\)<
 <span class="math notranslate nohighlight">\(2L=80\)</span>: the Lasso has found the nearest-neighbour couplings and almost
 nothing else.  Figure 3.6 shows the three recovered
 coupling matrices, and the difference is not subtle.</p>
-<p><img alt="The coupling matrices Jjk recovered from 400 configurations of the L40" src="_images/ising_couplings.png" /></p>
-<p><em>Figure 3.6: The coupling matrices <span class="math notranslate nohighlight">\(J_{jk}\)</span> recovered from <span class="math notranslate nohighlight">\(400\)</span> configurations of the <span class="math notranslate nohighlight">\(L=40\)</span> Ising chain.  The truth is a single off-diagonal band.  OLS and Ridge spread the interaction over the whole matrix and split each coupling symmetrically between <span class="math notranslate nohighlight">\((j,k)\)</span> and <span class="math notranslate nohighlight">\((k,j)\)</span>; the Lasso finds the band and puts each coupling entirely on one side of the pair.  Both behaviours are forced, by Proposition 3.12.</em></p>
+<p><img alt="The coupling matrices Jjk recovered from 400 configurations of the L40" src="../BookML/BookFigures/chapter03_linear_regression/ising_couplings.png" /></p>
+<p><em>Figure 3.6: The coupling matrices <span class="math notranslate nohighlight">\(J_{jk}\)</span> recovered from <span class="math notranslate nohighlight">\(400\)</span> configurations of the <span class="math notranslate nohighlight">\(L=40\)</span> Ising chain.  The truth is a single off-diagonal band.  OLS and Ridge spread the interaction over the whole matrix and split each coupling symmetrically between <span class="math notranslate nohighlight">\((j,k)\)</span> and <span class="math notranslate nohighlight">\((k,j)\)</span>; the Lasso finds the band and puts each coupling entirely on one side of the pair.  Both behaviours are forced, by Proposition 3.15.</em></p>
 </section>
 <section id="why-the-symmetry-and-why-only-for-two-of-the-three">
 <h3><span class="section-number">3.15.3. </span>Why the symmetry, and why only for two of the three<a class="headerlink" href="#why-the-symmetry-and-why-only-for-two-of-the-three" title="Link to this heading">#</a></h3>
@@ -2558,10 +3111,10 @@ coupling matrices, and the difference is not subtle.</p>
 set.  It is a theorem about duplicated columns, and it explains the behaviour
 of all three estimators at once.</p>
 <div class="important admonition">
-<p class="admonition-title">Proposition 3.12 (Duplicated columns)</p>
+<p class="admonition-title">Proposition 3.15 (Duplicated columns)</p>
 <p>Suppose two columns of <span class="math notranslate nohighlight">\(\bm{X}\)</span> are identical, say columns <span class="math notranslate nohighlight">\(a\)</span> and <span class="math notranslate nohighlight">\(b\)</span>.  Then</p>
 <ol class="arabic simple">
-<li><p>the Ridge estimator (3.28) satisfies
+<li><p>the Ridge estimator (3.44) satisfies
 <span class="math notranslate nohighlight">\(\hat\theta_a=\hat\theta_b\)</span> for every <span class="math notranslate nohighlight">\(\lambda&gt;0\)</span>, and so does the
 minimum-norm least-squares solution (3.11);</p></li>
 <li><p>the Lasso fit <span class="math notranslate nohighlight">\(\bm{X}\hat{\bm{\theta}}\)</span> is unique, but any
@@ -2582,7 +3135,7 @@ uniqueness forces <span class="math notranslate nohighlight">\(P\hat{\bm{\theta}
 strictly convex; the minimum-norm solution is nevertheless unique, and the
 same argument applies to it because <span class="math notranslate nohighlight">\(P\)</span> preserves the norm being minimised.</p>
 <p>For the Lasso, uniqueness of the fit is
-Proposition 3.6.  Write <span class="math notranslate nohighlight">\(t=\hat\theta_a+\hat\theta_b\)</span> and
+Proposition 3.9.  Write <span class="math notranslate nohighlight">\(t=\hat\theta_a+\hat\theta_b\)</span> and
 replace <span class="math notranslate nohighlight">\((\hat\theta_a,\hat\theta_b)\)</span> by <span class="math notranslate nohighlight">\((u,t-u)\)</span>.  The residual depends only
 on <span class="math notranslate nohighlight">\(t\)</span>, since the columns are equal, and if <span class="math notranslate nohighlight">\(u\)</span> and <span class="math notranslate nohighlight">\(t-u\)</span> share the sign of
 <span class="math notranslate nohighlight">\(t\)</span> then <span class="math notranslate nohighlight">\(|u|+|t-u|=|t|\)</span>, so the penalty is unchanged as well.  The objective
@@ -2618,7 +3171,7 @@ symmetrising the Lasso solution and re-evaluating:</p>
 </pre></div>
 </div>
 <p>Ten identical digits, and identical predictions.  This is
-Proposition 3.6 on real data: the fit is unique, the
+Proposition 3.9 on real data: the fit is unique, the
 coefficients are not, and any statement about <em>which</em> coefficient the
 Lasso selected among an exchangeable group is a statement about the solver.</p>
 <p>Averaged over all forty nearest-neighbour pairs the same picture holds, and
@@ -2638,7 +3191,7 @@ what destroys the test score.</p>
 <section id="the-penalty-over-eight-decades">
 <h3><span class="section-number">3.15.4. </span>The penalty, over eight decades<a class="headerlink" href="#the-penalty-over-eight-decades" title="Link to this heading">#</a></h3>
 <p>The one puzzle left in the first table is why Ridge and OLS agreed to four
-decimals at <span class="math notranslate nohighlight">\(\lambda=10^{-2}\)</span>.  Equation (3.30) answers it:
+decimals at <span class="math notranslate nohighlight">\(\lambda=10^{-2}\)</span>.  Equation (3.46) answers it:
 the Ridge shrinkage factor is <span class="math notranslate nohighlight">\(\sigma_i^{2}/(\sigma_i^{2}+\lambda)\)</span>, so the
 penalty does nothing at all until <span class="math notranslate nohighlight">\(\lambda\)</span> becomes comparable with the
 squared singular values.  On the <span class="math notranslate nohighlight">\(400\)</span> training rows those are</p>
@@ -2681,10 +3234,10 @@ both sides for the reasons the chapter gave.  Below it the penalty is too weak
 to resolve the exchangeable columns and the solver keeps <span class="math notranslate nohighlight">\(964\)</span> of them, at
 which point the test score collapses to <span class="math notranslate nohighlight">\(0.456\)</span> – <em>worse</em> than OLS, even
 though the training score is still <span class="math notranslate nohighlight">\(1\)</span>.  Above it we pass
-Proposition 3.5, the coefficients are driven to zero one
+Proposition 3.8, the coefficients are driven to zero one
 after another, and at <span class="math notranslate nohighlight">\(\lambda=10\)</span> none survive.
 Figure 3.7 plots both curves.</p>
-<p><img alt="Test and training R2 against the penalty for the Ising problem, with t" src="_images/ising_penalty.png" /></p>
+<p><img alt="Test and training R2 against the penalty for the Ising problem, with t" src="../BookML/BookFigures/chapter03_linear_regression/ising_penalty.png" /></p>
 <p><em>Figure 3.7: Test and training <span class="math notranslate nohighlight">\(R^{2}\)</span> against the penalty for the Ising problem, with the OLS test score marked.  Ridge (a) needs <span class="math notranslate nohighlight">\(\lambda\sim10^{3}\)</span> before anything happens, and never beats OLS.  The Lasso (b) has a broad plateau on which it is exact, and the count of non-zero coefficients (right axis, dashed) sits at about <span class="math notranslate nohighlight">\(2L=80\)</span> across it.</em></p>
 </section>
 <section id="what-the-example-is-for">
@@ -2699,7 +3252,7 @@ returned the correct minimiser of the objective they were given; the objective
 was simply the wrong one, because <span class="math notranslate nohighlight">\(819\)</span> directions in parameter space leave the
 training energies unchanged and something other than the data must decide what
 happens along them.  Ridge decides by the <span class="math notranslate nohighlight">\(2\)</span>-norm and the Lasso by the
-<span class="math notranslate nohighlight">\(1\)</span>-norm, and Proposition 3.12 says exactly what each
+<span class="math notranslate nohighlight">\(1\)</span>-norm, and Proposition 3.15 says exactly what each
 choice does.  This is the content of Section <em>A Bayesian reading</em> made concrete:
 in the underdetermined regime the penalty <em>is</em> the model.</p>
 <p>Second, sparsity and symmetry are in conflict, and one has to choose.  The
@@ -2710,7 +3263,7 @@ If a symmetric answer is wanted, the honest fix is not to post-process the
 Lasso but to remove the redundancy from the design matrix beforehand, keeping
 one column per unordered pair <span class="math notranslate nohighlight">\(j&lt;k\)</span> and none of the diagonal.  That reduces <span class="math notranslate nohighlight">\(p\)</span>
 from <span class="math notranslate nohighlight">\(1600\)</span> to <span class="math notranslate nohighlight">\(781\)</span>, makes the design matrix full rank by
-Proposition 3.11, and is what one should do in practice.  We
+Proposition 3.14, and is what one should do in practice.  We
 kept the redundant parametrisation here precisely because the pathology it
 produces is instructive.</p>
 <p>Third, and most important for what follows: everything above depended on
@@ -2735,7 +3288,7 @@ appreciably – and symmetry makes whole groups of features exactly
 exchangeable.  Practitioners consequently reach for the Lasso and for
 structured variants of it, and they take care to remove symmetry-equivalent
 duplicates from the design matrix before fitting rather than after, for the
-reason Proposition 3.12 gives.</p>
+reason Proposition 3.15 gives.</p>
 </div>
 </section>
 </section>
@@ -2748,20 +3301,27 @@ is the minimiser of the squared error, Eq. (3.8); as
 geometry it is the orthogonal projection of the targets onto the column space
 of the design matrix, Eq. (3.9); and as statistics it is the
 maximum-likelihood estimate under Gaussian noise,
-Eq. (3.22).  The three derivations are worth holding together,
+Eq. (3.28).  The three derivations are worth holding together,
 because each generalises differently: the first survives into every method in
 this book, the second is what makes the linear case special, and the third is
 what tells us that a different noise model demands a different loss.</p>
+<p>The statistics of the estimator all flow from one object, the residual
+projector <span class="math notranslate nohighlight">\(\bm{I}-\bm{H}\)</span>, which annihilates the model and leaves the noise:
+it gives the divisor <span class="math notranslate nohighlight">\(n-p\)</span> in <span class="math notranslate nohighlight">\(\hat{\sigma}^{2}\)</span>, the <span class="math notranslate nohighlight">\(\chi^{2}_{n-p}\)</span>
+distribution behind the reduced <span class="math notranslate nohighlight">\(\chi^{2}\)</span> and the <span class="math notranslate nohighlight">\(t\)</span> intervals, the
+optimism <span class="math notranslate nohighlight">\(2p\sigma^{2}/n\)</span> of the training error, and through its diagonal the
+leave-one-out formula (3.39).</p>
 <p>The three penalties then formed a sequence.  Ordinary least squares is
-unbiased and, by Gauss-Markov, of minimum variance among unbiased linear
-estimators – and that guarantee is worth less than it sounds, because
-Eq. (2.27) counts variance alongside bias.  Ridge
+unbiased and, by Gauss-Markov (Theorem 3.4), of minimum
+variance among unbiased linear estimators – and that guarantee is worth less
+than it sounds, because Eq. (2.27) counts variance
+alongside bias.  Ridge
 regression buys a large reduction in variance for a small bias, shrinking each
 singular direction by <span class="math notranslate nohighlight">\(\sigma_i^{2}/(\sigma_i^{2}+\lambda)\)</span> and hence
 suppressing hardest exactly those directions in which
-Eq. (3.26) shows the data to be least informative.  The Lasso
+Eq. (3.42) shows the data to be least informative.  The Lasso
 replaces proportional shrinkage by soft
-thresholding (3.47), and thereby sets coefficients exactly
+thresholding (3.63), and thereby sets coefficients exactly
 to zero – a difference which is visible in the algebra, in the geometry of
 the <span class="math notranslate nohighlight">\(1\)</span>-norm ball, and in the shape of the corresponding Laplace prior.</p>
 <p>The Bayesian reading of Section <em>A Bayesian reading</em> unified the three: a flat
@@ -2776,10 +3336,10 @@ and the number one reports must come from data the model has never seen.</p>
 Section <em>Kernel methods: regression without coordinates</em>.  The <span class="math notranslate nohighlight">\(2\)</span>-norm penalty is invariant under a
 change of orthonormal basis in the feature space, so it can be expressed
 through inner products alone; the push-through identity of
-Lemma 3.7 then rewrites Ridge regression in terms of the
+Lemma 3.10 then rewrites Ridge regression in terms of the
 <span class="math notranslate nohighlight">\(n\times n\)</span> matrix of those inner products, the basis expansion becomes free,
-and Theorem 3.9 shows that the same is true for any loss.
-The <span class="math notranslate nohighlight">\(1\)</span>-norm is <em>not</em> invariant, Proposition 3.10,
+and Theorem 3.12 shows that the same is true for any loss.
+The <span class="math notranslate nohighlight">\(1\)</span>-norm is <em>not</em> invariant, Proposition 3.13,
 and the Lasso therefore does not kernelise – which is worth knowing, because
 the literature contains two different repairs travelling under the same name.</p>
 <p>The complete programs are collected in <code class="docutils literal notranslate"><span class="pre">doc/BookML/BookPrograms</span></code>:</p>
@@ -2788,12 +3348,16 @@ the literature contains two different repairs travelling under the same name.</p
 Hoerl-Kennard theorem, kernel ridge regression against
 <code class="docutils literal notranslate"><span class="pre">scikit-learn</span></code> and against an explicit feature map, the
 rotation counter-example of
-Proposition 3.10, and both repairs of
+Proposition 3.13, and both repairs of
 Section <em>There is no kernel Lasso</em>.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">linear_regression.py</span></code> – OLS by the SVD, by QR and by the
 normal equations, with the conditioning comparison of
-Section <em>Ordinary least squares</em>; weighted least squares; and the quality
-measures of Section <em>Measures of quality</em>.</p></li>
+Section <em>Ordinary least squares</em>; weighted least squares and the
+reduced-<span class="math notranslate nohighlight">\(\chi^{2}\)</span> simulation of Section <em>Weighted least squares and the <span class="math notranslate nohighlight">\(\chi^2\)</span> function</em>; the
+quality measures of Section <em>Measures of quality</em>; and the checks of
+Section <em>Statistical properties of the least-squares estimator</em> – unbiasedness of
+<span class="math notranslate nohighlight">\(\hat{\sigma}^{2}\)</span>, coverage of the <span class="math notranslate nohighlight">\(t\)</span> intervals, the optimism
+formula (3.37) and leave-one-out in closed form.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">ridge_lasso.py</span></code> – Ridge in closed form and through the SVD,
 the Lasso by coordinate descent with soft thresholding, and the
 coefficient paths of Section <em>Comparing the three estimators</em> compared against
@@ -2808,9 +3372,9 @@ of Section <em>Scaling, centring and the intercept</em>, with a reconciliation o
 hand-written implementation against <code class="docutils literal notranslate"><span class="pre">scikit-learn</span></code>.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">ising_regression.py</span></code> – the one-dimensional Ising study of
 Section <em>A second example: the one-dimensional Ising model</em>: the exact rank deficiency of
-Proposition 3.11, the three estimators at
+Proposition 3.14, the three estimators at
 <span class="math notranslate nohighlight">\(p=4n\)</span>, the duplicated-column symmetry of
-Proposition 3.12 and the indifference of the
+Proposition 3.15 and the indifference of the
 Lasso objective to the split, and the penalty scan over eight
 decades.</p></li>
 </ul>
@@ -2824,20 +3388,20 @@ Jupyter-book.</p>
 <h3><span class="section-number">3.17.1. </span>Warm-up exercises<a class="headerlink" href="#warm-up-exercises" title="Link to this heading">#</a></h3>
 <ol class="arabic simple">
 <li><p><strong>The normal equations by hand.</strong>
-For the toy problem of Eq. (3.54):
+For the toy problem of Eq. (3.70):
 (a) compute <span class="math notranslate nohighlight">\(\bm{X}^{T}\bm{X}\)</span> and <span class="math notranslate nohighlight">\(\bm{X}^{T}\bm{y}\)</span> and verify
-Eq. (3.56);
+Eq. (3.72);
 (b) compute the hat matrix (3.9) and verify that it is
 symmetric, idempotent, and has trace <span class="math notranslate nohighlight">\(2\)</span>;
 (c) verify that the residual is orthogonal to both columns of <span class="math notranslate nohighlight">\(\bm{X}\)</span>.</p></li>
 <li><p><strong>Ridge by hand.</strong>
-For the same problem, derive Eq. (3.57) by differentiating
+For the same problem, derive Eq. (3.73) by differentiating
 the penalised cost, and explain why the two coefficients are shrunk by
 different factors.  Relate the factors to the singular values of <span class="math notranslate nohighlight">\(\bm{X}\)</span>.</p></li>
 <li><p><strong>The Lasso threshold.</strong>
 For the same problem, show that the Lasso sets <span class="math notranslate nohighlight">\(\theta_1=0\)</span> for
 <span class="math notranslate nohighlight">\(\lambda\ge4\)</span> and <span class="math notranslate nohighlight">\(\theta_0=0\)</span> for <span class="math notranslate nohighlight">\(\lambda\ge16\)</span> (with the convention of
-Eq. (3.41) and the <span class="math notranslate nohighlight">\(1/n\)</span> dropped).  Sketch all three
+Eq. (3.57) and the <span class="math notranslate nohighlight">\(1/n\)</span> dropped).  Sketch all three
 coefficient paths on one plot.</p></li>
 <li><p><strong>Equivariance under rescaling.</strong>
 (a) Show that if a column of <span class="math notranslate nohighlight">\(\bm{X}\)</span> is multiplied by <span class="math notranslate nohighlight">\(c\)</span>, the OLS fitted
@@ -2860,6 +3424,49 @@ Eq. (1.132).
 (c) Verify that <span class="math notranslate nohighlight">\(\bm{H}_\lambda\)</span> is symmetric but <em>not</em> idempotent for
 <span class="math notranslate nohighlight">\(\lambda&gt;0\)</span>, and interpret this using the eigenvalue argument of
 Section <em>Orthonormal bases and projections</em>.</p></li>
+<li><p><strong>The analysis-of-variance identity.</strong>
+(a) Show that if the design matrix has no constant column, the residuals of
+a least-squares fit need not sum to zero, and give a two-point example
+in which Eq. (3.20) fails.
+(b) Show that for a fit with intercept the sample correlation between
+<span class="math notranslate nohighlight">\(\bm{y}\)</span> and <span class="math notranslate nohighlight">\(\tilde{\bm{y}}\)</span> squared equals <span class="math notranslate nohighlight">\(R^{2}\)</span>.
+(c) Compute <span class="math notranslate nohighlight">\(R^{2}\)</span> and <span class="math notranslate nohighlight">\(\bar{R}^{2}\)</span> of Eq. (3.22) for a
+polynomial fit of degree <span class="math notranslate nohighlight">\(1,\dots,15\)</span> to <span class="math notranslate nohighlight">\(20\)</span> noisy points and plot
+both against the degree.</p></li>
+<li><p><strong>Generalised least squares.</strong>
+Noise with an autoregressive structure has covariance
+<span class="math notranslate nohighlight">\(\Omega_{ij}=\sigma^{2}\rho^{|i-j|}\)</span>.
+(a) Simulate such noise for <span class="math notranslate nohighlight">\(\rho=0.8\)</span> and fit a straight line by OLS and by
+GLS, Eq. (3.15), many times; compare the empirical variances
+of the slope with the two predicted covariance matrices.
+(b) Show that the OLS variance formula <span class="math notranslate nohighlight">\(\sigma^{2}(\bm{X}^{T}\bm{X})^{-1}\)</span>
+is wrong in this case, and derive the correct
+<span class="math notranslate nohighlight">\(\var(\hat{\bm{\theta}}_{\mathrm{OLS}})
+=(\bm{X}^{T}\bm{X})^{-1}\bm{X}^{T}\bm{\Omega}\bm{X}(\bm{X}^{T}\bm{X})^{-1}\)</span>.</p></li>
+<li><p><strong>The Cram’er-Rao bound for the noise variance.</strong>
+Compute the Fisher information for <span class="math notranslate nohighlight">\(\sigma^{2}\)</span> from
+Eq. (3.27), <span class="math notranslate nohighlight">\(\mathcal{I}(\sigma^{2})=n/(2\sigma^{4})\)</span>,
+and hence the bound <span class="math notranslate nohighlight">\(\var(\tilde{\sigma}^{2})\ge2\sigma^{4}/n\)</span>.  Using
+Proposition 3.3(iii), show that
+<span class="math notranslate nohighlight">\(\var(\hat{\sigma}^{2})=2\sigma^{4}/(n-p)\)</span>: the unbiased estimator does not
+attain the bound, and the gap closes as <span class="math notranslate nohighlight">\(p/n\to0\)</span>.</p></li>
+<li><p><strong>Leave-one-out by Sherman-Morrison.</strong>
+(a) Verify Eq. (3.38) by multiplication.
+(b) Derive both parts of Eq. (3.39); the key step is
+<span class="math notranslate nohighlight">\(\bm{x}_i^{T}(\bm{X}^{T}\bm{X})^{-1}\bm{x}_i=h_{ii}\)</span>.
+(c) Show that <span class="math notranslate nohighlight">\(0\le h_{ii}\le1\)</span> and <span class="math notranslate nohighlight">\(\sum_ih_{ii}=p\)</span>, so that the average
+leverage is <span class="math notranslate nohighlight">\(p/n\)</span>; explain what happens to Eq. (3.39) at a
+point with <span class="math notranslate nohighlight">\(h_{ii}=1\)</span>.
+(d) Repeat the numerical comparison of Section <em>Statistical properties of the least-squares estimator</em> for
+the Ridge smoother, and confirm that Eq. (3.40) still
+holds with <span class="math notranslate nohighlight">\(S_{ii}\)</span> in place of <span class="math notranslate nohighlight">\(h_{ii}\)</span>.</p></li>
+<li><p><strong>Optimism (numerical).</strong>
+For polynomial fits of degree <span class="math notranslate nohighlight">\(d=1,\dots,12\)</span> to <span class="math notranslate nohighlight">\(n=30\)</span> points generated by
+a cubic plus Gaussian noise, estimate by simulation the expected training
+and test errors and plot both against <span class="math notranslate nohighlight">\(d\)</span> together with the
+predictions (3.35) and (3.36).  Where do
+the predictions fail, and why?  Add Mallows’ <span class="math notranslate nohighlight">\(C_p\)</span> and check that its
+minimum sits at the true degree.</p></li>
 <li><p><strong>Conditioning in practice (numerical).</strong>
 Fit a polynomial of degree <span class="math notranslate nohighlight">\(d\)</span> to <span class="math notranslate nohighlight">\(100\)</span> points on <span class="math notranslate nohighlight">\([0,1]\)</span> using both
 functions of Section <em>Ordinary least squares</em>.
@@ -2869,16 +3476,16 @@ functions of Section <em>Ordinary least squares</em>.
 digit, and how does that relate to Eq. (1.118)?</p></li>
 <li><p><strong>Coordinate descent (numerical).</strong>
 Implement the Lasso by coordinate descent as in
-Eq. (3.53).
+Eq. (3.69).
 (a) Verify on an orthonormal design that it reproduces the soft
-thresholding result (3.47) exactly.
+thresholding result (3.63) exactly.
 (b) Compare against <code class="docutils literal notranslate"><span class="pre">sklearn.linear_model.Lasso</span></code> on a general
 design, taking care over the factor conventions noted in
 Section <em>Comparing the three estimators</em>.
 (c) Plot the number of non-zero coefficients against <span class="math notranslate nohighlight">\(\lambda\)</span>.</p></li>
 <li><p><strong>Confidence intervals (numerical).</strong>
 For data generated from a known linear model:
-(a) compute the confidence intervals (3.25) for each
+(a) compute the confidence intervals (3.34) for each
 coefficient;
 (b) repeat the whole experiment <span class="math notranslate nohighlight">\(1000\)</span> times with fresh noise and count how
 often the true value lies inside the interval;
@@ -2897,7 +3504,7 @@ sum occurs at <span class="math notranslate nohighlight">\(\lambda&gt;0\)</span>
 <p>This extended exercise assembles the whole chapter, and follows the structure
 of the first project of the course.</p>
 <p><strong>Part a: ordinary least squares.</strong>
-Generate a data set from the Franke function (3.75) with
+Generate a data set from the Franke function (3.91) with
 <span class="math notranslate nohighlight">\(x,y\in[0,1]\)</span> and added noise <span class="math notranslate nohighlight">\(\mathcal{N}(0,\sigma^{2})\)</span>.  Write your own
 code – using either a matrix inversion or, preferably, the singular value
 decomposition – and perform a standard least-squares analysis with
@@ -2916,8 +3523,8 @@ Repeat parts a to c for Ridge regression, as a function of both the polynomial
 degree and the penalty <span class="math notranslate nohighlight">\(\lambda\)</span>.  Present your results as a heat map of the
 cross-validated test error over the two hyperparameters, and identify the
 optimum.  Discuss the results in the light of the
-shrinkage (3.32) and of the variance
-difference (3.36).</p>
+shrinkage (3.48) and of the variance
+difference (3.52).</p>
 <p><strong>Part e: the Lasso.</strong>
 Repeat part d for the Lasso, using either your own coordinate-descent
 implementation or <code class="docutils literal notranslate"><span class="pre">scikit-learn</span></code>.  In addition, count the non-zero

@@ -391,7 +391,18 @@ document.write(`
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#adam">4.11. Adam</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#implementations">4.12. Implementations</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#none-of-these-can-compete-with-newton-s-method">4.13. None of these can compete with Newton’s method</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#automatic-differentiation">4.14. Automatic differentiation</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#automatic-differentiation">4.14. Automatic differentiation</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#three-ways-to-differentiate-a-program">4.14.1. Three ways to differentiate a program</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#evaluation-traces-and-the-computational-graph">4.14.2. Evaluation traces and the computational graph</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#forward-mode-tangents-and-dual-numbers">4.14.3. Forward mode: tangents and dual numbers</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#reverse-mode-adjoints">4.14.4. Reverse mode: adjoints</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#forward-or-reverse-the-chain-rule-as-a-matrix-product">4.14.5. Forward or reverse: the chain rule as a matrix product</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#accuracy-and-points-where-the-derivative-does-not-exist">4.14.6. Accuracy, and points where the derivative does not exist</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#automatic-differentiation-in-python-autograd-and-jax">4.14.7. Automatic differentiation in Python: autograd and JAX</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-optimisers-of-this-chapter-on-a-non-convex-function">4.14.8. The optimisers of this chapter on a non-convex function</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#finite-differences-against-automatic-differentiation">4.14.9. Finite differences against automatic differentiation</a></li>
+</ul>
+</li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#practical-tips">4.15. Practical tips</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#summary-and-the-programs">4.16. Summary and the programs</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercises">4.17. Exercises</a><ul class="nav section-nav flex-column">
@@ -1658,34 +1669,459 @@ how much of the Hessian it manages to imitate for <span class="math notranslate 
 computed it by hand in Eq. (4.13); for a neural network with
 a dozen layers, doing so by hand is possible but error-prone, and for a model
 under active development it is impractical.  <em>Automatic differentiation</em>
-(AD), also called algorithmic differentiation, solves the problem completely.</p>
+(AD), also called algorithmic differentiation, solves the problem completely,
+and this section explains how.  We first say precisely what AD is not, then
+derive its two modes from the chain rule, prove the one result about cost that
+makes deep learning feasible, and finally show how the same ideas are used
+from Python through the <code class="docutils literal notranslate"><span class="pre">JAX</span></code> library.</p>
 <p>AD exploits the fact that every computer program, however complicated,
 executes a sequence of elementary arithmetic operations and elementary
 functions – addition, multiplication, <span class="math notranslate nohighlight">\(\exp\)</span>, <span class="math notranslate nohighlight">\(\log\)</span>, <span class="math notranslate nohighlight">\(\sin\)</span> – each of whose
 derivatives is known.  Applying the chain rule of Eq. (1.51)
 repeatedly to that sequence yields derivatives of arbitrary order,
 <em>accurate to working precision</em>, at a cost only a small constant factor
-above that of the original program.</p>
+above that of the original program.  Both halves of that sentence – the
+accuracy and the cost – are theorems, and we shall prove them.</p>
+<section id="three-ways-to-differentiate-a-program">
+<h3><span class="section-number">4.14.1. </span>Three ways to differentiate a program<a class="headerlink" href="#three-ways-to-differentiate-a-program" title="Link to this heading">#</a></h3>
 <p>It is important to distinguish AD from the two things it is often confused
-with.  It is not <em>symbolic</em> differentiation, which manipulates
-expressions and can produce enormous formulae, and which requires the program
-to be converted into a single closed-form expression in the first place.  Nor
-is it <em>numerical</em> differentiation by finite differences, which suffers
-both discretisation error and, worse, catastrophic cancellation when the step
-is made small – the loss of significant digits described in
-Section <em>Vector and matrix norms</em>.  AD has neither defect: it is exact, up to rounding,
-and it costs a constant factor rather than one extra function evaluation per
-parameter.</p>
-<p>That last point is what makes deep learning possible.  Reverse-mode AD, which
-is what backpropagation is, computes the gradient of a scalar cost with
-respect to <em>all</em> <span class="math notranslate nohighlight">\(p\)</span> parameters at a cost of roughly two forward
-evaluations, independent of <span class="math notranslate nohighlight">\(p\)</span>.  Finite differences would need <span class="math notranslate nohighlight">\(p+1\)</span>
-evaluations.  For <span class="math notranslate nohighlight">\(p=10^{7}\)</span> the difference is between a fraction of a second
-and a week.  The reason, as noted after Eq. (1.50), is
-that for a scalar output it is far cheaper to accumulate the chain rule from
-the left, row times matrix, than from the right.</p>
-<p><strong>Autograd.</strong>
-The <code class="docutils literal notranslate"><span class="pre">autograd</span></code> package differentiates ordinary numpy code.</p>
+with.</p>
+<p><strong>Symbolic differentiation.</strong>
+A symbolic differentiator manipulates expressions: it takes the formula for <span class="math notranslate nohighlight">\(f\)</span> and returns the formula
+for <span class="math notranslate nohighlight">\(f'\)</span>.  This is what a computer-algebra system does and it is exact, but it
+requires the program to be a single closed-form expression in the first place
+– no loops, no branches, no intermediate variables – and it suffers from
+<em>expression swell</em>: the derivative of a product of <span class="math notranslate nohighlight">\(m\)</span> factors has <span class="math notranslate nohighlight">\(m\)</span>
+terms, the derivative of that has <span class="math notranslate nohighlight">\(m^{2}\)</span>, and the size of the formula grows
+without any of the sharing of intermediate results that the original program
+enjoyed.</p>
+<p><strong>Numerical differentiation.</strong>
+A numerical differentiator replaces the derivative by a difference quotient.  For a function of one
+variable the central difference is</p>
+<div class="math notranslate nohighlight">
+\[
+f'(x) \approx D_h f(x) = \frac{f(x+h)-f(x-h)}{2h},\tag{4.43}
+\]</div>
+<p>and its error can be analysed exactly.  Expanding both terms in Taylor series
+about <span class="math notranslate nohighlight">\(x\)</span> and subtracting, all even powers of <span class="math notranslate nohighlight">\(h\)</span> cancel and</p>
+<div class="math notranslate nohighlight">
+\[
+D_hf(x) = f'(x) + \frac{h^{2}}{6}f'''(x) + \bigO(h^{4}),\tag{4.44}
+\]</div>
+<p>the <em>truncation error</em>, which shrinks as <span class="math notranslate nohighlight">\(h^{2}\)</span>.  This suggests taking
+<span class="math notranslate nohighlight">\(h\)</span> as small as possible.  But the two function values are computed in
+floating point, each with a relative error of order the unit roundoff
+<span class="math notranslate nohighlight">\(\epsilon_M\approx2.2\times10^{-16}\)</span> of Section <em>Vector and matrix norms</em>, so the
+numerator carries an absolute error of order <span class="math notranslate nohighlight">\(\epsilon_M|f(x)|\)</span> and the
+quotient an error of order <span class="math notranslate nohighlight">\(\epsilon_M|f(x)|/h\)</span>: the <em>rounding error</em>,
+which <em>grows</em> as <span class="math notranslate nohighlight">\(h\)</span> shrinks.  This is catastrophic cancellation, the
+subtraction of two nearly equal numbers.  The total error is therefore of the
+form</p>
+<div class="math notranslate nohighlight">
+\[
+E(h) \approx \frac{h^{2}}{6}\left|f'''(x)\right|
+             + \frac{\epsilon_M\left|f(x)\right|}{h},\tag{4.45}
+\]</div>
+<p>and setting <span class="math notranslate nohighlight">\(dE/dh=0\)</span> gives the optimal step and the best attainable accuracy,</p>
+<div class="math notranslate nohighlight">
+\[
+h^{*} = \left(\frac{3\epsilon_M|f|}{|f'''|}\right)^{1/3}
+        \sim \epsilon_M^{1/3}\approx 6\times10^{-6},
+  \qquad
+  E(h^{*}) \sim \epsilon_M^{2/3}\approx 4\times10^{-11}.\tag{4.46}
+\]</div>
+<p>A central difference can never deliver more than about two thirds of the
+available digits, and only if <span class="math notranslate nohighlight">\(h\)</span> is chosen well; the one-sided difference
+<span class="math notranslate nohighlight">\((f(x+h)-f(x))/h\)</span> has truncation error <span class="math notranslate nohighlight">\(\bigO(h)\)</span> and does correspondingly
+worse, <span class="math notranslate nohighlight">\(E\sim\epsilon_M^{1/2}\approx10^{-8}\)</span>.  Figure 4.6
+shows the curve (4.45) measured for a concrete function.  And
+the cost is the second objection: for a function of <span class="math notranslate nohighlight">\(p\)</span> variables the gradient
+needs <span class="math notranslate nohighlight">\(2p\)</span> evaluations, or <span class="math notranslate nohighlight">\(p+1\)</span> for one-sided differences, and for <span class="math notranslate nohighlight">\(p=10^{7}\)</span>
+that is a week of computing to obtain one, mediocre, gradient.</p>
+<p><strong>Automatic differentiation.</strong>
+AD has neither defect.  It computes the numerical value of the derivative at a
+point, not a formula, so there is no expression swell; it does so by
+propagating exact derivative rules through the program, so there is no
+truncation error and no step <span class="math notranslate nohighlight">\(h\)</span> to choose; and, in the mode used for
+training, it obtains all <span class="math notranslate nohighlight">\(p\)</span> components of the gradient for the price of a
+small constant number of evaluations of <span class="math notranslate nohighlight">\(f\)</span>.  Reverse-mode AD is what
+backpropagation is.  For <span class="math notranslate nohighlight">\(p=10^{7}\)</span> the difference against finite differences
+is between a fraction of a second and a week, and it is the reason the models
+of the later chapters can be trained at all.</p>
+</section>
+<section id="evaluation-traces-and-the-computational-graph">
+<h3><span class="section-number">4.14.2. </span>Evaluation traces and the computational graph<a class="headerlink" href="#evaluation-traces-and-the-computational-graph" title="Link to this heading">#</a></h3>
+<p>The object AD works on is not the formula for <span class="math notranslate nohighlight">\(f\)</span> but the sequence of
+operations a program executes to evaluate it.  Consider the function</p>
+<div class="math notranslate nohighlight">
+\[
+f(x_1,x_2) = \ln x_1 + x_1x_2 - \sin x_2 ,\tag{4.47}
+\]</div>
+<p>which a program evaluates as the following list of assignments, each applying
+one elementary operation <span class="math notranslate nohighlight">\(\varphi_i\)</span> to variables already computed:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{aligned}
+    v_{-1} &amp;= x_1, &amp; v_0 &amp;= x_2, \\
+    v_1 &amp;= \ln v_{-1}, &amp; v_2 &amp;= v_{-1}\,v_0, &amp; v_3 &amp;= \sin v_0, \\
+    v_4 &amp;= v_1 + v_2, &amp; v_5 &amp;= v_4 - v_3, &amp; y &amp;= v_5 .
+  \end{aligned}\tag{4.48}
+\end{split}\]</div>
+<p>This is the <em>evaluation trace</em>, or Wengert list, of <span class="math notranslate nohighlight">\(f\)</span>
+[wengert1964,griewank2008]: the inputs are numbered <span class="math notranslate nohighlight">\(v_{1-n},\dots,v_0\)</span>,
+the intermediate results <span class="math notranslate nohighlight">\(v_1,\dots,v_\ell\)</span> in the order in which they are
+computed, and the output is the last of them.  Drawn as a directed graph with
+an edge <span class="math notranslate nohighlight">\(j\to i\)</span> whenever <span class="math notranslate nohighlight">\(v_i\)</span> depends directly on <span class="math notranslate nohighlight">\(v_j\)</span>, it is the
+<em>computational graph</em> of Fig. 4.5.  Any program made
+of elementary operations has such a trace – loops unroll into repeated
+assignments, and a branch simply selects which assignments are executed for
+the given input – and that is what makes AD applicable to programs rather
+than to formulae.  A neural network is a particularly regular trace: the
+matrix products, additions and activation functions of Chapter 8,
+one layer after another.</p>
+<p><img alt="The computational graph of the evaluation trace 4.48 for .  Each node " src="../BookML/BookFigures/chapter04_optimization/4-compgraph.png" /></p>
+<p><em>Figure 4.5: The computational graph of the evaluation trace (4.48) for <span class="math notranslate nohighlight">\(f(x_1,x_2)=\ln x_1+x_1x_2-\sin x_2\)</span>.  Each node is one elementary operation applied to its predecessors.  Forward-mode AD sweeps this graph from left to right, carrying a derivative <span class="math notranslate nohighlight">\(\dot v_i\)</span> with every value; reverse-mode AD first evaluates the values from left to right and then sweeps back from right to left, carrying an adjoint <span class="math notranslate nohighlight">\(\bar v_i=\partial y/\partial v_i\)</span> with every node.</em></p>
+<p>For each node the derivative of the elementary operation with respect to each
+of its arguments – its <em>local</em> or <em>partial</em> derivative – is known
+in closed form:</p>
+<div class="math notranslate nohighlight">
+\[
+\frac{\partial v_1}{\partial v_{-1}} = \frac{1}{v_{-1}},\quad
+  \frac{\partial v_2}{\partial v_{-1}} = v_0,\quad
+  \frac{\partial v_2}{\partial v_{0}} = v_{-1},\quad
+  \frac{\partial v_3}{\partial v_{0}} = \cos v_0,\quad
+  \frac{\partial v_4}{\partial v_{1}} = \frac{\partial v_4}{\partial v_{2}} = 1,\quad
+  \frac{\partial v_5}{\partial v_{4}} = 1,\quad
+  \frac{\partial v_5}{\partial v_{3}} = -1 .\tag{4.49}
+\]</div>
+<p>Everything AD does is to combine these local derivatives by the chain rule.
+The only question is in which order, and there are two natural answers.</p>
+</section>
+<section id="forward-mode-tangents-and-dual-numbers">
+<h3><span class="section-number">4.14.3. </span>Forward mode: tangents and dual numbers<a class="headerlink" href="#forward-mode-tangents-and-dual-numbers" title="Link to this heading">#</a></h3>
+<p>Fix a direction <span class="math notranslate nohighlight">\(\dot{\bm{x}}\in\mathbb{R}^{n}\)</span> in the input space and define
+for every node its <em>tangent</em>, the directional derivative</p>
+<div class="math notranslate nohighlight">
+\[
+\dot v_i = \sum_{k=1}^{n}\frac{\partial v_i}{\partial x_k}\,\dot x_k
+           = \frac{d}{d\epsilon}\,v_i(\bm{x}+\epsilon\dot{\bm{x}})\Big|_{\epsilon=0}.\tag{4.50}
+\]</div>
+<p>Since <span class="math notranslate nohighlight">\(v_i=\varphi_i(v_j:j\prec i)\)</span> depends only on its predecessors, the
+chain rule gives the <em>forward recursion</em></p>
+<div class="math notranslate nohighlight">
+\[
+\dot v_i = \sum_{j\prec i}\frac{\partial\varphi_i}{\partial v_j}\,\dot v_j ,
+  \qquad i=1,\dots,\ell,\tag{4.51}
+\]</div>
+<p>started from <span class="math notranslate nohighlight">\(\dot v_{1-n},\dots,\dot v_0\)</span> set equal to the chosen direction
+<span class="math notranslate nohighlight">\(\dot x_1,\dots,\dot x_n\)</span>.  The recursion runs in the same order as the
+evaluation itself, so each tangent can be computed alongside its value, and
+when the sweep reaches the output it holds <span class="math notranslate nohighlight">\(\dot y=\nabla f(\bm{x})^{T}\dot{\bm{x}}\)</span>.
+For our example with <span class="math notranslate nohighlight">\(\dot{\bm{x}}=(1,0)\)</span>, that is <span class="math notranslate nohighlight">\(\partial f/\partial x_1\)</span>,
+the sweep at <span class="math notranslate nohighlight">\((x_1,x_2)=(2,5)\)</span> reads</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{aligned}
+    \dot v_{-1} &amp;= 1, &amp; \dot v_0 &amp;= 0,\\
+    \dot v_1 &amp;= \dot v_{-1}/v_{-1} = 0.5, &amp;
+    \dot v_2 &amp;= \dot v_{-1}v_0 + v_{-1}\dot v_0 = 5, &amp;
+    \dot v_3 &amp;= \cos(v_0)\,\dot v_0 = 0,\\
+    \dot v_4 &amp;= \dot v_1+\dot v_2 = 5.5, &amp;
+    \dot v_5 &amp;= \dot v_4-\dot v_3 = 5.5 ,
+  \end{aligned}\tag{4.52}
+\end{split}\]</div>
+<p>and indeed <span class="math notranslate nohighlight">\(\partial f/\partial x_1 = 1/x_1 + x_2 = 5.5\)</span>.  To obtain
+<span class="math notranslate nohighlight">\(\partial f/\partial x_2\)</span> the whole sweep is repeated with
+<span class="math notranslate nohighlight">\(\dot{\bm{x}}=(0,1)\)</span>.</p>
+<p><strong>Dual numbers.</strong>
+There is an elegant algebraic way to say the same thing.  Introduce a symbol
+<span class="math notranslate nohighlight">\(\varepsilon\)</span> with <span class="math notranslate nohighlight">\(\varepsilon^{2}=0\)</span> (but <span class="math notranslate nohighlight">\(\varepsilon\neq0\)</span>) and consider
+<em>dual numbers</em> <span class="math notranslate nohighlight">\(a+b\varepsilon\)</span> with <span class="math notranslate nohighlight">\(a,b\in\mathbb{R}\)</span>.  They add
+componentwise and multiply as</p>
+<div class="math notranslate nohighlight">
+\[
+(a+b\varepsilon)(c+d\varepsilon) = ac + (ad+bc)\varepsilon ,\tag{4.53}
+\]</div>
+<p>because the <span class="math notranslate nohighlight">\(\varepsilon^{2}\)</span> term vanishes.  Now let <span class="math notranslate nohighlight">\(g\)</span> be any function with
+a Taylor series and evaluate it at a dual argument.  Every power of
+<span class="math notranslate nohighlight">\(\varepsilon\)</span> beyond the first is zero, so the series terminates:</p>
+<div class="math notranslate nohighlight">
+\[
+g(a+b\varepsilon) = g(a) + g'(a)\,b\varepsilon
+     + \tfrac{1}{2}g''(a)\,b^{2}\varepsilon^{2}+\dots
+     = g(a) + g'(a)\,b\varepsilon .\tag{4.54}
+\]</div>
+<p>The dual part is exactly the tangent (4.51) of <span class="math notranslate nohighlight">\(g\)</span>: dual
+numbers carry a value and a derivative together, and the multiplication
+rule (4.53) <em>is</em> the product rule.  Applying <span class="math notranslate nohighlight">\(g\)</span> to
+<span class="math notranslate nohighlight">\(x+1\cdot\varepsilon\)</span> and reading off the coefficient of <span class="math notranslate nohighlight">\(\varepsilon\)</span>
+therefore returns <span class="math notranslate nohighlight">\(g'(x)\)</span> exactly – not approximately, since nothing was
+truncated: the series terminates by the algebra of <span class="math notranslate nohighlight">\(\varepsilon\)</span>, not by
+neglecting small terms.  This is forward-mode AD in one line, and it can be
+implemented in a few more.  The following class overloads the arithmetic
+operators of Python so that ordinary code, written with no thought of
+derivatives, computes them when handed a dual argument.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">math</span>
+
+<span class="k">class</span> <span class="nc">Dual</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A dual number a + b*eps with eps**2 = 0: a value and its derivative.&quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">val</span><span class="p">,</span> <span class="n">dot</span><span class="o">=</span><span class="mf">0.0</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">val</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dot</span> <span class="o">=</span> <span class="n">val</span><span class="p">,</span> <span class="n">dot</span>
+    <span class="k">def</span> <span class="nf">_lift</span><span class="p">(</span><span class="n">o</span><span class="p">):</span>                       <span class="c1"># promote plain floats to duals</span>
+        <span class="k">return</span> <span class="n">o</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="n">Dual</span><span class="p">)</span> <span class="k">else</span> <span class="n">Dual</span><span class="p">(</span><span class="n">o</span><span class="p">)</span>
+    <span class="k">def</span> <span class="fm">__add__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">o</span><span class="p">):</span>
+        <span class="n">o</span> <span class="o">=</span> <span class="n">Dual</span><span class="o">.</span><span class="n">_lift</span><span class="p">(</span><span class="n">o</span><span class="p">);</span> <span class="k">return</span> <span class="n">Dual</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">val</span> <span class="o">+</span> <span class="n">o</span><span class="o">.</span><span class="n">val</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dot</span> <span class="o">+</span> <span class="n">o</span><span class="o">.</span><span class="n">dot</span><span class="p">)</span>
+    <span class="fm">__radd__</span> <span class="o">=</span> <span class="fm">__add__</span>
+    <span class="k">def</span> <span class="fm">__sub__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">o</span><span class="p">):</span>
+        <span class="n">o</span> <span class="o">=</span> <span class="n">Dual</span><span class="o">.</span><span class="n">_lift</span><span class="p">(</span><span class="n">o</span><span class="p">);</span> <span class="k">return</span> <span class="n">Dual</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">val</span> <span class="o">-</span> <span class="n">o</span><span class="o">.</span><span class="n">val</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dot</span> <span class="o">-</span> <span class="n">o</span><span class="o">.</span><span class="n">dot</span><span class="p">)</span>
+    <span class="k">def</span> <span class="fm">__mul__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">o</span><span class="p">):</span>               <span class="c1"># the product rule, Eq. (4.dualmult)</span>
+        <span class="n">o</span> <span class="o">=</span> <span class="n">Dual</span><span class="o">.</span><span class="n">_lift</span><span class="p">(</span><span class="n">o</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">Dual</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">val</span> <span class="o">*</span> <span class="n">o</span><span class="o">.</span><span class="n">val</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">val</span> <span class="o">*</span> <span class="n">o</span><span class="o">.</span><span class="n">dot</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">dot</span> <span class="o">*</span> <span class="n">o</span><span class="o">.</span><span class="n">val</span><span class="p">)</span>
+    <span class="fm">__rmul__</span> <span class="o">=</span> <span class="fm">__mul__</span>
+    <span class="k">def</span> <span class="fm">__truediv__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">o</span><span class="p">):</span>           <span class="c1"># the quotient rule</span>
+        <span class="n">o</span> <span class="o">=</span> <span class="n">Dual</span><span class="o">.</span><span class="n">_lift</span><span class="p">(</span><span class="n">o</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">Dual</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">val</span> <span class="o">/</span> <span class="n">o</span><span class="o">.</span><span class="n">val</span><span class="p">,</span>
+                    <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dot</span> <span class="o">*</span> <span class="n">o</span><span class="o">.</span><span class="n">val</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">val</span> <span class="o">*</span> <span class="n">o</span><span class="o">.</span><span class="n">dot</span><span class="p">)</span> <span class="o">/</span> <span class="n">o</span><span class="o">.</span><span class="n">val</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+    <span class="k">def</span> <span class="fm">__pow__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">Dual</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">val</span><span class="o">**</span><span class="n">k</span><span class="p">,</span> <span class="n">k</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">val</span><span class="o">**</span><span class="p">(</span><span class="n">k</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">dot</span><span class="p">)</span>
+
+<span class="c1"># elementary functions: value and local derivative, Eq. (4.dualtaylor)</span>
+<span class="k">def</span> <span class="nf">sin</span><span class="p">(</span><span class="n">d</span><span class="p">):</span> <span class="k">return</span> <span class="n">Dual</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">val</span><span class="p">),</span> <span class="n">math</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">val</span><span class="p">)</span> <span class="o">*</span> <span class="n">d</span><span class="o">.</span><span class="n">dot</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">exp</span><span class="p">(</span><span class="n">d</span><span class="p">):</span> <span class="k">return</span> <span class="n">Dual</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">val</span><span class="p">),</span> <span class="n">math</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">val</span><span class="p">)</span> <span class="o">*</span> <span class="n">d</span><span class="o">.</span><span class="n">dot</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">log</span><span class="p">(</span><span class="n">d</span><span class="p">):</span> <span class="k">return</span> <span class="n">Dual</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">val</span><span class="p">),</span> <span class="n">d</span><span class="o">.</span><span class="n">dot</span> <span class="o">/</span> <span class="n">d</span><span class="o">.</span><span class="n">val</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">f</span><span class="p">(</span><span class="n">x1</span><span class="p">,</span> <span class="n">x2</span><span class="p">):</span>                          <span class="c1"># Eq. (4.adexample), ordinary code</span>
+    <span class="k">return</span> <span class="n">log</span><span class="p">(</span><span class="n">x1</span><span class="p">)</span> <span class="o">+</span> <span class="n">x1</span> <span class="o">*</span> <span class="n">x2</span> <span class="o">-</span> <span class="n">sin</span><span class="p">(</span><span class="n">x2</span><span class="p">)</span>
+
+<span class="c1"># seed the tangent of the variable we differentiate with respect to</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;df/dx1 =&quot;</span><span class="p">,</span> <span class="n">f</span><span class="p">(</span><span class="n">Dual</span><span class="p">(</span><span class="mf">2.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">),</span> <span class="n">Dual</span><span class="p">(</span><span class="mf">5.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">))</span><span class="o">.</span><span class="n">dot</span><span class="p">)</span>   <span class="c1"># 1/x1 + x2 = 5.5</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;df/dx2 =&quot;</span><span class="p">,</span> <span class="n">f</span><span class="p">(</span><span class="n">Dual</span><span class="p">(</span><span class="mf">2.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">),</span> <span class="n">Dual</span><span class="p">(</span><span class="mf">5.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">))</span><span class="o">.</span><span class="n">dot</span><span class="p">)</span>   <span class="c1"># x1 - cos(x2)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;exact  =&quot;</span><span class="p">,</span> <span class="mf">0.5</span> <span class="o">+</span> <span class="mf">5.0</span><span class="p">,</span> <span class="mf">2.0</span> <span class="o">-</span> <span class="n">math</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="mf">5.0</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p><strong>Jacobian–vector products and the cost of forward mode.</strong>
+For a vector-valued <span class="math notranslate nohighlight">\(\bm{f}:\mathbb{R}^{n}\to\mathbb{R}^{m}\)</span> with Jacobian
+<span class="math notranslate nohighlight">\(\bm{J}\in\mathbb{R}^{m\times n}\)</span> as in Eq. (1.16), one forward
+sweep with seed <span class="math notranslate nohighlight">\(\dot{\bm{x}}\)</span> returns</p>
+<div class="math notranslate nohighlight">
+\[
+\dot{\bm{y}} = \bm{J}\,\dot{\bm{x}} ,\tag{4.55}
+\]</div>
+<p>a <em>Jacobian–vector product</em> (JVP), without ever forming <span class="math notranslate nohighlight">\(\bm{J}\)</span>.
+Seeding with the unit vector <span class="math notranslate nohighlight">\(\bm{e}_k\)</span> returns the <span class="math notranslate nohighlight">\(k\)</span>-th column of the
+Jacobian, so the full Jacobian costs <span class="math notranslate nohighlight">\(n\)</span> sweeps and the gradient of a scalar
+function of <span class="math notranslate nohighlight">\(p\)</span> parameters costs <span class="math notranslate nohighlight">\(p\)</span> sweeps – the same count as finite
+differences, only exact.  Each sweep costs a small multiple of one function
+evaluation, since Eq. (4.51) adds to each elementary
+operation a bounded number of further ones.  Forward mode is therefore the
+right tool when the number of <em>inputs</em> is small: the sensitivity of a
+whole network output to one physical parameter, or the derivatives with
+respect to one or two spatial coordinates that Chapter 9 needs
+when a network is made to satisfy a differential equation.  It is the wrong
+tool for training, where <span class="math notranslate nohighlight">\(p\)</span> is enormous and the output is a single scalar.</p>
+</section>
+<section id="reverse-mode-adjoints">
+<h3><span class="section-number">4.14.4. </span>Reverse mode: adjoints<a class="headerlink" href="#reverse-mode-adjoints" title="Link to this heading">#</a></h3>
+<p>Reverse mode fixes the <em>output</em> instead of the input.  For a scalar
+output <span class="math notranslate nohighlight">\(y\)</span> define the <em>adjoint</em> of every node,</p>
+<div class="math notranslate nohighlight">
+\[
+\bar v_i = \frac{\partial y}{\partial v_i},\tag{4.56}
+\]</div>
+<p>the sensitivity of the final result to that intermediate value.  Since <span class="math notranslate nohighlight">\(y\)</span>
+depends on <span class="math notranslate nohighlight">\(v_j\)</span> only through the nodes <span class="math notranslate nohighlight">\(v_i\)</span> that consume it, the chain rule
+gives the <em>reverse recursion</em></p>
+<div class="math notranslate nohighlight">
+\[
+\bar v_j = \sum_{i\succ j}\bar v_i\,\frac{\partial\varphi_i}{\partial v_j},
+  \qquad j=\ell-1,\dots,1-n,\tag{4.57}
+\]</div>
+<p>started from <span class="math notranslate nohighlight">\(\bar v_\ell=\partial y/\partial y=1\)</span>.  Compare this with the
+forward recursion (4.51): the same local derivatives appear,
+but the sum now runs over the <em>successors</em> of a node and the recursion
+runs <em>backwards</em> through the trace, from output to inputs.  When it
+reaches the inputs it holds <span class="math notranslate nohighlight">\(\bar v_{1-n},\dots,\bar v_0\)</span>, which is the whole
+gradient <span class="math notranslate nohighlight">\(\nabla f(\bm{x})\)</span> – all <span class="math notranslate nohighlight">\(n\)</span> components from a single sweep.  For
+our example, with the values from the forward evaluation at <span class="math notranslate nohighlight">\((2,5)\)</span>,</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{aligned}
+    \bar v_5 &amp;= 1,\\
+    \bar v_4 &amp;= \bar v_5\cdot1 = 1, &amp;
+    \bar v_3 &amp;= \bar v_5\cdot(-1) = -1,\\
+    \bar v_1 &amp;= \bar v_4\cdot1 = 1, &amp;
+    \bar v_2 &amp;= \bar v_4\cdot1 = 1,\\
+    \bar v_0 &amp;= \bar v_3\cos v_0 + \bar v_2 v_{-1} = 2-\cos5 = 1.716, &amp;
+    \bar v_{-1} &amp;= \bar v_2 v_0 + \bar v_1/v_{-1} = 5 + 0.5 = 5.5 ,
+  \end{aligned}\tag{4.58}
+\end{split}\]</div>
+<p>which are <span class="math notranslate nohighlight">\(\partial f/\partial x_2\)</span> and <span class="math notranslate nohighlight">\(\partial f/\partial x_1\)</span>, both
+obtained at once.  The two contributions to <span class="math notranslate nohighlight">\(\bar v_0\)</span> are the two paths
+from <span class="math notranslate nohighlight">\(v_0\)</span> to <span class="math notranslate nohighlight">\(y\)</span> in Fig. 4.5: the chain rule sums over
+paths, and the reverse sweep organises that sum so that each edge is visited
+once.</p>
+<p>Reverse mode has a price that forward mode does not: the local derivatives
+in Eq. (4.57) depend on the values <span class="math notranslate nohighlight">\(v_j\)</span> – <span class="math notranslate nohighlight">\(\cos v_0\)</span>,
+<span class="math notranslate nohighlight">\(v_{-1}\)</span>, <span class="math notranslate nohighlight">\(1/v_{-1}\)</span> above – and those must be available when the backward
+sweep needs them, in the reverse of the order in which they were produced.
+The forward evaluation must therefore be recorded, on what is called the
+<em>tape</em>, and the memory cost of reverse mode is proportional to the length
+of the trace rather than to the number of variables.  This is why training a
+deep network is memory-bound: every activation of every layer is stored until
+the backward pass has consumed it.</p>
+<p><strong>Vector–Jacobian products.</strong>
+For a vector-valued function seeded with a covector <span class="math notranslate nohighlight">\(\bar{\bm{y}}\in\mathbb{R}^{m}\)</span>
+the reverse sweep returns</p>
+<div class="math notranslate nohighlight">
+\[
+\bar{\bm{x}}^{T} = \bar{\bm{y}}^{T}\bm{J},
+  \qquad\text{equivalently}\qquad
+  \bar{\bm{x}} = \bm{J}^{T}\bar{\bm{y}} ,\tag{4.59}
+\]</div>
+<p>a <em>vector–Jacobian product</em> (VJP): one row of <span class="math notranslate nohighlight">\(\bm{J}\)</span> per sweep, and
+the full Jacobian in <span class="math notranslate nohighlight">\(m\)</span> sweeps.  Equation (4.59) is precisely
+Eq. (1.51), a gradient propagated backwards by multiplication
+with a transposed Jacobian, and it is why backpropagation was described in
+Section <em>The chain rule</em> as the chain rule with the products taken in the
+cheapest order.</p>
+<p><strong>The cheap gradient principle.</strong>
+The result that makes all of deep learning possible is the following.</p>
+<div class="important admonition">
+<p class="admonition-title">Proposition 4.1 (Cheap gradient principle)</p>
+<p>Let <span class="math notranslate nohighlight">\(f:\mathbb{R}^{p}\to\mathbb{R}\)</span> be evaluated by a trace of <span class="math notranslate nohighlight">\(\ell\)</span>
+elementary operations, each of which has at most two arguments and whose
+local derivatives cost at most a fixed multiple of the operation itself.
+Then reverse-mode AD computes <span class="math notranslate nohighlight">\(f(\bm{x})\)</span> and the complete gradient
+<span class="math notranslate nohighlight">\(\nabla f(\bm{x})\)</span> with at most <span class="math notranslate nohighlight">\(c\,\ell\)</span> operations, where <span class="math notranslate nohighlight">\(c\le4\)</span> is a
+constant <em>independent of <span class="math notranslate nohighlight">\(p\)</span></em>.</p>
+</div>
+<div class="note admonition">
+<p class="admonition-title">Proof</p>
+<p>The forward evaluation costs <span class="math notranslate nohighlight">\(\ell\)</span> operations and records the trace.  In the
+reverse recursion (4.57) each edge <span class="math notranslate nohighlight">\(j\to i\)</span> of the graph
+contributes exactly one term <span class="math notranslate nohighlight">\(\bar v_i\,\partial\varphi_i/\partial v_j\)</span>: one
+multiplication, one addition into <span class="math notranslate nohighlight">\(\bar v_j\)</span>, and the evaluation of the local
+derivative, which by hypothesis costs a bounded amount and often nothing at
+all (for <span class="math notranslate nohighlight">\(+\)</span> it is <span class="math notranslate nohighlight">\(1\)</span>, for <span class="math notranslate nohighlight">\(\times\)</span> it is the other argument, already on the
+tape).  Since each node has at most two incoming edges, the number of edges is
+at most <span class="math notranslate nohighlight">\(2\ell\)</span> and the reverse sweep costs at most a fixed multiple of <span class="math notranslate nohighlight">\(2\ell\)</span>
+operations.  Adding the forward evaluation gives the bound, and nowhere did
+<span class="math notranslate nohighlight">\(p\)</span> enter: it determines how many adjoints are <em>read off</em> at the end,
+not how many operations are performed.</p>
+</div>
+<p>The result is due to Baur and Strassen [baur1983] in the setting of
+arithmetic circuits and to Linnainmaa [linnainmaa1976] and, independently,
+the backpropagation literature in the setting of programs; the survey by
+Baydin et al. [baydin2018] traces the history.  In practice the constant
+is nearer <span class="math notranslate nohighlight">\(2\)</span>–<span class="math notranslate nohighlight">\(3\)</span> than <span class="math notranslate nohighlight">\(4\)</span>: a gradient costs about as much as two or three
+function evaluations.  Set against the <span class="math notranslate nohighlight">\(p+1\)</span> evaluations of finite
+differences or the <span class="math notranslate nohighlight">\(p\)</span> sweeps of forward mode, this is the entire difference
+between what can and cannot be trained.</p>
+<div class="tip admonition">
+<p class="admonition-title">Machine learning connection</p>
+<p>Backpropagation, the algorithm of Chapter 8 that trains every
+neural network, is Eq. (4.57) specialised to the layered
+trace of a network.  The forward pass computes and stores the activations;
+the backward pass propagates the adjoint of the cost – the “error” of the
+older literature – from the output layer to the input, one transposed
+weight matrix at a time, exactly as in Eq. (4.59).  Nothing in
+backpropagation is specific to networks: it is reverse-mode AD, and modern
+frameworks make no distinction.</p>
+</div>
+</section>
+<section id="forward-or-reverse-the-chain-rule-as-a-matrix-product">
+<h3><span class="section-number">4.14.5. </span>Forward or reverse: the chain rule as a matrix product<a class="headerlink" href="#forward-or-reverse-the-chain-rule-as-a-matrix-product" title="Link to this heading">#</a></h3>
+<p>The cleanest way to see why the two modes differ in cost is to write a program
+as a composition of <span class="math notranslate nohighlight">\(L\)</span> stages,
+<span class="math notranslate nohighlight">\(\bm{f}=\bm{f}_L\circ\bm{f}_{L-1}\circ\cdots\circ\bm{f}_1\)</span>, with
+<span class="math notranslate nohighlight">\(\bm{f}_k:\mathbb{R}^{n_{k-1}}\to\mathbb{R}^{n_k}\)</span>, <span class="math notranslate nohighlight">\(n_0=n\)</span> and <span class="math notranslate nohighlight">\(n_L=m\)</span>.  The
+chain rule of Eq. (1.50) says that the Jacobian is a
+product of the stage Jacobians,</p>
+<div class="math notranslate nohighlight">
+\[
+\bm{J} = \bm{J}_L\,\bm{J}_{L-1}\cdots\bm{J}_1 ,
+  \qquad
+  \bm{J}_k = \frac{\partial\bm{f}_k}{\partial\bm{x}_{k-1}}\in\mathbb{R}^{n_k\times n_{k-1}} .\tag{4.60}
+\]</div>
+<p>Matrix multiplication is associative, so this product may be evaluated in any
+order, and the orders differ enormously in cost.  Forward mode multiplies from
+the right, <span class="math notranslate nohighlight">\(\bm{J}\dot{\bm{x}}=\bm{J}_L(\cdots(\bm{J}_2(\bm{J}_1\dot{\bm{x}})))\)</span>,
+so every intermediate is a vector of length <span class="math notranslate nohighlight">\(n_k\)</span> and never a matrix.  Reverse
+mode multiplies from the left, <span class="math notranslate nohighlight">\(\bar{\bm{y}}^{T}\bm{J}
+=(((\bar{\bm{y}}^{T}\bm{J}_L)\bm{J}_{L-1})\cdots)\bm{J}_1\)</span>, and again every
+intermediate is a vector.  If the stage Jacobians are dense the cost of the
+right-to-left product is <span class="math notranslate nohighlight">\(\sum_k n_kn_{k-1}\)</span> per column, hence
+<span class="math notranslate nohighlight">\(n\sum_kn_kn_{k-1}\)</span> for the whole Jacobian, while the left-to-right product
+costs <span class="math notranslate nohighlight">\(m\sum_kn_kn_{k-1}\)</span>.  The rule is therefore simple: use forward mode
+when <span class="math notranslate nohighlight">\(n\ll m\)</span> and reverse mode when <span class="math notranslate nohighlight">\(m\ll n\)</span>.  Training a model is the
+extreme case <span class="math notranslate nohighlight">\(m=1\)</span>, <span class="math notranslate nohighlight">\(n=p\)</span>, and reverse mode wins by a factor <span class="math notranslate nohighlight">\(p\)</span>.  When <span class="math notranslate nohighlight">\(n\)</span>
+and <span class="math notranslate nohighlight">\(m\)</span> are comparable, neither mode is optimal and finding the cheapest
+bracketing of Eq. (4.60) – the optimal Jacobian
+accumulation problem – is NP-hard, though good heuristics exist
+[griewank2008].</p>
+<p><strong>Second derivatives.</strong>
+The two modes compose, and their composition gives cheap access to curvature.
+The Hessian of a scalar <span class="math notranslate nohighlight">\(f\)</span> is the Jacobian of its gradient, and the
+Hessian–vector product is a directional derivative of the gradient,</p>
+<div class="math notranslate nohighlight">
+\[
+\bm{H}\bm{v}
+   = \frac{d}{d\epsilon}\nabla f(\bm{x}+\epsilon\bm{v})\Big|_{\epsilon=0} .\tag{4.61}
+\]</div>
+<p>The right-hand side is a forward-mode derivative, in the direction <span class="math notranslate nohighlight">\(\bm{v}\)</span>,
+of a function – the gradient – that is itself computed by reverse mode.
+This <em>forward-over-reverse</em> construction costs a small constant times
+one gradient, hence a small constant times one function evaluation, and it
+never forms the <span class="math notranslate nohighlight">\(p\times p\)</span> Hessian.  That is exactly the price at which
+Section <em>None of these can compete with Newton’s method</em> said curvature information could <em>not</em>
+be had; the truncated-Newton and conjugate-gradient methods of the
+optimisation literature [nocedal2006] use Eq. (4.61) to run
+Newton’s method (4.8) with only Hessian–vector products,
+and the natural-gradient methods of Chapter 8 rely on the same
+device.  The full Hessian, when it is wanted, is <span class="math notranslate nohighlight">\(p\)</span> such products,
+<span class="math notranslate nohighlight">\(\bm{H}=\bm{H}[\bm{e}_1,\dots,\bm{e}_p]\)</span>, and this is how
+<code class="docutils literal notranslate"><span class="pre">jax.hessian</span></code> computes it.</p>
+</section>
+<section id="accuracy-and-points-where-the-derivative-does-not-exist">
+<h3><span class="section-number">4.14.6. </span>Accuracy, and points where the derivative does not exist<a class="headerlink" href="#accuracy-and-points-where-the-derivative-does-not-exist" title="Link to this heading">#</a></h3>
+<p>We claimed that AD is accurate to working precision, and the claim can now be
+made precise.  The recursions (4.51) and
+(4.57) are exact identities; the only errors are the rounding
+errors of the floating-point operations that implement them.  Each tangent or
+adjoint is obtained from its predecessors by a short chain of multiplications
+and additions of quantities that were themselves computed to relative accuracy
+<span class="math notranslate nohighlight">\(\bigO(\epsilon_M)\)</span>, so the derivative inherits the numerical stability of the
+function evaluation itself: if the program computes <span class="math notranslate nohighlight">\(f\)</span> to <span class="math notranslate nohighlight">\(d\)</span> correct digits
+it computes <span class="math notranslate nohighlight">\(\nabla f\)</span> to about <span class="math notranslate nohighlight">\(d\)</span> correct digits as well.  There is no
+step <span class="math notranslate nohighlight">\(h\)</span>, no cancellation of nearly equal numbers, and no term of the form
+<span class="math notranslate nohighlight">\(\epsilon_M/h\)</span>.  In Fig. 4.6 the AD derivative sits at the
+floor of the plot, at <span class="math notranslate nohighlight">\(10^{-16}\)</span>, for the same reason that the function value
+does.</p>
+<p>The one genuine limitation is that AD differentiates the program actually
+executed.  At a point where the function is not differentiable – <span class="math notranslate nohighlight">\(|x|\)</span> at
+zero, or the ReLU activation <span class="math notranslate nohighlight">\(\max(0,x)\)</span> of Chapter 8 at <span class="math notranslate nohighlight">\(x=0\)</span> –
+the program takes one of the two branches and AD returns the derivative of
+that branch, typically <span class="math notranslate nohighlight">\(0\)</span> or <span class="math notranslate nohighlight">\(1\)</span> by convention.  This is a valid
+<em>subgradient</em> and is harmless in practice, since the set of such points
+has measure zero and an iterate never lands on it exactly.  More insidious is
+a program that computes a smooth function by a non-smooth route, for instance
+<span class="math notranslate nohighlight">\(\sqrt{x^{2}}\)</span> for <span class="math notranslate nohighlight">\(|x|\)</span> or a table lookup with interpolation, whose AD
+derivative is that of the route rather than of the function.  Writing
+functions with AD in mind – using the library’s own <span class="math notranslate nohighlight">\(\log(1+e^{x})\)</span>,
+<span class="math notranslate nohighlight">\(\log\sum\exp\)</span> and similar numerically careful primitives, whose derivative
+rules are hand-written – avoids both this and overflow in intermediate
+values.</p>
+</section>
+<section id="automatic-differentiation-in-python-autograd-and-jax">
+<h3><span class="section-number">4.14.7. </span>Automatic differentiation in Python: autograd and JAX<a class="headerlink" href="#automatic-differentiation-in-python-autograd-and-jax" title="Link to this heading">#</a></h3>
+<p>Two libraries deliver the machinery above to ordinary numpy code.  The older
+<code class="docutils literal notranslate"><span class="pre">autograd</span></code> package overloads the numpy functions with dual-number-like
+objects that record a tape, exactly as the <code class="docutils literal notranslate"><span class="pre">Dual</span></code> class above did for
+the standard library, and it remains a good way to see the mechanism at work:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">autograd.numpy</span> <span class="k">as</span> <span class="nn">np</span>
@@ -1695,7 +2131,7 @@ The <code class="docutils literal notranslate"><span class="pre">autograd</span>
     <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">x</span> <span class="o">+</span> <span class="n">x</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
 
 <span class="n">df</span> <span class="o">=</span> <span class="n">grad</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>                 <span class="c1"># df is a Python function, the derivative of f</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">df</span><span class="p">(</span><span class="mf">1.0</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">df</span><span class="p">(</span><span class="mf">1.0</span><span class="p">))</span>               <span class="c1"># (2 pi + 2) cos(2 pi + 1) = 4.475424121402227</span>
 
 <span class="c1"># It composes: the second derivative is just grad applied twice</span>
 <span class="n">d2f</span> <span class="o">=</span> <span class="n">grad</span><span class="p">(</span><span class="n">grad</span><span class="p">(</span><span class="n">f</span><span class="p">))</span>
@@ -1704,54 +2140,343 @@ The <code class="docutils literal notranslate"><span class="pre">autograd</span>
 </div>
 </div>
 </div>
-<p>Applied to our least-squares problem, the gradient we derived by hand in
-Eq. (4.13) need never be written down:</p>
+<p>For current work we recommend <em>JAX</em> [jax2018].  JAX combines the
+same differentiation machinery with a compiler, XLA, so that the resulting
+code can additionally be just-in-time compiled, vectorised over a batch and
+run on GPUs and TPUs, and it exposes forward mode, reverse mode and their
+compositions explicitly.  Its four fundamental transformations are
+<code class="docutils literal notranslate"><span class="pre">grad</span></code>, <code class="docutils literal notranslate"><span class="pre">jit</span></code>, <code class="docutils literal notranslate"><span class="pre">vmap</span></code> and the pair <code class="docutils literal notranslate"><span class="pre">jvp</span></code> and
+<code class="docutils literal notranslate"><span class="pre">vjp</span></code>, and they compose freely.</p>
+<div class="tip admonition">
+<p class="admonition-title">Precision</p>
+<p>JAX uses single precision by default.  Every numerical
+comparison in this book is made in double precision, and the first line of
+every JAX program should therefore be
+<code class="docutils literal notranslate"><span class="pre">jax.config.update(&quot;jax_enable_x64&quot;,</span> <span class="pre">True)</span></code>.  Without it the
+gradient checks below would agree only to about seven digits and one would
+wrongly conclude that AD is inexact.</p>
+</div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">autograd.numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">autograd</span> <span class="kn">import</span> <span class="n">grad</span>
-
-<span class="k">def</span> <span class="nf">cost</span><span class="p">(</span><span class="n">theta</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
-    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">((</span><span class="n">X</span> <span class="o">@</span> <span class="n">theta</span> <span class="o">-</span> <span class="n">y</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
-
-<span class="n">training_gradient</span> <span class="o">=</span> <span class="n">grad</span><span class="p">(</span><span class="n">cost</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>      <span class="c1"># differentiate w.r.t. argument 0</span>
-
-<span class="n">theta</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
-<span class="n">eta</span> <span class="o">=</span> <span class="mf">0.1</span>
-<span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1000</span><span class="p">):</span>
-    <span class="n">theta</span> <span class="o">-=</span> <span class="n">eta</span> <span class="o">*</span> <span class="n">training_gradient</span><span class="p">(</span><span class="n">theta</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-</div>
-<p>The result agrees with the hand-coded version to machine precision, which is
-worth checking once as a matter of habit: comparing an analytical gradient
-against an automatically differentiated one, or against a finite difference,
-is the standard way of catching an error in a derivation.</p>
-<p><strong>JAX.</strong>
-For current work we recommend <em>JAX</em> rather than <code class="docutils literal notranslate"><span class="pre">autograd</span></code>.  JAX
-combines the same differentiation machinery with XLA, so that the resulting
-code can additionally be just-in-time compiled, vectorised and run on GPUs.</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">jax.numpy</span> <span class="k">as</span> <span class="nn">jnp</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">jax</span>
+<span class="n">jax</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="s2">&quot;jax_enable_x64&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>   <span class="c1"># double precision throughout</span>
+<span class="kn">import</span> <span class="nn">jax.numpy</span> <span class="k">as</span> <span class="nn">jnp</span>
 <span class="kn">from</span> <span class="nn">jax</span> <span class="kn">import</span> <span class="n">grad</span><span class="p">,</span> <span class="n">jit</span><span class="p">,</span> <span class="n">vmap</span>
 
-<span class="k">def</span> <span class="nf">sum_logistic</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
-    <span class="k">return</span> <span class="n">jnp</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="mf">1.0</span> <span class="o">/</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">+</span> <span class="n">jnp</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">x</span><span class="p">)))</span>
+<span class="k">def</span> <span class="nf">f</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">jnp</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">jnp</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">x</span> <span class="o">+</span> <span class="n">x</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
 
-<span class="n">x_small</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mf">3.0</span><span class="p">)</span>
-<span class="n">derivative_fn</span> <span class="o">=</span> <span class="n">grad</span><span class="p">(</span><span class="n">sum_logistic</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">derivative_fn</span><span class="p">(</span><span class="n">x_small</span><span class="p">))</span>
+<span class="n">df</span> <span class="o">=</span> <span class="n">grad</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>                       <span class="c1"># reverse-mode gradient of a scalar function</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">df</span><span class="p">(</span><span class="mf">1.0</span><span class="p">))</span>                     <span class="c1"># 4.475424121402227, exact to all digits</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">grad</span><span class="p">(</span><span class="n">grad</span><span class="p">(</span><span class="n">f</span><span class="p">))(</span><span class="mf">1.0</span><span class="p">))</span>          <span class="c1"># second derivative, by composing grad</span>
 
-<span class="n">fast_derivative</span> <span class="o">=</span> <span class="n">jit</span><span class="p">(</span><span class="n">derivative_fn</span><span class="p">)</span>      <span class="c1"># compiled on first call</span>
+<span class="n">xs</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">vmap</span><span class="p">(</span><span class="n">df</span><span class="p">)(</span><span class="n">xs</span><span class="p">))</span>                <span class="c1"># the derivative at five points at once</span>
+<span class="n">fast_df</span> <span class="o">=</span> <span class="n">jit</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>                  <span class="c1"># compiled on first call, then very fast</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">fast_df</span><span class="p">(</span><span class="mf">1.0</span><span class="p">))</span>
 </pre></div>
 </div>
 </div>
 </div>
-<p>The transformations compose: <code class="docutils literal notranslate"><span class="pre">jit(grad(f))</span></code> compiles the gradient,
-<code class="docutils literal notranslate"><span class="pre">vmap(grad(f))</span></code> vectorises it over a batch, and <code class="docutils literal notranslate"><span class="pre">grad(grad(f))</span></code>
-differentiates it again.  We shall use this machinery freely from Chapter 5 onwards.</p>
+<p><strong>Forward and reverse mode explicitly.</strong>
+The two modes of Sections <em>Forward mode: tangents and dual numbers</em> and <em>Reverse mode: adjoints</em> are
+available directly.  <code class="docutils literal notranslate"><span class="pre">jvp</span></code> takes a function, a point and a tangent
+direction and returns the value and the Jacobian–vector product of
+Eq. (4.55); <code class="docutils literal notranslate"><span class="pre">vjp</span></code> takes a function and a point and returns
+the value and a function that maps a covector to the vector–Jacobian product
+of Eq. (4.59).  <code class="docutils literal notranslate"><span class="pre">jacfwd</span></code> and <code class="docutils literal notranslate"><span class="pre">jacrev</span></code> assemble the
+full Jacobian by the two routes of Section <em>Forward or reverse: the chain rule as a matrix product</em>, one column or
+one row per sweep, and agree to rounding.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">jax</span> <span class="kn">import</span> <span class="n">jvp</span><span class="p">,</span> <span class="n">vjp</span><span class="p">,</span> <span class="n">jacfwd</span><span class="p">,</span> <span class="n">jacrev</span>
+
+<span class="k">def</span> <span class="nf">F</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>                          <span class="c1"># a map from R^2 to R^3</span>
+    <span class="k">return</span> <span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">jnp</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">jnp</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">])])</span>
+
+<span class="n">x0</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">])</span>
+<span class="n">J</span> <span class="o">=</span> <span class="n">jacfwd</span><span class="p">(</span><span class="n">F</span><span class="p">)(</span><span class="n">x0</span><span class="p">)</span>                  <span class="c1"># 3 x 2 Jacobian, built from two forward sweeps</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">J</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">jnp</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">J</span><span class="p">,</span> <span class="n">jacrev</span><span class="p">(</span><span class="n">F</span><span class="p">)(</span><span class="n">x0</span><span class="p">)))</span>       <span class="c1"># ...and from three reverse sweeps</span>
+
+<span class="n">v</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">])</span>          <span class="c1"># a direction in the input space</span>
+<span class="n">_</span><span class="p">,</span> <span class="n">Jv</span> <span class="o">=</span> <span class="n">jvp</span><span class="p">(</span><span class="n">F</span><span class="p">,</span> <span class="p">(</span><span class="n">x0</span><span class="p">,),</span> <span class="p">(</span><span class="n">v</span><span class="p">,))</span>        <span class="c1"># forward mode: J v, first column of J</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">Jv</span><span class="p">)</span>
+
+<span class="n">u</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">])</span>     <span class="c1"># a covector in the output space</span>
+<span class="n">_</span><span class="p">,</span> <span class="n">vjp_fn</span> <span class="o">=</span> <span class="n">vjp</span><span class="p">(</span><span class="n">F</span><span class="p">,</span> <span class="n">x0</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">vjp_fn</span><span class="p">(</span><span class="n">u</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>                <span class="c1"># reverse mode: u^T J, the column sums of J</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p><strong>The least-squares gradient without deriving it.</strong>
+Applied to our least-squares problem, the gradient we derived by hand in
+Eq. (4.13) need never be written down.  We write the
+cost (4.12) as a function of <span class="math notranslate nohighlight">\(\bm{\theta}\)</span> and the data,
+differentiate with respect to its first argument, compile the result, and
+run the gradient descent iteration (4.15) with it.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">jax</span>
+<span class="n">jax</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="s2">&quot;jax_enable_x64&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+<span class="kn">import</span> <span class="nn">jax.numpy</span> <span class="k">as</span> <span class="nn">jnp</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">jax</span> <span class="kn">import</span> <span class="n">grad</span><span class="p">,</span> <span class="n">jit</span>
+
+<span class="c1"># The data of Section 4.gdlinreg</span>
+<span class="n">n</span> <span class="o">=</span> <span class="mi">100</span>
+<span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="mi">2024</span><span class="p">)</span>
+<span class="n">x</span> <span class="o">=</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">rng</span><span class="o">.</span><span class="n">random</span><span class="p">((</span><span class="n">n</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+<span class="n">y</span> <span class="o">=</span> <span class="mf">4.0</span> <span class="o">+</span> <span class="mf">3.0</span> <span class="o">*</span> <span class="n">x</span> <span class="o">+</span> <span class="n">rng</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+<span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">c_</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="n">n</span><span class="p">,</span> <span class="mi">1</span><span class="p">)),</span> <span class="n">x</span><span class="p">]</span>
+<span class="n">Xj</span><span class="p">,</span> <span class="n">yj</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">X</span><span class="p">),</span> <span class="n">jnp</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">cost</span><span class="p">(</span><span class="n">theta</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>                     <span class="c1"># Eq. (4.gdcost)</span>
+    <span class="k">return</span> <span class="n">jnp</span><span class="o">.</span><span class="n">sum</span><span class="p">((</span><span class="n">X</span> <span class="o">@</span> <span class="n">theta</span> <span class="o">-</span> <span class="n">y</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+
+<span class="n">cost_grad</span> <span class="o">=</span> <span class="n">jit</span><span class="p">(</span><span class="n">grad</span><span class="p">(</span><span class="n">cost</span><span class="p">,</span> <span class="n">argnums</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span>     <span class="c1"># d cost / d theta, compiled</span>
+
+<span class="c1"># Check against the hand-derived gradient, Eq. (4.gdgradient)</span>
+<span class="n">theta</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">rng</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">)))</span>
+<span class="n">g_ad</span> <span class="o">=</span> <span class="n">cost_grad</span><span class="p">(</span><span class="n">theta</span><span class="p">,</span> <span class="n">Xj</span><span class="p">,</span> <span class="n">yj</span><span class="p">)</span>
+<span class="n">g_hand</span> <span class="o">=</span> <span class="p">(</span><span class="mf">2.0</span> <span class="o">/</span> <span class="n">n</span><span class="p">)</span> <span class="o">*</span> <span class="n">X</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="p">(</span><span class="n">X</span> <span class="o">@</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">theta</span><span class="p">)</span> <span class="o">-</span> <span class="n">y</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;max |AD - hand| =&quot;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">g_ad</span><span class="p">)</span> <span class="o">-</span> <span class="n">g_hand</span><span class="p">)))</span>
+
+<span class="c1"># Gradient descent, Eq. (4.gditeration), with the automatic gradient</span>
+<span class="n">eta</span> <span class="o">=</span> <span class="mf">0.1</span>
+<span class="nd">@jit</span>
+<span class="k">def</span> <span class="nf">gd_step</span><span class="p">(</span><span class="n">theta</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">theta</span> <span class="o">-</span> <span class="n">eta</span> <span class="o">*</span> <span class="n">grad</span><span class="p">(</span><span class="n">cost</span><span class="p">)(</span><span class="n">theta</span><span class="p">,</span> <span class="n">Xj</span><span class="p">,</span> <span class="n">yj</span><span class="p">)</span>
+
+<span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1000</span><span class="p">):</span>
+    <span class="n">theta</span> <span class="o">=</span> <span class="n">gd_step</span><span class="p">(</span><span class="n">theta</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;gradient descent with AD:&quot;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">theta</span><span class="p">)</span><span class="o">.</span><span class="n">ravel</span><span class="p">())</span>
+<span class="n">theta_exact</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">pinv</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">X</span><span class="p">)</span> <span class="o">@</span> <span class="n">X</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">y</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;analytical:              &quot;</span><span class="p">,</span> <span class="n">theta_exact</span><span class="o">.</span><span class="n">ravel</span><span class="p">())</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>The two gradients agree to <span class="math notranslate nohighlight">\(5\times10^{-15}\)</span>, which is rounding, and the
+iteration returns the analytical solution <span class="math notranslate nohighlight">\(\bm{\theta}=(4.03012,\,2.80580)\)</span>.  Comparing
+an analytical gradient against an automatically differentiated one in this
+way is worth doing once as a matter of habit: it is the standard way of
+catching an error in a derivation.</p>
+<p>The same code differentiates the Ridge cost (4.16) – and,
+because <code class="docutils literal notranslate"><span class="pre">grad</span></code> can differentiate with respect to any argument, it also
+returns the derivative of the cost with respect to the penalty <span class="math notranslate nohighlight">\(\lambda\)</span>,
+which by Eq. (4.16) is <span class="math notranslate nohighlight">\(\bm{\theta}^{T}\bm{\theta}\)</span>, a quantity
+one might want when tuning hyperparameters by gradient methods.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">ridge_cost</span><span class="p">(</span><span class="n">theta</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">lmbda</span><span class="p">):</span>        <span class="c1"># Eq. (4.ridgecost)</span>
+    <span class="k">return</span> <span class="n">jnp</span><span class="o">.</span><span class="n">sum</span><span class="p">((</span><span class="n">X</span> <span class="o">@</span> <span class="n">theta</span> <span class="o">-</span> <span class="n">y</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">y</span><span class="p">)</span> <span class="o">+</span> <span class="n">lmbda</span> <span class="o">*</span> <span class="n">jnp</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">theta</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+
+<span class="n">lmbda</span> <span class="o">=</span> <span class="mf">0.001</span>
+<span class="n">theta</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">rng</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">)))</span>
+<span class="n">step</span> <span class="o">=</span> <span class="n">jit</span><span class="p">(</span><span class="k">lambda</span> <span class="n">th</span><span class="p">:</span> <span class="n">th</span> <span class="o">-</span> <span class="n">eta</span> <span class="o">*</span> <span class="n">grad</span><span class="p">(</span><span class="n">ridge_cost</span><span class="p">)(</span><span class="n">th</span><span class="p">,</span> <span class="n">Xj</span><span class="p">,</span> <span class="n">yj</span><span class="p">,</span> <span class="n">lmbda</span><span class="p">))</span>
+<span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1000</span><span class="p">):</span>
+    <span class="n">theta</span> <span class="o">=</span> <span class="n">step</span><span class="p">(</span><span class="n">theta</span><span class="p">)</span>
+
+<span class="n">I</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">theta_closed</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">inv</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">X</span> <span class="o">+</span> <span class="n">n</span> <span class="o">*</span> <span class="n">lmbda</span> <span class="o">*</span> <span class="n">I</span><span class="p">)</span> <span class="o">@</span> <span class="n">X</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">y</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;gradient descent:&quot;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">theta</span><span class="p">)</span><span class="o">.</span><span class="n">ravel</span><span class="p">())</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;closed form:     &quot;</span><span class="p">,</span> <span class="n">theta_closed</span><span class="o">.</span><span class="n">ravel</span><span class="p">())</span>
+
+<span class="c1"># The derivative with respect to lambda, argument number 3</span>
+<span class="n">dC_dlambda</span> <span class="o">=</span> <span class="n">grad</span><span class="p">(</span><span class="n">ridge_cost</span><span class="p">,</span> <span class="n">argnums</span><span class="o">=</span><span class="mi">3</span><span class="p">)(</span><span class="n">theta</span><span class="p">,</span> <span class="n">Xj</span><span class="p">,</span> <span class="n">yj</span><span class="p">,</span> <span class="n">lmbda</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">dC_dlambda</span><span class="p">,</span> <span class="s2">&quot;=&quot;</span><span class="p">,</span> <span class="n">jnp</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">theta</span><span class="o">**</span><span class="mi">2</span><span class="p">))</span>    <span class="c1"># theta^T theta</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p><strong>Hessians, Newton’s method and Hessian–vector products.</strong>
+<code class="docutils literal notranslate"><span class="pre">jax.hessian</span></code> is <code class="docutils literal notranslate"><span class="pre">jacfwd(jacrev(f))</span></code>, forward-over-reverse
+exactly as in Section <em>Forward or reverse: the chain rule as a matrix product</em>.  For the least-squares cost it
+returns <span class="math notranslate nohighlight">\(\frac{2}{n}\bm{X}^{T}\bm{X}\)</span> of Eq. (4.14) to
+rounding, and one Newton step (4.8) with the automatic
+gradient and Hessian lands on the exact minimum, as
+Section <em>None of these can compete with Newton’s method</em> said it would.  The Hessian–vector product
+of Eq. (4.61) is one line, and it never forms the matrix.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">jax</span> <span class="kn">import</span> <span class="n">hessian</span><span class="p">,</span> <span class="n">jvp</span>
+
+<span class="n">H</span> <span class="o">=</span> <span class="n">hessian</span><span class="p">(</span><span class="n">cost</span><span class="p">)(</span><span class="n">theta</span><span class="p">,</span> <span class="n">Xj</span><span class="p">,</span> <span class="n">yj</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>     <span class="c1"># forward-over-reverse</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">H</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">((</span><span class="mf">2.0</span> <span class="o">/</span> <span class="n">n</span><span class="p">)</span> <span class="o">*</span> <span class="n">X</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">X</span><span class="p">)</span>                         <span class="c1"># Eq. (4.gdhessian)</span>
+
+<span class="c1"># One Newton step from a random start, Eq. (4.newtonopt)</span>
+<span class="n">theta0</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">rng</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">)))</span>
+<span class="n">theta_newton</span> <span class="o">=</span> <span class="n">theta0</span> <span class="o">-</span> <span class="n">jnp</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">grad</span><span class="p">(</span><span class="n">cost</span><span class="p">)(</span><span class="n">theta0</span><span class="p">,</span> <span class="n">Xj</span><span class="p">,</span> <span class="n">yj</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;one Newton step:&quot;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">theta_newton</span><span class="p">)</span><span class="o">.</span><span class="n">ravel</span><span class="p">())</span>
+
+<span class="c1"># Hessian-vector product without the Hessian, Eq. (4.hvp)</span>
+<span class="k">def</span> <span class="nf">hvp</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">theta</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">jvp</span><span class="p">(</span><span class="n">grad</span><span class="p">(</span><span class="n">f</span><span class="p">),</span> <span class="p">(</span><span class="n">theta</span><span class="p">,),</span> <span class="p">(</span><span class="n">v</span><span class="p">,))[</span><span class="mi">1</span><span class="p">]</span>
+
+<span class="n">v</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">1.0</span><span class="p">],</span> <span class="p">[</span><span class="mf">0.0</span><span class="p">]])</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">hvp</span><span class="p">(</span><span class="k">lambda</span> <span class="n">th</span><span class="p">:</span> <span class="n">cost</span><span class="p">(</span><span class="n">th</span><span class="p">,</span> <span class="n">Xj</span><span class="p">,</span> <span class="n">yj</span><span class="p">),</span> <span class="n">theta0</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span><span class="o">.</span><span class="n">ravel</span><span class="p">(),</span> <span class="p">(</span><span class="n">H</span> <span class="o">@</span> <span class="n">v</span><span class="p">)</span><span class="o">.</span><span class="n">ravel</span><span class="p">())</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="the-optimisers-of-this-chapter-on-a-non-convex-function">
+<h3><span class="section-number">4.14.8. </span>The optimisers of this chapter on a non-convex function<a class="headerlink" href="#the-optimisers-of-this-chapter-on-a-non-convex-function" title="Link to this heading">#</a></h3>
+<p>Everything so far has been demonstrated on the least-squares problem, where
+the gradient is known.  The point of AD is to be able to optimise a function
+whose gradient one has <em>not</em> derived, and a classical test case is the
+Rosenbrock function [rosenbrock1960]</p>
+<div class="math notranslate nohighlight">
+\[
+f(x,y) = (1-x)^{2} + 100\,(y-x^{2})^{2},\tag{4.62}
+\]</div>
+<p>which has a unique minimum at <span class="math notranslate nohighlight">\((1,1)\)</span> with <span class="math notranslate nohighlight">\(f=0\)</span> at the bottom of a long,
+curved, parabolic valley.  It is not convex, and its Hessian at the minimum
+has eigenvalues <span class="math notranslate nohighlight">\(0.40\)</span> and <span class="math notranslate nohighlight">\(1001.6\)</span>, hence <span class="math notranslate nohighlight">\(\kappa\approx2500\)</span>: by
+Eq. (4.21) plain gradient descent will be slow, momentum should
+help by about <span class="math notranslate nohighlight">\(\sqrt{\kappa}\approx50\)</span>, and Newton’s method, which is
+invariant to the conditioning, should be fast.  With the gradient and Hessian
+supplied by JAX, all four methods are a few lines each.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">jax</span>
+<span class="n">jax</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="s2">&quot;jax_enable_x64&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+<span class="kn">import</span> <span class="nn">jax.numpy</span> <span class="k">as</span> <span class="nn">jnp</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">jax</span> <span class="kn">import</span> <span class="n">grad</span><span class="p">,</span> <span class="n">jit</span><span class="p">,</span> <span class="n">hessian</span>
+
+<span class="k">def</span> <span class="nf">rosenbrock</span><span class="p">(</span><span class="n">p</span><span class="p">):</span>                                 <span class="c1"># Eq. (4.rosenbrock)</span>
+    <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">p</span>
+    <span class="k">return</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">x</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="mi">100</span> <span class="o">*</span> <span class="p">(</span><span class="n">y</span> <span class="o">-</span> <span class="n">x</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span>
+
+<span class="n">rgrad</span> <span class="o">=</span> <span class="n">jit</span><span class="p">(</span><span class="n">grad</span><span class="p">(</span><span class="n">rosenbrock</span><span class="p">))</span>                      <span class="c1"># nobody derived these</span>
+<span class="n">rhess</span> <span class="o">=</span> <span class="n">jit</span><span class="p">(</span><span class="n">hessian</span><span class="p">(</span><span class="n">rosenbrock</span><span class="p">))</span>
+<span class="n">p0</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="o">-</span><span class="mf">1.5</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">])</span>
+
+<span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="n">stepper</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="mf">1e-10</span><span class="p">,</span> <span class="n">max_iter</span><span class="o">=</span><span class="mi">100000</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Iterate p, state = stepper(p, state, t) until f(p) &lt; tol.&quot;&quot;&quot;</span>
+    <span class="n">p</span><span class="p">,</span> <span class="n">state</span> <span class="o">=</span> <span class="n">p0</span><span class="p">,</span> <span class="kc">None</span>
+    <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">max_iter</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+        <span class="n">p</span><span class="p">,</span> <span class="n">state</span> <span class="o">=</span> <span class="n">stepper</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">t</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">float</span><span class="p">(</span><span class="n">rosenbrock</span><span class="p">(</span><span class="n">p</span><span class="p">))</span> <span class="o">&lt;</span> <span class="n">tol</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">t</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+    <span class="k">return</span> <span class="kc">None</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">gd</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">eta</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">):</span>                     <span class="c1"># Eq. (4.gd)</span>
+    <span class="k">return</span> <span class="n">p</span> <span class="o">-</span> <span class="n">eta</span> <span class="o">*</span> <span class="n">rgrad</span><span class="p">(</span><span class="n">p</span><span class="p">),</span> <span class="n">state</span>
+
+<span class="k">def</span> <span class="nf">momentum</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">eta</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">,</span> <span class="n">gamma</span><span class="o">=</span><span class="mf">0.9</span><span class="p">):</span>    <span class="c1"># Eq. (4.momentum)</span>
+    <span class="n">v</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="k">if</span> <span class="n">state</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">state</span>
+    <span class="n">v</span> <span class="o">=</span> <span class="n">gamma</span> <span class="o">*</span> <span class="n">v</span> <span class="o">+</span> <span class="n">eta</span> <span class="o">*</span> <span class="n">rgrad</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">p</span> <span class="o">-</span> <span class="n">v</span><span class="p">,</span> <span class="n">v</span>
+
+<span class="k">def</span> <span class="nf">adam</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">eta</span><span class="o">=</span><span class="mf">0.02</span><span class="p">,</span> <span class="n">b1</span><span class="o">=</span><span class="mf">0.9</span><span class="p">,</span> <span class="n">b2</span><span class="o">=</span><span class="mf">0.999</span><span class="p">,</span> <span class="n">eps</span><span class="o">=</span><span class="mf">1e-8</span><span class="p">):</span>   <span class="c1"># Eq. (4.adam)</span>
+    <span class="n">m</span><span class="p">,</span> <span class="n">r</span> <span class="o">=</span> <span class="p">(</span><span class="n">jnp</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span> <span class="n">jnp</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">2</span><span class="p">))</span> <span class="k">if</span> <span class="n">state</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">state</span>
+    <span class="n">g</span> <span class="o">=</span> <span class="n">rgrad</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+    <span class="n">m</span> <span class="o">=</span> <span class="n">b1</span> <span class="o">*</span> <span class="n">m</span> <span class="o">+</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">b1</span><span class="p">)</span> <span class="o">*</span> <span class="n">g</span>
+    <span class="n">r</span> <span class="o">=</span> <span class="n">b2</span> <span class="o">*</span> <span class="n">r</span> <span class="o">+</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">b2</span><span class="p">)</span> <span class="o">*</span> <span class="n">g</span> <span class="o">*</span> <span class="n">g</span>
+    <span class="n">m_hat</span><span class="p">,</span> <span class="n">r_hat</span> <span class="o">=</span> <span class="n">m</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">b1</span><span class="o">**</span><span class="n">t</span><span class="p">),</span> <span class="n">r</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">b2</span><span class="o">**</span><span class="n">t</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">p</span> <span class="o">-</span> <span class="n">eta</span> <span class="o">*</span> <span class="n">m_hat</span> <span class="o">/</span> <span class="p">(</span><span class="n">jnp</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">r_hat</span><span class="p">)</span> <span class="o">+</span> <span class="n">eps</span><span class="p">),</span> <span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">r</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">newton</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>                           <span class="c1"># Eq. (4.newtonopt)</span>
+    <span class="k">return</span> <span class="n">p</span> <span class="o">-</span> <span class="n">jnp</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">rhess</span><span class="p">(</span><span class="n">p</span><span class="p">),</span> <span class="n">rgrad</span><span class="p">(</span><span class="n">p</span><span class="p">)),</span> <span class="n">state</span>
+
+<span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">stepper</span> <span class="ow">in</span> <span class="p">[(</span><span class="s2">&quot;gradient descent&quot;</span><span class="p">,</span> <span class="n">gd</span><span class="p">),</span> <span class="p">(</span><span class="s2">&quot;momentum&quot;</span><span class="p">,</span> <span class="n">momentum</span><span class="p">),</span>
+                      <span class="p">(</span><span class="s2">&quot;Adam&quot;</span><span class="p">,</span> <span class="n">adam</span><span class="p">),</span> <span class="p">(</span><span class="s2">&quot;Newton&quot;</span><span class="p">,</span> <span class="n">newton</span><span class="p">)]:</span>
+    <span class="n">steps</span><span class="p">,</span> <span class="n">p</span> <span class="o">=</span> <span class="n">run</span><span class="p">(</span><span class="n">stepper</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">:</span><span class="s2">17s</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">steps</span><span class="si">:</span><span class="s2">6d</span><span class="si">}</span><span class="s2"> iterations, p = </span><span class="si">{</span><span class="n">p</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Started from <span class="math notranslate nohighlight">\((-1.5,2)\)</span> and stopped when <span class="math notranslate nohighlight">\(f&lt;10^{-10}\)</span>, the four methods need</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p><strong>Method</strong></p></th>
+<th class="head"><p><strong>Iterations</strong></p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Gradient descent, <span class="math notranslate nohighlight">\(\eta=10^{-3}\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(27\,206\)</span></p></td>
+</tr>
+<tr class="row-odd"><td><p>Momentum, <span class="math notranslate nohighlight">\(\eta=10^{-3}\)</span>, <span class="math notranslate nohighlight">\(\gamma=0.9\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(2\,591\)</span></p></td>
+</tr>
+<tr class="row-even"><td><p>Adam, <span class="math notranslate nohighlight">\(\eta=0.02\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(2\,934\)</span></p></td>
+</tr>
+<tr class="row-odd"><td><p>Newton</p></td>
+<td><p><span class="math notranslate nohighlight">\(6\)</span></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>iterations, and every argument of the chapter is visible in the four numbers.
+Gradient descent is limited by the largest curvature – the Hessian at the
+starting point has <span class="math notranslate nohighlight">\(\lambda_{\max}\approx2100\)</span>, so by
+Eq. (4.20) <span class="math notranslate nohighlight">\(\eta\)</span> must be below about <span class="math notranslate nohighlight">\(10^{-3}\)</span> – and then
+crawls along the valley floor at the rate set by <span class="math notranslate nohighlight">\(\lambda_{\min}\)</span>.  Momentum
+improves the count by a factor <span class="math notranslate nohighlight">\(10.5\)</span>, in line with the <span class="math notranslate nohighlight">\(\sqrt{\kappa}\)</span> of
+Eq. (4.26); Adam, with no tuning beyond <span class="math notranslate nohighlight">\(\eta\)</span>, does about
+as well; and Newton’s method, using the curvature that JAX supplies at the
+cost of a few gradient evaluations, converges quadratically in six steps.
+None of the derivative code was written by hand, and replacing
+Eq. (4.62) by a neural network with a million parameters
+would change only the definition of the function.</p>
+</section>
+<section id="finite-differences-against-automatic-differentiation">
+<h3><span class="section-number">4.14.9. </span>Finite differences against automatic differentiation<a class="headerlink" href="#finite-differences-against-automatic-differentiation" title="Link to this heading">#</a></h3>
+<p>We close by measuring the error curve (4.45).  For
+<span class="math notranslate nohighlight">\(f(x)=\sin(2\pi x+x^{2})\)</span> at <span class="math notranslate nohighlight">\(x=1\)</span> the exact derivative is
+<span class="math notranslate nohighlight">\((2\pi+2)\cos(2\pi+1)=4.475424121402227\)</span>, and the central
+difference (4.43) gives, for decreasing <span class="math notranslate nohighlight">\(h\)</span>:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="k">def</span> <span class="nf">f</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">x</span> <span class="o">+</span> <span class="n">x</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+
+<span class="n">exact</span> <span class="o">=</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">+</span> <span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">h</span> <span class="ow">in</span> <span class="p">[</span><span class="mf">1e-2</span><span class="p">,</span> <span class="mf">1e-4</span><span class="p">,</span> <span class="mf">1e-6</span><span class="p">,</span> <span class="mf">1e-8</span><span class="p">,</span> <span class="mf">1e-10</span><span class="p">,</span> <span class="mf">1e-12</span><span class="p">]:</span>
+    <span class="n">fd</span> <span class="o">=</span> <span class="p">(</span><span class="n">f</span><span class="p">(</span><span class="mf">1.0</span> <span class="o">+</span> <span class="n">h</span><span class="p">)</span> <span class="o">-</span> <span class="n">f</span><span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">h</span><span class="p">))</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">h</span><span class="p">)</span>       <span class="c1"># Eq. (4.centraldiff)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;h = </span><span class="si">{</span><span class="n">h</span><span class="si">:</span><span class="s2">.0e</span><span class="si">}</span><span class="s2">   error = </span><span class="si">{</span><span class="nb">abs</span><span class="p">(</span><span class="n">fd</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">exact</span><span class="p">)</span><span class="si">:</span><span class="s2">.1e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">h</span> <span class="o">=</span> <span class="mf">1e-02</span>   <span class="n">error</span> <span class="o">=</span> <span class="mf">5.8e-03</span>
+<span class="n">h</span> <span class="o">=</span> <span class="mf">1e-04</span>   <span class="n">error</span> <span class="o">=</span> <span class="mf">5.8e-07</span>
+<span class="n">h</span> <span class="o">=</span> <span class="mf">1e-06</span>   <span class="n">error</span> <span class="o">=</span> <span class="mf">3.8e-10</span>
+<span class="n">h</span> <span class="o">=</span> <span class="mf">1e-08</span>   <span class="n">error</span> <span class="o">=</span> <span class="mf">6.8e-09</span>
+<span class="n">h</span> <span class="o">=</span> <span class="mf">1e-10</span>   <span class="n">error</span> <span class="o">=</span> <span class="mf">1.5e-06</span>
+<span class="n">h</span> <span class="o">=</span> <span class="mf">1e-12</span>   <span class="n">error</span> <span class="o">=</span> <span class="mf">2.2e-04</span>
+</pre></div>
+</div>
+<p>The error falls as <span class="math notranslate nohighlight">\(h^{2}\)</span> – two orders of magnitude for each factor ten in
+<span class="math notranslate nohighlight">\(h\)</span>, with the coefficient <span class="math notranslate nohighlight">\(|f'''|/6\approx51\)</span> of Eq. (4.44)
+– until <span class="math notranslate nohighlight">\(h\approx10^{-6}\)</span>, the <span class="math notranslate nohighlight">\(\epsilon_M^{1/3}\)</span> of
+Eq. (4.46), and then <em>rises</em> as <span class="math notranslate nohighlight">\(1/h\)</span> as rounding takes
+over.  The best the finite difference achieves is <span class="math notranslate nohighlight">\(4\times10^{-10}\)</span>; the JAX
+derivative of the same function, <code class="docutils literal notranslate"><span class="pre">grad(f)(1.0)</span></code>, is
+<span class="math notranslate nohighlight">\(4.475424121402227\)</span>, correct in every digit.
+Figure 4.6 plots the whole curve, and it is worth memorising
+its shape: whenever a finite-difference gradient check is used, as in
+Eq. (4.63), <span class="math notranslate nohighlight">\(h\)</span> must sit near the bottom of this valley, and
+agreement to better than about <span class="math notranslate nohighlight">\(10^{-8}\)</span> relative should not be expected.</p>
+<p><img alt="Absolute error of the central finite difference 4.43 for fxsin2pi xx2 " src="../BookML/BookFigures/chapter04_optimization/fd_vs_ad_error.png" /></p>
+<p><em>Figure 4.6: Absolute error of the central finite difference (4.43) for <span class="math notranslate nohighlight">\(f(x)=\sin(2\pi x+x^{2})\)</span> at <span class="math notranslate nohighlight">\(x=1\)</span>, as a function of the step <span class="math notranslate nohighlight">\(h\)</span> (points), together with the model (4.45) (dashed): truncation error <span class="math notranslate nohighlight">\(\propto h^{2}\)</span> on the right, rounding error <span class="math notranslate nohighlight">\(\propto1/h\)</span> on the left, and a minimum of about <span class="math notranslate nohighlight">\(10^{-10}\)</span> near <span class="math notranslate nohighlight">\(h\approx\epsilon_M^{1/3}\)</span>.  The reverse-mode derivative computed by JAX has an error at the level of the unit roundoff, shown as the horizontal line, for any <span class="math notranslate nohighlight">\(h\)</span> because it involves no <span class="math notranslate nohighlight">\(h\)</span>.</em></p>
+<p>The transformations of JAX compose: <code class="docutils literal notranslate"><span class="pre">jit(grad(f))</span></code> compiles the
+gradient, <code class="docutils literal notranslate"><span class="pre">vmap(grad(f))</span></code> vectorises it over a batch,
+<code class="docutils literal notranslate"><span class="pre">grad(grad(f))</span></code> differentiates it again and
+<code class="docutils literal notranslate"><span class="pre">jvp(grad(f),dots)</span></code> gives Hessian–vector products.  We shall use this
+machinery freely from Chapter 5 onwards, and in
+Chapter 8 we shall meet reverse mode again under its older name.</p>
+</section>
 </section>
 <section id="practical-tips">
 <h2><span class="section-number">4.15. </span>Practical tips<a class="headerlink" href="#practical-tips" title="Link to this heading">#</a></h2>
@@ -1795,7 +2520,7 @@ analytical expression against a central finite difference,</p>
 <div class="math notranslate nohighlight">
 \[
 \frac{\partial C}{\partial\theta_j}
-   \approx \frac{C(\bm{\theta}+h\bm{e}_j)-C(\bm{\theta}-h\bm{e}_j)}{2h},\tag{4.43}
+   \approx \frac{C(\bm{\theta}+h\bm{e}_j)-C(\bm{\theta}-h\bm{e}_j)}{2h},\tag{4.63}
 \]</div>
 <p>with <span class="math notranslate nohighlight">\(h\)</span> around <span class="math notranslate nohighlight">\(10^{-5}\)</span>, or against automatic differentiation.  An optimiser
 given a wrong gradient does not usually crash; it quietly converges to the
@@ -1849,9 +2574,16 @@ great deal: these methods exist for large, ill-conditioned, non-convex
 landscapes, which is where we shall meet them from Chapter 5 onwards.</p>
 <p>Finally, none of this is usable without gradients, and
 Section <em>Automatic differentiation</em> showed that they need not be derived by hand.
-Reverse-mode automatic differentiation returns the gradient with respect to
-all <span class="math notranslate nohighlight">\(p\)</span> parameters for the price of about two function evaluations, and it is
-the reason the models of the later chapters can be written down at all.</p>
+Automatic differentiation applies the chain rule to the evaluation trace of a
+program: forward mode carries a tangent with every value and returns one
+Jacobian–vector product per sweep, reverse mode carries an adjoint with
+every node and returns one vector–Jacobian product per sweep, and by the
+cheap gradient principle of Proposition 4.1 the latter
+delivers the gradient with respect to all <span class="math notranslate nohighlight">\(p\)</span> parameters for the price of a
+few function evaluations, independent of <span class="math notranslate nohighlight">\(p\)</span>.  It is exact to rounding, where
+finite differences are limited to <span class="math notranslate nohighlight">\(\epsilon_M^{2/3}\)</span> by
+Eq. (4.46), and it is the reason the models of the later
+chapters can be written down at all.</p>
 <p>The complete programs are collected in <code class="docutils literal notranslate"><span class="pre">doc/BookML/BookPrograms</span></code>:</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">gradient_descent.py</span></code> – plain and momentum gradient descent on
@@ -1868,9 +2600,13 @@ Section <em>Implementations</em>, the learning-rate sweep of
 Table 4.1, and the same comparison repeated on a
 deliberately ill-conditioned design matrix where the adaptive methods
 win decisively.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">autodiff_examples.py</span></code> – <code class="docutils literal notranslate"><span class="pre">autograd</span></code> and <code class="docutils literal notranslate"><span class="pre">JAX</span></code>
-versions of the gradients used above, with the finite-difference
-gradient check of Eq. (4.43).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">autodiff_examples.py</span></code> – the <code class="docutils literal notranslate"><span class="pre">Dual</span></code> class of
+Section <em>Forward mode: tangents and dual numbers</em>, the <code class="docutils literal notranslate"><span class="pre">autograd</span></code> and <code class="docutils literal notranslate"><span class="pre">JAX</span></code>
+versions of the least-squares and Ridge gradients, the explicit
+<code class="docutils literal notranslate"><span class="pre">jvp</span></code>/<code class="docutils literal notranslate"><span class="pre">vjp</span></code> and Hessian–vector products of
+Section <em>Automatic differentiation in Python: autograd and JAX</em>, the four optimisers on the Rosenbrock
+function of Section <em>The optimisers of this chapter on a non-convex function</em>, and the finite-difference
+error curve of Fig. 4.6.</p></li>
 </ul>
 <p>Each file runs as a script and reproduces the numbers quoted in this chapter.
 An executable version is available as a Jupyter notebook in the accompanying
@@ -1948,6 +2684,53 @@ numerically.
 (c) Show that with <span class="math notranslate nohighlight">\(\beta_2=0.999\)</span> the uncorrected <span class="math notranslate nohighlight">\(\sqrt{v_1}\)</span> is smaller
 than the true root mean square gradient by a factor of about <span class="math notranslate nohighlight">\(32\)</span>, and
 explain what that does to the first step.</p></li>
+<li><p><strong>Dual numbers.</strong>
+(a) Using only <span class="math notranslate nohighlight">\(\varepsilon^{2}=0\)</span>, derive the rules for the quotient
+<span class="math notranslate nohighlight">\((a+b\varepsilon)/(c+d\varepsilon)\)</span> and for <span class="math notranslate nohighlight">\(\sqrt{a+b\varepsilon}\)</span>, and
+check that they reproduce the quotient rule and <span class="math notranslate nohighlight">\(d\sqrt{x}/dx\)</span>.
+(b) Show from Eq. (4.54) that dual numbers cannot deliver
+second derivatives, and that the “hyper-dual” algebra with two
+symbols <span class="math notranslate nohighlight">\(\varepsilon_1,\varepsilon_2\)</span>, <span class="math notranslate nohighlight">\(\varepsilon_1^{2}=\varepsilon_2^{2}=0\)</span>
+but <span class="math notranslate nohighlight">\(\varepsilon_1\varepsilon_2\neq0\)</span>, can.
+(c) Extend the <code class="docutils literal notranslate"><span class="pre">Dual</span></code> class of Section <em>Forward mode: tangents and dual numbers</em> with
+<code class="docutils literal notranslate"><span class="pre">sqrt</span></code> and <code class="docutils literal notranslate"><span class="pre">__truediv__</span></code> for a dual denominator, and
+verify your rules numerically.</p></li>
+<li><p><strong>Forward and reverse sweeps by hand.</strong>
+For <span class="math notranslate nohighlight">\(f(x_1,x_2)=x_1x_2+\exp(x_1x_2)-\sin x_1\)</span> at <span class="math notranslate nohighlight">\((x_1,x_2)=(1,2)\)</span>:
+(a) write down the evaluation trace and draw the computational graph, as
+in Eq. (4.48) and Fig. 4.5;
+(b) carry out the forward sweep (4.51) for both
+coordinate directions;
+(c) carry out the reverse sweep (4.57) once, and confirm
+that it delivers both partial derivatives;
+(d) count the multiplications in (b) and in (c), and check the operation
+count against Proposition 4.1.</p></li>
+<li><p><strong>Reverse mode for least squares.</strong>
+Write the least-squares cost (4.12) as the trace
+<span class="math notranslate nohighlight">\(\bm{v}_1=\bm{X}\bm{\theta}\)</span>, <span class="math notranslate nohighlight">\(\bm{v}_2=\bm{v}_1-\bm{y}\)</span>,
+<span class="math notranslate nohighlight">\(v_3=\bm{v}_2^{T}\bm{v}_2/n\)</span>, with vector-valued nodes.  Apply the reverse
+recursion (4.57) with the vector–Jacobian
+products (4.59) of each stage, and show that it produces the
+gradient (4.13) <span class="math notranslate nohighlight">\(\frac{2}{n}\bm{X}^{T}(\bm{X}\bm{\theta}-\bm{y})\)</span>
+without ever forming a Jacobian larger than <span class="math notranslate nohighlight">\(\bm{X}\)</span> itself.  Explain why
+the adjoint <span class="math notranslate nohighlight">\(\bar{\bm{v}}_1\)</span> is what Chapter 8 will call the
+output error.</p></li>
+<li><p><strong>Hessian–vector products (numerical).</strong>
+(a) Implement Eq. (4.61) in JAX as forward-over-reverse,
+<code class="docutils literal notranslate"><span class="pre">jvp(grad(f))</span></code>, and alternatively as reverse-over-reverse,
+<code class="docutils literal notranslate"><span class="pre">grad(lambda</span> <span class="pre">x:</span> <span class="pre">grad(f)(x)</span> <span class="pre">&#64;</span> <span class="pre">v)</span></code>.  Check both against <code class="docutils literal notranslate"><span class="pre">jax.hessian</span></code>
+on the Ridge cost (4.16).
+(b) Use only Hessian–vector products and the conjugate-gradient method to
+solve the Newton system (4.8) for the Rosenbrock
+function (4.62), and reproduce the six-step
+convergence of Section <em>The optimisers of this chapter on a non-convex function</em> without ever forming
+the Hessian.</p></li>
+<li><p><strong>The finite-difference error curve (numerical).</strong>
+Reproduce Fig. 4.6 for <span class="math notranslate nohighlight">\(f(x)=e^{x}\)</span> at <span class="math notranslate nohighlight">\(x=1\)</span> and for
+<span class="math notranslate nohighlight">\(f(x)=\tan x\)</span> at <span class="math notranslate nohighlight">\(x=1.5\)</span>.  From the measured minimum, estimate <span class="math notranslate nohighlight">\(\epsilon_M\)</span>
+and <span class="math notranslate nohighlight">\(|f'''|\)</span> using Eq. (4.46), and compare with the true
+values.  Repeat in single precision (<code class="docutils literal notranslate"><span class="pre">np.float32</span></code>) and explain the
+change.</p></li>
 </ol>
 </section>
 <section id="project-style-exercise-optimisers-on-an-ill-conditioned-problem">
@@ -1990,7 +2773,7 @@ approximation to <span class="math notranslate nohighlight">\(\bm{H}\)</span> an
 <p><strong>Part f: automatic differentiation.</strong>
 Repeat part b using <code class="docutils literal notranslate"><span class="pre">autograd</span></code> or <code class="docutils literal notranslate"><span class="pre">JAX</span></code> instead of the
 hand-derived gradient, and verify that the two agree to machine precision.
-Then apply the gradient check (4.43) and compare the accuracy
+Then apply the gradient check (4.63) and compare the accuracy
 of the finite difference with that of automatic differentiation as <span class="math notranslate nohighlight">\(h\)</span> is
 varied over many orders of magnitude.  Explain the shape of the resulting
 curve using the discussion of round-off error in
@@ -2082,7 +2865,18 @@ Section <em>Vector and matrix norms</em>.</p>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#adam">4.11. Adam</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#implementations">4.12. Implementations</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#none-of-these-can-compete-with-newton-s-method">4.13. None of these can compete with Newton’s method</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#automatic-differentiation">4.14. Automatic differentiation</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#automatic-differentiation">4.14. Automatic differentiation</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#three-ways-to-differentiate-a-program">4.14.1. Three ways to differentiate a program</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#evaluation-traces-and-the-computational-graph">4.14.2. Evaluation traces and the computational graph</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#forward-mode-tangents-and-dual-numbers">4.14.3. Forward mode: tangents and dual numbers</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#reverse-mode-adjoints">4.14.4. Reverse mode: adjoints</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#forward-or-reverse-the-chain-rule-as-a-matrix-product">4.14.5. Forward or reverse: the chain rule as a matrix product</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#accuracy-and-points-where-the-derivative-does-not-exist">4.14.6. Accuracy, and points where the derivative does not exist</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#automatic-differentiation-in-python-autograd-and-jax">4.14.7. Automatic differentiation in Python: autograd and JAX</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-optimisers-of-this-chapter-on-a-non-convex-function">4.14.8. The optimisers of this chapter on a non-convex function</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#finite-differences-against-automatic-differentiation">4.14.9. Finite differences against automatic differentiation</a></li>
+</ul>
+</li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#practical-tips">4.15. Practical tips</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#summary-and-the-programs">4.16. Summary and the programs</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercises">4.17. Exercises</a><ul class="nav section-nav flex-column">

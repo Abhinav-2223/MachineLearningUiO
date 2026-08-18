@@ -470,7 +470,7 @@ the data.  Figure 12.1 draws the network in the notation of
 Section <em>Notation and the feed-forward pass</em>: it is the feed-forward network of
 Figure 8.5 with two changes, a narrow layer in the middle and a
 target that is the input.</p>
-<p><img alt="An undercomplete autoencoder in the layer notation of Section Notation" src="_images/12-ae.png" /></p>
+<p><img alt="An undercomplete autoencoder in the layer notation of Section Notation" src="../BookML/BookFigures/chapter12_autoencoders/12-ae.png" /></p>
 <p><em>Figure 12.1: An undercomplete autoencoder in the layer notation of Section <em>Notation and the feed-forward pass</em>, with <span class="math notranslate nohighlight">\(d=6\)</span> and <span class="math notranslate nohighlight">\(p=2\)</span>.  Read left to right it is an ordinary feed-forward network of Figure 8.5; what makes it an autoencoder is the dashed arrow at the bottom, which says that the target of example <span class="math notranslate nohighlight">\(n\)</span> is example <span class="math notranslate nohighlight">\(n\)</span> itself.  No labels enter anywhere, which is the content of the word <em>self-supervised</em>.  Everything the network knows about <span class="math notranslate nohighlight">\(\bm{x}\)</span> after the encoder must pass through the two orange units, and the reconstruction is built from those two numbers alone.</em></p>
 <p>The layer that produces <span class="math notranslate nohighlight">\(\bm{z}\)</span> is the <em>bottleneck</em>, and its width <span class="math notranslate nohighlight">\(p\)</span> is
 the single most important architectural choice.  Three regimes are worth naming.</p>
@@ -485,7 +485,7 @@ exactly.</p></li>
 the bottleneck must supply the constraint, and Section <em>Regularised autoencoders</em>
 is about what.</p></li>
 </ul>
-<p><img alt="The three regimes of the bottleneck width, drawn as the width of the r" src="_images/12-regimes.png" /></p>
+<p><img alt="The three regimes of the bottleneck width, drawn as the width of the r" src="../BookML/BookFigures/chapter12_autoencoders/12-regimes.png" /></p>
 <p><em>Figure 12.2: The three regimes of the bottleneck width, drawn as the width of the representation against depth.  Only the first compresses.  In the second and third the map <span class="math notranslate nohighlight">\(g\circ f=\mathrm{id}\)</span> is available and achieves zero reconstruction error while learning nothing whatever about the data, so the constraint that makes the network useful has to come from somewhere other than the architecture – which is what Section <em>Regularised autoencoders</em> supplies.  The orange bar is the code layer in each case.</em></p>
 <p>Figure 12.2 contrasts the three.  In practice the two halves
 are usually <em>mirrored</em>: a decoder whose layer
@@ -538,7 +538,7 @@ variance are the same problem seen from two sides.  For linear autoencoders this
 is exact and we prove it below; Figure 12.3 is the proof in one
 picture, since the decomposition is Pythagoras’ theorem applied at each data
 point and summed.</p>
-<p><img alt="What a linear autoencoder does, in  with , on centred data -- which is" src="_images/12-proj.png" /></p>
+<p><img alt="What a linear autoencoder does, in  with , on centred data -- which is" src="../BookML/BookFigures/chapter12_autoencoders/12-proj.png" /></p>
 <p><em>Figure 12.3: What a linear autoencoder does, in <span class="math notranslate nohighlight">\(d=2\)</span> with <span class="math notranslate nohighlight">\(p=1\)</span>, on centred data – which is why the subspace passes through the origin. Lemma 12.1 says that the best reconstruction of a given rank can always be taken to be an orthogonal projection, so <span class="math notranslate nohighlight">\(\hat{\bm{x}}\)</span> is the foot of the perpendicular from <span class="math notranslate nohighlight">\(\bm{x}\)</span> to the subspace, and Theorem 12.5 identifies the subspace that minimises the total squared residual as the principal one.  The right angle is the whole of Eq. (12.5): Pythagoras at every data point, summed, splits the total variance into an explained part and a reconstruction error, so making one small is exactly making the other large.  A nonlinear autoencoder replaces the straight line by a curve and changes nothing else in the picture.</em></p>
 <div class="tip admonition">
 <p class="admonition-title">Reconstruction is not representation</p>
@@ -1141,7 +1141,7 @@ the normal directions.  The encoder learns the manifold’s tangent structure.
 Figure 12.6 draws the denoising and the contractive geometry
 next to one another, which is the quickest way to see why the two are so nearly
 the same construction.</p>
-<p><img alt="The geometry behind the two regularisers of Section Regularised autoen" src="_images/12-manifold.png" /></p>
+<p><img alt="The geometry behind the two regularisers of Section Regularised autoen" src="../BookML/BookFigures/chapter12_autoencoders/12-manifold.png" /></p>
 <p><em>Figure 12.6: The geometry behind the two regularisers of Section <em>Regularised autoencoders</em>, drawn for data concentrated near a curve in the plane.  (a) Denoising, Eq. (12.17): the corrupted input <span class="math notranslate nohighlight">\(\tilde{\bm{x}}\)</span> is displaced off the data by an amount of order <span class="math notranslate nohighlight">\(\sigma\)</span>, and the network is scored on how well it recovers the clean <span class="math notranslate nohighlight">\(\bm{x}\)</span>, so it must learn the map that points back towards where the data are. Equation (12.18) identifies that map, to leading order, with the score <span class="math notranslate nohighlight">\(\nabla_{\bm{x}}\log p\)</span>.  (b) Contraction, Eq. (12.20): reconstruction needs the encoder to respond to displacements <em>along</em> the data, while the penalty asks it to respond to nothing at all; the compromise keeps <span class="math notranslate nohighlight">\(\bm{J}_f\)</span> large on the tangent and small on the normal, so the ellipse of responses is flattened onto the manifold. Proposition 12.8 makes the resemblance precise to order <span class="math notranslate nohighlight">\(\sigma^{2}\)</span>, with the one caveat recorded there: the denoising penalty falls on <span class="math notranslate nohighlight">\(\bm{J}_r\)</span>, the sensitivity of the round trip, and not on <span class="math notranslate nohighlight">\(\bm{J}_f\)</span>.</em></p>
 <p>The last sentence of the notebox below says these regularisers are “the same
 idea”.  For two of them that is a theorem rather than an impression.</p>
