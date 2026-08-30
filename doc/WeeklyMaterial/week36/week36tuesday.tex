@@ -1,0 +1,219 @@
+%% Week 36 -- Tuesday session (flipped classroom)
+%% Companion to week36slides.tex (Monday lecture).  Two cases only this week,
+%% by design: the bias-variance decomposition via the bootstrap, and k-fold
+%% cross-validation for the Ridge penalty.  The cases are worked in
+%% week36tuesday.ipynb; the warm-ups tie to exercisesweek36.
+%% Build:  pdflatex week36tuesday.tex  (twice)
+\documentclass[10pt,aspectratio=169]{beamer}
+\usetheme{red_plain}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath,amssymb,bm}
+\usepackage{graphicx}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{booktabs}
+\graphicspath{{../BookFigures/chapter02_statistics/}{./}}
+
+%% ---- code listings
+\definecolor{codebg}{rgb}{0.97,0.97,0.97}
+\lstset{language=Python,basicstyle=\ttfamily\scriptsize,backgroundcolor=\color{codebg},
+  keywordstyle=\color{blue!70!black}\bfseries,commentstyle=\color{green!45!black},
+  stringstyle=\color{red!60!black},showstringspaces=false,frame=single,
+  framerule=0pt,xleftmargin=4pt,xrightmargin=4pt,breaklines=true,columns=fullflexible}
+
+%% ---- discussion frames (same machinery as the Monday "Pause and think",
+%% here used for the plenary warm-up questions)
+\newcounter{insight}
+\newenvironment{insight}[1][]{%
+  \stepcounter{insight}%
+  \begin{frame}{Warm-up \arabic{insight}: #1}%
+  \setbeamercolor{block title}{bg=structure.fg,fg=white}%
+  \setbeamercolor{block body}{bg=structure.fg!8}%
+}{\end{frame}}
+\newcommand{\question}[1]{\begin{block}{Question}#1\end{block}}
+\newcommand{\answer}[1]{\pause\begin{block}{Answer}#1\end{block}}
+\newcommand{\hint}[1]{\pause{\small\emph{Hint: }#1}}
+
+%% ---- case frames
+\newcounter{case}
+\newenvironment{case}[1][]{%
+  \stepcounter{case}%
+  \begin{frame}[fragile,environment=case]{Case \arabic{case}: #1}%
+}{\end{frame}}
+
+\setbeamertemplate{footline}[frame number]
+\setbeamertemplate{blocks}[rounded][shadow=false]
+\setbeamercovered{invisible}
+
+\title{Week 36, Tuesday Session}
+\subtitle{Flipped classroom: your questions, then bias-variance and cross-validation in practice\\[3pt]
+  \small Bring your laptop -- we work in \texttt{week36tuesday.ipynb}}
+\author{Morten Hjorth-Jensen}
+\institute{Department of Physics and Center for Computing in Science Education,\\
+  University of Oslo, Norway}
+\date{}
+
+\begin{document}
+
+\begin{frame}
+\titlepage
+\end{frame}
+
+\begin{frame}{How today works}
+\begin{block}{The format (as every Tuesday)}
+Mondays are lectures; Tuesdays belong to your questions and to concrete
+cases.  You have heard the lecture and skimmed Sections 2.3--2.12.
+\end{block}
+\begin{enumerate}
+  \item \textbf{First $\sim$20 min:} open questions from Monday, then the warm-ups
+        on the next slides, discussed with your neighbours and in plenum.
+  \item \textbf{Rest of the double session:} \emph{two} cases only this week --
+        the bias-variance decomposition, and cross-validation -- worked in
+        pairs or small groups from \texttt{week36tuesday.ipynb}.  Deep beats
+        broad: the goal is that you leave owning Eq.~(2.47) and a working
+        $k$-fold loop, both of which Project 1 asks for.
+  \item \textbf{Last 5 min:} wrap-up, exercise deadline, and what next Monday
+        builds on.
+\end{enumerate}
+\end{frame}
+
+\begin{frame}{Picking up from Monday: the measured decomposition}
+\begin{columns}
+\begin{column}{0.55\textwidth}
+\includegraphics[width=\textwidth]{week36_bias_variance}
+\end{column}
+\begin{column}{0.43\textwidth}
+\small
+Monday's lecture closed the loop on last week's U-curve: the test error is,
+by Eq.~(2.47), the sum
+\[
+  \mathrm{Bias}^2+\mathrm{Var}+\sigma^2,
+\]
+and the bootstrap let us \emph{measure} each term.  Bias falls and flattens,
+variance explodes, the sum has a broad minimum (degrees 5--9 here).
+\vspace{4pt}
+Today you reproduce this figure yourselves, stress-test it -- more data, more
+noise, a Ridge penalty -- and then let cross-validation find the minimum
+without ever touching the test set.
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{insight}[the three terms, in your own words]
+\question{Without looking at your notes: which term of Eq.~(2.47) does each
+sentence describe?  (a) ``No amount of data fixes a model that is too
+simple.''  (b) ``Redraw the training set and the prediction jumps.''
+(c) ``Even the perfect model gets this wrong.''}
+\answer{(a) the squared bias -- the error of the \emph{average} prediction,
+built into the model's assumptions; (b) the variance -- sensitivity to the
+particular training sample; (c) the irreducible $\sigma^2$ -- the noise no
+model predicts.  Bonus check: which one does Ridge attack?  The variance,
+at the price of some bias.}
+\end{insight}
+
+\begin{insight}[read the code, not the formula]
+\question{In Monday's bootstrap code the bias is computed as
+\texttt{np.mean((y\_test - np.mean(y\_pred, axis=1, keepdims=True))**2)}.
+Two questions: why \texttt{axis=1}, and why does this ``bias'' contain
+$\sigma^2$?}
+\answer{Columns of \texttt{y\_pred} are bootstrap training sets, so averaging
+over \texttt{axis=1} is the expectation over training sets,
+$\mathbb{E}[\tilde{\bm{y}}]$ -- averaging over \texttt{axis=0} would average
+over test points instead, which is meaningless here.  And the code compares
+with $y_{\mathrm{test}}=f+\varepsilon$, not the unknown $f$: the noise cannot
+be subtracted out, so the measured bias absorbs $\sigma^2$ and the printed
+identity is really an inequality.}
+\end{insight}
+
+\begin{insight}[predict before you compute]
+\question{Case 1 below reruns the bias-variance sweep with (a) $n=400$
+instead of $40$ data points, and (b) noise $\sigma=0.3$ instead of $0.1$.
+Predict: what happens to each of the three curves in each case?}
+\answer{(a) More data tames the variance (roughly like $1/n$ for fixed
+complexity): the explosion moves to higher degree and the minimum shifts
+right -- with more data you can afford a richer model.  The bias curve is
+unchanged: it is a property of the model family, not of $n$.  (b) More noise
+lifts the floor ($\sigma^2$ is 9 times larger) and scales up the variance
+term; the bias$^2$ term is unchanged, but the minimum moves \emph{left}:
+noisier data favour simpler models.  Now go check.}
+\end{insight}
+
+\begin{case}[the bias-variance decomposition, owned]
+\textbf{Goal:} reproduce Monday's figure, then break it and understand the
+pieces (notebook, Case 1; seed 2026 gives exactly the lecture numbers).
+\begin{enumerate}
+  \item Run the sweep ($n=40$, 100 bootstraps, degrees $0$--$13$) and
+        reproduce \texttt{week36\_bias\_variance.pdf}.
+  \item \textbf{Vary the data size:} $n=100$ and $n=400$.  Where does the
+        variance explosion move?  Does the bias curve care?
+  \item \textbf{Vary the noise:} $\sigma=0.3$.  Confirm your warm-up 3
+        prediction for floor and minimum.
+  \item \textbf{Swap the model:} replace OLS by Ridge with
+        $\lambda\in\{10^{-4},10^{-1},10\}$ at fixed high degree 12.  Watch
+        the variance fall and the bias rise as $\lambda$ grows -- the
+        tradeoff turned into a dial.
+\end{enumerate}
+\vspace{2pt}
+\begin{block}{Checkpoints (plenary after $\sim$25 min)}
+Degree 0 has bias$^2\approx0.39$ ($\approx$ the variance of $f$ itself --
+why?); the minimum is broad, degrees 5--9; at degree 13 the variance is
+$\sim10^3$.  For step 4: which $\lambda$ gives the smallest \emph{total}
+error at degree 12, and is it better than plain OLS at degree 6?
+\end{block}
+\end{case}
+
+\begin{case}[cross-validation: choosing $\lambda$ without touching the test set]
+\textbf{Goal:} a $k$-fold loop you wrote yourself, validated against
+\texttt{scikit-learn}, then used for real model selection (notebook, Case 2).
+\begin{enumerate}
+  \item Implement 5-fold CV for Ridge on $y=3x^2+\varepsilon$ (degree-6
+        polynomial, $\lambda$ on \texttt{np.logspace(-3, 5, 100)}), scaler
+        fitted \emph{inside} each fold.  Reproduce
+        \texttt{week36\_cv\_ridge.pdf}.
+  \item Check yourself against \texttt{cross\_val\_score} with a
+        \texttt{Pipeline}: the two curves must coincide to plotting accuracy.
+        If they do not, the usual culprit is scaling fitted on the full data.
+  \item Read off $\lambda^*$ and compare the minimal CV-MSE with the known
+        $\sigma^2=1$.  Vary $k\in\{5,10,20\}$: how stable are $\lambda^*$ and
+        the error bar (the spread over folds)?
+  \item \textbf{Close the week's loop:} run CV over the polynomial
+        \emph{degree} for the week-35 data set (OLS, degrees $0$--$13$) and
+        compare the CV curve with Case 1's test-error curve -- same minimum,
+        no test set consumed.
+\end{enumerate}
+\vspace{2pt}
+\begin{block}{Checkpoints}
+With seed 2026: $\lambda^*\approx1.2$, CV-MSE $\approx1.5$ (just above the
+noise floor).  For step 4: CV picks a degree in the same broad 5--9 window as
+the bootstrap decomposition -- two independent methods, one answer.
+\end{block}
+\end{case}
+
+\begin{frame}{Wrap-up, deadlines, and Monday}
+\begin{itemize}
+  \item \textbf{What you should own now:} Eq.~(2.47) and what each term means
+        operationally; a bootstrap loop; a leak-free $k$-fold loop with the
+        preprocessing inside the folds.
+  \item \textbf{Weekly exercises} (\texttt{exercisesweek36.ipynb}): the
+        analytical steps of the bias-variance derivation, plus bootstrap and
+        cross-validation on your own code.  Deadline \textbf{Friday
+        September 4 at midnight}.
+  \item \textbf{Project 1} asks for exactly today's machinery (bias-variance
+        analysis and cross-validation on regression models) -- the code you
+        wrote today is directly reusable.
+  \item \textbf{Next Monday and week 38:} the main focus shifts to
+        \emph{optimization}: gradient descent methods -- from plain and
+        steepest descent via momentum to stochastic gradient descent -- the
+        workhorse behind everything from Lasso to deep networks.  We will
+        also briefly mention the Bayesian reading of OLS, Ridge and Lasso
+        (a Gaussian prior gives Ridge, a Laplace prior the Lasso).
+\end{itemize}
+\vspace{4pt}
+\begin{block}{Before you leave}
+One line on a piece of paper (or the digital board): the muddiest point of
+the week -- what should Monday's first ten minutes revisit?
+\end{block}
+\end{frame}
+
+\end{document}
