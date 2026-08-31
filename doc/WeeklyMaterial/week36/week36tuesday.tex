@@ -139,7 +139,7 @@ term; the bias$^2$ term is unchanged, but the minimum moves \emph{left}:
 noisier data favour simpler models.  Now go check.}
 \end{insight}
 
-\begin{case}[the bias-variance decomposition, owned]
+\begin{case}[the bias-variance decomposition]
 \textbf{Goal:} reproduce Monday's figure, then break it and understand the
 pieces (notebook, Case 1; seed 2026 gives exactly the lecture numbers).
 \begin{enumerate}
@@ -164,16 +164,12 @@ error at degree 12, and is it better than plain OLS at degree 6?
 \end{case}
 
 \begin{case}[cross-validation: choosing $\lambda$ without touching the test set]
-\textbf{Goal:} a $k$-fold loop you wrote yourself, validated against
-\texttt{scikit-learn}, then used for real model selection (notebook, Case 2).
+\textbf{Goal:} a $k$-fold loop using \texttt{scikit-learn} or your own code, then used for real model selection (notebook, Case 2).
 \begin{enumerate}
   \item Implement 5-fold CV for Ridge on $y=3x^2+\varepsilon$ (degree-6
         polynomial, $\lambda$ on \texttt{np.logspace(-3, 5, 100)}), scaler
         fitted \emph{inside} each fold.  Reproduce
         \texttt{week36\_cv\_ridge.pdf}.
-  \item Check yourself against \texttt{cross\_val\_score} with a
-        \texttt{Pipeline}: the two curves must coincide to plotting accuracy.
-        If they do not, the usual culprit is scaling fitted on the full data.
   \item Read off $\lambda^*$ and compare the minimal CV-MSE with the known
         $\sigma^2=1$.  Vary $k\in\{5,10,20\}$: how stable are $\lambda^*$ and
         the error bar (the spread over folds)?
@@ -185,8 +181,8 @@ error at degree 12, and is it better than plain OLS at degree 6?
 \vspace{2pt}
 \begin{block}{Checkpoints}
 With seed 2026: $\lambda^*\approx1.2$, CV-MSE $\approx1.5$ (just above the
-noise floor).  For step 4: CV picks a degree in the same broad 5--9 window as
-the bootstrap decomposition -- two independent methods, one answer.
+noise floor).  For step 3: CV picks a degree in the same broad 5--9 window as
+the bootstrap decomposition, that is two independent methods, one answer.
 \end{block}
 \end{case}
 
@@ -203,16 +199,16 @@ the bootstrap decomposition -- two independent methods, one answer.
         analysis and cross-validation on regression models) -- the code you
         wrote today is directly reusable.
   \item \textbf{Next Monday and week 38:} the main focus shifts to
-        \emph{optimization}: gradient descent methods -- from plain and
-        steepest descent via momentum to stochastic gradient descent -- the
+        \emph{optimization}: gradient descent methods, from plain and
+        steepest descent via momentum to stochastic gradient descent. The lattes is the
         workhorse behind everything from Lasso to deep networks.  We will
         also briefly mention the Bayesian reading of OLS, Ridge and Lasso
         (a Gaussian prior gives Ridge, a Laplace prior the Lasso).
 \end{itemize}
 \vspace{4pt}
 \begin{block}{Before you leave}
-One line on a piece of paper (or the digital board): the muddiest point of
-the week -- what should Monday's first ten minutes revisit?
+One line on in an email to us: the muddiest point of
+the week, what should Monday's first ten minutes next week revisit?
 \end{block}
 \end{frame}
 
