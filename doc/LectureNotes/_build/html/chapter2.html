@@ -1094,7 +1094,175 @@ is the fixed <span class="math notranslate nohighlight">\(n\times p\)</span> des
   \qquad
   \var(y_i) = \sigma^2 ,\tag{2.39}
 \]</div>
-<p>where <span class="math notranslate nohighlight">\(\bm{X}_{i,\ast}\)</span> denotes row <span class="math notranslate nohighlight">\(i\)</span> of the design matrix.</p>
+<p>where <span class="math notranslate nohighlight">\(\bm{X}_{i,\ast}\)</span> denotes row <span class="math notranslate nohighlight">\(i\)</span> of the design matrix.  This is the
+first place in the book where a random and a non-random quantity are added,
+and since every statistical statement about regression rests on the
+distinction, it is worth being precise about what it means and why
+Eq. (2.39) follows from it.</p>
+<p><strong>What is random here, and what is not.</strong></p>
+<p>Equation (2.37) contains four objects, and only one of them
+is stochastic.  The noise <span class="math notranslate nohighlight">\(\bm{\varepsilon}\)</span> is a random vector: it takes a
+different value every time the experiment is repeated, and those values
+follow the distribution (2.38).  The parameter vector
+<span class="math notranslate nohighlight">\(\bm{\theta}\)</span> is a set of fixed numbers – unknown to us, which is the whole
+problem, but not random; nature does not redraw it between measurements.  The
+design matrix <span class="math notranslate nohighlight">\(\bm{X}\)</span> is likewise treated as a fixed array of numbers: the
+inputs <span class="math notranslate nohighlight">\(\bm{x}_i\)</span> at which the measurements were taken are regarded as
+chosen, or at least as given, and the analysis is carried out for those
+inputs.  Statisticians call this the <em>fixed design</em> viewpoint, and
+everything in this section is conditional on the observed <span class="math notranslate nohighlight">\(\bm{X}\)</span>.  And
+the function <span class="math notranslate nohighlight">\(f\)</span> that the model is trying to capture is a
+<em>non-stochastic</em>, or deterministic, function: a fixed rule that returns
+the same value <span class="math notranslate nohighlight">\(f(\bm{x})\)</span> every time it is evaluated at the same input.
+Nothing about <span class="math notranslate nohighlight">\(f\)</span> changes from one repetition of the experiment to the next;
+what changes is the noise added to it.  If we could measure the response at
+the same <span class="math notranslate nohighlight">\(\bm{x}_i\)</span> a thousand times, the thousand values of <span class="math notranslate nohighlight">\(y_i\)</span> would
+scatter about the single fixed number <span class="math notranslate nohighlight">\(f(\bm{x}_i)\)</span>, and the scatter would be
+entirely that of <span class="math notranslate nohighlight">\(\varepsilon_i\)</span>.</p>
+<p>A non-random quantity <span class="math notranslate nohighlight">\(c\)</span> can be accommodated in the formalism of
+Section <em>Expectation values and moments</em> by regarding it as a stochastic variable whose
+distribution is concentrated at a single point, <span class="math notranslate nohighlight">\(p(c')=\delta(c'-c)\)</span> with
+<span class="math notranslate nohighlight">\(\delta\)</span> the Dirac delta function.
+Inserting this into the definition (2.12) gives</p>
+<div class="math notranslate nohighlight">
+\[
+\mathbb{E}[c] = \int c'\,\delta(c'-c)\,dc' = c,
+  \qquad
+  \var(c) = \int (c'-c)^{2}\,\delta(c'-c)\,dc' = 0 :\tag{2.40}
+\]</div>
+<p>the expectation of a constant is the constant, and a constant has no
+variance.  These two lines are all that “non-random” means for the
+purposes of computing moments.</p>
+<p><strong>Deriving Eq. (2.39).</strong>
+Write <span class="math notranslate nohighlight">\(\mu_i=\bm{X}_{i,\ast}\bm{\theta}=\sum_j X_{ij}\theta_j\)</span> for the
+<span class="math notranslate nohighlight">\(i\)</span>th fitted value at the true parameters.  It is a sum of products of fixed
+numbers and is therefore itself a fixed number, and the model says
+<span class="math notranslate nohighlight">\(y_i=\mu_i+\varepsilon_i\)</span>.  Because <span class="math notranslate nohighlight">\(\mu_i\)</span> is a constant, the distribution of
+<span class="math notranslate nohighlight">\(y_i\)</span> is that of <span class="math notranslate nohighlight">\(\varepsilon_i\)</span> shifted by <span class="math notranslate nohighlight">\(\mu_i\)</span>: if <span class="math notranslate nohighlight">\(p_\varepsilon\)</span> is
+the noise density, <span class="math notranslate nohighlight">\(p(y_i)=p_\varepsilon(y_i-\mu_i)\)</span>.  The expectation then
+follows directly from the definition (2.12) by the
+substitution <span class="math notranslate nohighlight">\(e=y_i-\mu_i\)</span>,</p>
+<div class="math notranslate nohighlight">
+\[
+\mathbb{E}[y_i]
+   = \int y\,p_\varepsilon(y-\mu_i)\,dy
+   = \int (\mu_i+e)\,p_\varepsilon(e)\,de
+   = \mu_i\underbrace{\int p_\varepsilon(e)\,de}_{=1}
+     + \underbrace{\int e\,p_\varepsilon(e)\,de}_{=\mathbb{E}[\varepsilon_i]=0}
+   = \mu_i ,\tag{2.41}
+\]</div>
+<p>where the first integral is the normalisation (2.5) and
+the second vanishes because the noise has zero mean.  The variance follows
+from the central moment (2.15) by the same substitution,</p>
+<div class="math notranslate nohighlight">
+\[
+\var(y_i)
+   = \int (y-\mu_i)^{2}\,p_\varepsilon(y-\mu_i)\,dy
+   = \int e^{2}\,p_\varepsilon(e)\,de
+   = \var(\varepsilon_i) = \sigma^{2}.\tag{2.42}
+\]</div>
+<p>Both results are the rule (2.17) with <span class="math notranslate nohighlight">\(a=1\)</span> and <span class="math notranslate nohighlight">\(b=\mu_i\)</span>:
+adding a constant shifts the mean by that constant and leaves the variance
+untouched, because the variance measures spread about the mean and a
+constant shift moves the mean and every value together.  The same argument
+applied to two different observations gives
+<span class="math notranslate nohighlight">\(\cov(y_i,y_j)=\mathbb{E}[(y_i-\mu_i)(y_j-\mu_j)]
+=\mathbb{E}[\varepsilon_i\varepsilon_j]=\cov(\varepsilon_i,\varepsilon_j)\)</span>,
+so the whole vector satisfies</p>
+<div class="math notranslate nohighlight">
+\[
+\mathbb{E}[\bm{y}] = \bm{X}\bm{\theta},
+  \qquad
+  \cov(\bm{y}) = \cov(\bm{\varepsilon}) = \sigma^{2}\bm{I}_{nn} :\tag{2.43}
+\]</div>
+<p>the observations inherit the covariance structure of the noise exactly,
+and the deterministic part of the model contributes only to the mean.  When
+the noise is Gaussian, <span class="math notranslate nohighlight">\(\bm{y}\)</span> is the multivariate
+Gaussian (2.9) with <span class="math notranslate nohighlight">\(\bm{\mu}=\bm{X}\bm{\theta}\)</span> and
+<span class="math notranslate nohighlight">\(\bm{\Sigma}=\sigma^{2}\bm{I}\)</span>, which is the form the likelihood of
+Chapter 3 will take.</p>
+<p>A short simulation makes the statement concrete.  The design and the
+parameters are fixed once; only the noise is redrawn, a hundred thousand
+times; and the sample mean and variance of each <span class="math notranslate nohighlight">\(y_i\)</span> over the repetitions
+are compared with Eq. (2.39).</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="mi">2024</span><span class="p">)</span>
+<span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>            <span class="c1"># the design is fixed once and for all</span>
+<span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">column_stack</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="n">x</span><span class="p">,</span> <span class="n">x</span><span class="o">**</span><span class="mi">2</span><span class="p">])</span>
+<span class="n">theta</span><span class="p">,</span> <span class="n">sigma</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">2.0</span><span class="p">,</span> <span class="mf">3.0</span><span class="p">]),</span> <span class="mf">0.5</span>
+<span class="n">mu</span> <span class="o">=</span> <span class="n">X</span> <span class="o">@</span> <span class="n">theta</span>                          <span class="c1"># non-random: the same in every repetition</span>
+
+<span class="n">Y</span> <span class="o">=</span> <span class="n">mu</span> <span class="o">+</span> <span class="n">sigma</span> <span class="o">*</span> <span class="n">rng</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">100000</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)))</span>  <span class="c1"># 100000 draws of the noise only</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;X theta        :&quot;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">mu</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;mean of y      :&quot;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">Y</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span> <span class="mi">3</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;variance of y  :&quot;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">Y</span><span class="o">.</span><span class="n">var</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span> <span class="mi">3</span><span class="p">),</span> <span class="s2">&quot;  sigma^2 =&quot;</span><span class="p">,</span> <span class="n">sigma</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;cov(y_0, y_1)  :&quot;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">cov</span><span class="p">(</span><span class="n">Y</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">Y</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">])[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="mi">4</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">X</span> <span class="n">theta</span>        <span class="p">:</span> <span class="p">[</span><span class="mf">1.</span>    <span class="mf">0.688</span> <span class="mf">0.75</span>  <span class="mf">1.188</span> <span class="mf">2.</span>   <span class="p">]</span>
+<span class="n">mean</span> <span class="n">of</span> <span class="n">y</span>      <span class="p">:</span> <span class="p">[</span><span class="mf">1.</span>    <span class="mf">0.686</span> <span class="mf">0.751</span> <span class="mf">1.188</span> <span class="mf">2.</span>   <span class="p">]</span>
+<span class="n">variance</span> <span class="n">of</span> <span class="n">y</span>  <span class="p">:</span> <span class="p">[</span><span class="mf">0.251</span> <span class="mf">0.252</span> <span class="mf">0.252</span> <span class="mf">0.251</span> <span class="mf">0.249</span><span class="p">]</span>   <span class="n">sigma</span><span class="o">^</span><span class="mi">2</span> <span class="o">=</span> <span class="mf">0.25</span>
+<span class="n">cov</span><span class="p">(</span><span class="n">y_0</span><span class="p">,</span> <span class="n">y_1</span><span class="p">)</span>  <span class="p">:</span> <span class="mf">0.0015</span>
+</pre></div>
+</div>
+<p>The means agree with <span class="math notranslate nohighlight">\(\bm{X}\bm{\theta}\)</span> to the third decimal, the variances
+with <span class="math notranslate nohighlight">\(\sigma^{2}\)</span>, and the covariance between two observations is zero to
+within the sampling error of Eq. (2.24).  Note what was
+<em>not</em> redrawn: the array <code class="docutils literal notranslate"><span class="pre">X</span></code> is the same object in all hundred
+thousand repetitions, which is exactly what the fixed-design assumption
+says.</p>
+<p><strong>The model as an approximation of <span class="math notranslate nohighlight">\(f\)</span>.</strong>
+Equation (2.37) asserts more than that <span class="math notranslate nohighlight">\(f\)</span> is
+non-stochastic: it asserts that <span class="math notranslate nohighlight">\(f\)</span> is <em>linear in the features</em>, so
+that <span class="math notranslate nohighlight">\(f(\bm{x}_i)=\bm{X}_{i,\ast}\bm{\theta}\)</span> exactly, for some
+<span class="math notranslate nohighlight">\(\bm{\theta}\)</span>.  The two assumptions are independent and it is worth
+separating them.  Suppose only the weaker one holds, so that the data are
+generated by <span class="math notranslate nohighlight">\(y_i=f(\bm{x}_i)+\varepsilon_i\)</span> with <span class="math notranslate nohighlight">\(f\)</span> a fixed but otherwise
+arbitrary function.  Nothing in the derivation of
+Eqs. (2.41) and (2.42) used the
+form of <span class="math notranslate nohighlight">\(\mu_i\)</span>, only that it was a constant, so the conclusion survives
+unchanged with <span class="math notranslate nohighlight">\(\mu_i=f(\bm{x}_i)\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[
+\mathbb{E}[y_i] = f(\bm{x}_i),
+  \qquad
+  \var(y_i) = \sigma^{2}.\tag{2.44}
+\]</div>
+<p>This is the sense in which the linear model <span class="math notranslate nohighlight">\(\bm{X}\bm{\theta}\)</span>
+<em>approximates</em> <span class="math notranslate nohighlight">\(f\)</span>: it is a candidate for the deterministic part of the
+data, the mean of <span class="math notranslate nohighlight">\(\bm{y}\)</span>, and the noise variance is untouched by how good
+or bad the candidate is.  If <span class="math notranslate nohighlight">\(f\)</span> really is linear in the features,
+Eq. (2.44) reduces to Eq. (2.39) and
+the estimator below is unbiased.  If it is not, then no choice of
+<span class="math notranslate nohighlight">\(\bm{\theta}\)</span> makes <span class="math notranslate nohighlight">\(\bm{X}_{i,\ast}\bm{\theta}\)</span> equal to <span class="math notranslate nohighlight">\(f(\bm{x}_i)\)</span> at
+every <span class="math notranslate nohighlight">\(i\)</span>, and the discrepancy <span class="math notranslate nohighlight">\(f(\bm{x}_i)-\bm{X}_{i,\ast}\bm{\theta}\)</span> is a
+fixed number, not a random one: it does not average away with more data, it
+is invisible in the residuals, whose scatter still has variance <span class="math notranslate nohighlight">\(\sigma^{2}\)</span>,
+and it reappears as the squared-bias term of Section <em>The bias-variance tradeoff</em>.
+A deterministic <span class="math notranslate nohighlight">\(f\)</span> that the model cannot represent is thus the source of
+bias, exactly as the random <span class="math notranslate nohighlight">\(\bm{\varepsilon}\)</span> is the source of variance;
+keeping the two apart is what the decomposition of that section is for.</p>
+<div class="tip admonition">
+<p class="admonition-title">Machine learning connection</p>
+<p>The fixed-design viewpoint is the
+natural one for a designed experiment, where the inputs are chosen by the
+experimenter.  In machine learning the inputs are usually themselves a random
+sample – the pixels of whichever images happened to be collected – and one
+speaks of a <em>random design</em>.  The two viewpoints are reconciled by
+conditioning: every expectation in this section is
+<span class="math notranslate nohighlight">\(\mathbb{E}[\,\cdot\,|\,\bm{X}]\)</span>, an average over the noise for the inputs
+actually observed, and the results hold as stated for every <span class="math notranslate nohighlight">\(\bm{X}\)</span> that
+might have been drawn.  The bias-variance decomposition of
+Section <em>The bias-variance tradeoff</em> averages over training sets, inputs included,
+and the bootstrap that estimates it resamples whole rows <span class="math notranslate nohighlight">\((\bm{x}_i,y_i)\)</span>
+rather than the noise alone; the reader should keep in mind which
+expectation is meant when a result from one setting is quoted in the other.</p>
+</div>
 <p><strong>The estimator is unbiased.</strong>
 The least-squares estimator of Eq. (1.39) is
 <span class="math notranslate nohighlight">\(\hat{\bm{\theta}}=(\bm{X}^{T}\bm{X})^{-1}\bm{X}^{T}\bm{y}\)</span>.  Taking its
@@ -1104,7 +1272,7 @@ expectation and using <span class="math notranslate nohighlight">\(\mathbb{E}[\b
 \mathbb{E}[\hat{\bm{\theta}}]
    = (\bm{X}^{T}\bm{X})^{-1}\bm{X}^{T}\,\mathbb{E}[\bm{y}]
    = (\bm{X}^{T}\bm{X})^{-1}\bm{X}^{T}\bm{X}\bm{\theta}
-   = \bm{\theta},\tag{2.40}
+   = \bm{\theta},\tag{2.45}
 \]</div>
 <p>so ordinary least squares is unbiased, provided the model (2.37)
 is correct.  That proviso carries all the weight: if the true <span class="math notranslate nohighlight">\(f(\bm{x})\)</span> is
@@ -1134,7 +1302,7 @@ Writing <span class="math notranslate nohighlight">\(\bm{A}=(\bm{X}^{T}\bm{X})^{
 <div class="math notranslate nohighlight">
 \[
 \boxed{\;
-  \var(\hat{\bm{\theta}}) = \sigma^{2}\left(\bm{X}^{T}\bm{X}\right)^{-1}. \;}\tag{2.42}
+  \var(\hat{\bm{\theta}}) = \sigma^{2}\left(\bm{X}^{T}\bm{X}\right)^{-1}. \;}\tag{2.47}
 \]</div>
 <p>This is the result promised in Section <em>The Hessian matrix</em>: the covariance
 matrix of the fitted parameters is the inverse Hessian (1.44)
@@ -1143,7 +1311,7 @@ the square root of the corresponding diagonal element,</p>
 <div class="math notranslate nohighlight">
 \[
 \sigma(\hat{\theta}_j) = \sigma\sqrt{
-    \left[(\bm{X}^{T}\bm{X})^{-1}\right]_{jj}} ,\tag{2.43}
+    \left[(\bm{X}^{T}\bm{X})^{-1}\right]_{jj}} ,\tag{2.48}
 \]</div>
 <p>from which a confidence interval follows in the usual way, and in practice
 <span class="math notranslate nohighlight">\(\sigma^2\)</span> is itself estimated from the residuals as
@@ -1152,7 +1320,7 @@ the square root of the corresponding diagonal element,</p>
 <span class="math notranslate nohighlight">\(p\)</span> fitted parameters.</p>
 <div class="tip admonition">
 <p class="admonition-title">Machine learning connection</p>
-<p>Read Eq. (2.42)
+<p>Read Eq. (2.47)
 through the singular value decomposition.  By Eq. (1.115),
 <span class="math notranslate nohighlight">\((\bm{X}^{T}\bm{X})^{-1}=\bm{V}\tilde{\bm{\Sigma}}^{-2}\bm{V}^{T}\)</span>, so the
 variance along the <span class="math notranslate nohighlight">\(i\)</span>th right singular direction is <span class="math notranslate nohighlight">\(\sigma^2/\sigma_i^2\)</span>.
@@ -1162,7 +1330,7 @@ numerical warning given in Section <em>Rank, the pseudoinverse and ill-condition
 ill-conditioning we diagnosed there as a loss of significant digits is here
 diagnosed as an inability of the data to determine the parameter.  Both
 readings describe the same fact, and both are repaired by the same shrinkage:
-Ridge regression trades the unbiasedness (2.40) for a
+Ridge regression trades the unbiasedness (2.45) for a
 variance reduced by the factors of Eq. (1.130), a bargain
 which Eq. (2.27) tells us is worth taking whenever the
 squared bias introduced is smaller than the variance removed.</p>
@@ -1224,7 +1392,7 @@ the intuition carries over to classification.</p>
 \[
 \bm{y} = f(\bm{x}) + \bm{\varepsilon},
   \qquad
-  \bm{\varepsilon}\sim\mathcal{N}(0,\sigma^{2}),\tag{2.44}
+  \bm{\varepsilon}\sim\mathcal{N}(0,\sigma^{2}),\tag{2.49}
 \]</div>
 <p>with <span class="math notranslate nohighlight">\(f\)</span> the unknown true function and the noise of zero mean and variance
 <span class="math notranslate nohighlight">\(\sigma^{2}\)</span>.  We fit a model on a training set drawn at random, obtaining
@@ -1237,15 +1405,15 @@ because the data it was fitted to were random.</p>
 <div class="math notranslate nohighlight">
 \[
 \mathbb{E}\left[\left(\bm{y}-\tilde{\bm{y}}\right)^{2}\right]
-   = \frac{1}{n}\sum_{i=0}^{n-1}\left(y_i-\tilde{y}_i\right)^{2} .\tag{2.45}
+   = \frac{1}{n}\sum_{i=0}^{n-1}\left(y_i-\tilde{y}_i\right)^{2} .\tag{2.50}
 \]</div>
-<p>Insert Eq. (2.44) and add and subtract
+<p>Insert Eq. (2.49) and add and subtract
 <span class="math notranslate nohighlight">\(\mathbb{E}[\tilde{\bm{y}}]\)</span>, the average prediction over training sets,</p>
 <div class="math notranslate nohighlight">
 \[
 \mathbb{E}\left[\left(\bm{y}-\tilde{\bm{y}}\right)^{2}\right]
    = \mathbb{E}\left[\left(\bm{f}+\bm{\varepsilon}-\tilde{\bm{y}}
-       +\mathbb{E}[\tilde{\bm{y}}]-\mathbb{E}[\tilde{\bm{y}}]\right)^{2}\right].\tag{2.46}
+       +\mathbb{E}[\tilde{\bm{y}}]-\mathbb{E}[\tilde{\bm{y}}]\right)^{2}\right].\tag{2.51}
 \]</div>
 <p>Expanding the square produces three squared terms and three cross terms.  The
 cross terms all vanish: those involving <span class="math notranslate nohighlight">\(\bm{\varepsilon}\)</span> because the noise
@@ -1258,7 +1426,7 @@ because <span class="math notranslate nohighlight">\(\mathbb{E}[\tilde{\bm{y}}-\
   \mathbb{E}\left[\left(\bm{y}-\tilde{\bm{y}}\right)^{2}\right]
    = \underbrace{\frac{1}{n}\sum_i\left(f_i-\mathbb{E}[\tilde{\bm{y}}]\right)^{2}}_{\mathrm{Bias}^{2}}
    + \underbrace{\frac{1}{n}\sum_i\left(\tilde{y}_i-\mathbb{E}[\tilde{\bm{y}}]\right)^{2}}_{\var[\tilde{\bm{y}}]}
-   + \;\sigma^{2} . \;}\tag{2.47}
+   + \;\sigma^{2} . \;}\tag{2.52}
 \]</div>
 <p>The three terms have distinct meanings.</p>
 <p>The <strong>bias</strong> measures how far the <em>average</em> prediction is from the
@@ -1278,7 +1446,7 @@ is wrong.</p>
 test error, being their sum plus a constant, has a minimum somewhere in
 between, and finding it is the entire business of model selection.</p>
 <p><strong>Estimating the three terms.</strong>
-Equation (2.47) involves an expectation over training sets,
+Equation (2.52) involves an expectation over training sets,
 which in practice we do not have – we have one data set.  The bootstrap of
 Section <em>Resampling: the jackknife and the bootstrap</em> manufactures the missing ensemble by resampling,
 and the following code uses it to compute all three terms for a polynomial fit
@@ -1370,8 +1538,8 @@ bootstrap sample it is given.  Their sum, the test error, therefore falls,
 reaches a minimum around degree four or five, and rises thereafter.  Model
 selection is the business of locating that minimum, and
 Section <em>Cross-validation</em> is how it is done without a test set.</p>
-<p><img alt="The bias-variance decomposition 2.47 for a polynomial fit, with the th" src="_images/bias_variance_tradeoff.png" /></p>
-<p><em>Figure 2.4: The bias-variance decomposition (2.47) for a polynomial fit, with the three terms estimated by the bootstrap.  Bias falls and saturates, variance grows without limit, and the test error has a minimum in between.</em></p>
+<p><img alt="The bias-variance decomposition 2.52 for a polynomial fit, with the th" src="_images/bias_variance_tradeoff.png" /></p>
+<p><em>Figure 2.4: The bias-variance decomposition (2.52) for a polynomial fit, with the three terms estimated by the bootstrap.  Bias falls and saturates, variance grows without limit, and the test error has a minimum in between.</em></p>
 <div class="tip admonition">
 <p class="admonition-title">Machine learning connection</p>
 <p>Every regularisation method in this book
@@ -1435,7 +1603,7 @@ The older jackknife is a special case.  Instead of resampling, it
 systematically leaves out one observation at a time.  Writing</p>
 <div class="math notranslate nohighlight">
 \[
-\bm{x}_i = (x_0,\dots,x_{i-1},x_{i+1},\dots,x_{n-1})\tag{2.48}
+\bm{x}_i = (x_0,\dots,x_{i-1},x_{i+1},\dots,x_{n-1})\tag{2.53}
 \]</div>
 <p>for the sample with observation <span class="math notranslate nohighlight">\(i\)</span> removed, and <span class="math notranslate nohighlight">\(\hat{\theta}_i\)</span> for the
 estimator computed on it, the spread of the <span class="math notranslate nohighlight">\(n\)</span> values <span class="math notranslate nohighlight">\(\hat{\theta}_i\)</span>
@@ -1508,7 +1676,7 @@ evaluate on the held-out fold, record the score and discard the model.</p></li>
 <p>Choosing <span class="math notranslate nohighlight">\(k=n\)</span> leaves out one observation at a time and removes the residual
 randomness of the fold assignment entirely; this is <em>leave-one-out
 cross-validation</em> (LOOCV), and the reader will recognise it as the jackknife
-of Eq. (2.48) applied to prediction error.  It is unbiased but
+of Eq. (2.53) applied to prediction error.  It is unbiased but
 expensive, requiring <span class="math notranslate nohighlight">\(n\)</span> fits, and its estimates have high variance because
 the <span class="math notranslate nohighlight">\(n\)</span> training sets are almost identical.  Values of <span class="math notranslate nohighlight">\(k\)</span> between five and
 ten are the usual compromise.</p>
@@ -1524,7 +1692,7 @@ logarithmically spaced.</p></li>
    \bm{\theta}_{-i}(\lambda) =
    \left(\bm{X}_{-i,\ast}^{T}\bm{X}_{-i,\ast}
    +\lambda\bm{I}_{pp}\right)^{-1}
-   \bm{X}_{-i,\ast}^{T}\bm{y}_{-i}\tag{2.49}
+   \bm{X}_{-i,\ast}^{T}\bm{y}_{-i}\tag{2.54}
    \]</div>
 <p>on the data with fold <span class="math notranslate nohighlight">\(i\)</span> removed.</p>
 </li>
@@ -1535,6 +1703,10 @@ prediction error on unseen data.</p></li>
 <li><p>Choose the <span class="math notranslate nohighlight">\(\lambda\)</span> minimising that estimate, and refit on all the
 data.</p></li>
 </ul>
+<p>This is the outline; the details that make it correct – the standardisation
+inside each fold, the refit, the one-standard-error rule, the handling of
+the Lasso, and the comparison with the bootstrap – are the subject of
+Section <em>Choosing the penalty: cross-validation for Ridge and Lasso</em>.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
@@ -1570,7 +1742,7 @@ data.</p></li>
 <p>The run above returns <span class="math notranslate nohighlight">\(\lambda\approx0.028\)</span> with a cross-validated mean
 squared error of <span class="math notranslate nohighlight">\(1.01\)</span>, which is reassuring: the noise added to the data had
 variance one, so the procedure has recovered the irreducible error
-<span class="math notranslate nohighlight">\(\sigma^{2}\)</span> of Eq. (2.47) and nothing more.  At the other
+<span class="math notranslate nohighlight">\(\sigma^{2}\)</span> of Eq. (2.52) and nothing more.  At the other
 end of the grid, <span class="math notranslate nohighlight">\(\lambda=10^{5}\)</span> shrinks every coefficient to almost zero and
 the error rises to <span class="math notranslate nohighlight">\(19\)</span>, the variance of <span class="math notranslate nohighlight">\(\bm{y}\)</span> itself – the model has been
 regularised into predicting the mean.</p>
@@ -1627,7 +1799,7 @@ bootstrap alike.</p>
 logistic map</p>
 <div class="math notranslate nohighlight">
 \[
-x_{i+1} = c\,x_i\left(1-x_i\right)\tag{2.50}
+x_{i+1} = c\,x_i\left(1-x_i\right)\tag{2.55}
 \]</div>
 <p>produces, for suitable <span class="math notranslate nohighlight">\(c\)</span>, sequences that pass many naive tests of
 randomness while being entirely reproducible.</p>
@@ -1635,7 +1807,7 @@ randomness while being entirely reproducible.</p>
 The classical construction is</p>
 <div class="math notranslate nohighlight">
 \[
-N_{i+1} = \left(aN_i+c\right)\ \mathrm{mod}\ M,\tag{2.51}
+N_{i+1} = \left(aN_i+c\right)\ \mathrm{mod}\ M,\tag{2.56}
 \]</div>
 <p>with <span class="math notranslate nohighlight">\(a\)</span>, <span class="math notranslate nohighlight">\(c\)</span> and <span class="math notranslate nohighlight">\(M\)</span> integers chosen with care, and <span class="math notranslate nohighlight">\(x_i=N_i/M\)</span> the resulting
 deviate on <span class="math notranslate nohighlight">\([0,1)\)</span>.  The sequence is completely determined by the seed <span class="math notranslate nohighlight">\(N_0\)</span>,
@@ -1678,7 +1850,7 @@ distribution <span class="math notranslate nohighlight">\(P(x)\)</span> from Eq.
 then the variable</p>
 <div class="math notranslate nohighlight">
 \[
-X = P^{-1}(U)\tag{2.52}
+X = P^{-1}(U)\tag{2.57}
 \]</div>
 <p>has exactly the distribution <span class="math notranslate nohighlight">\(p\)</span>.  The proof is one line:
 <span class="math notranslate nohighlight">\(\Prob(X\le x)=\Prob(P^{-1}(U)\le x)=\Prob(U\le P(x))=P(x)\)</span>, using the
@@ -1692,7 +1864,7 @@ which draws two independent standard normal variables from two uniform ones,</p>
 \[
 x_0 = \sqrt{-2\ln u_0}\,\cos(2\pi u_1),
   \qquad
-  x_1 = \sqrt{-2\ln u_0}\,\sin(2\pi u_1),\tag{2.53}
+  x_1 = \sqrt{-2\ln u_0}\,\sin(2\pi u_1),\tag{2.58}
 \]</div>
 <p>by exploiting the fact that the two-dimensional Gaussian is separable in polar
 coordinates.  When neither route is available, one falls back on
@@ -1713,13 +1885,13 @@ next state depends only on the current one and not on the history,</p>
 <div class="math notranslate nohighlight">
 \[
 \Prob(\bm{x}_{t+1}\mid\bm{x}_t,\bm{x}_{t-1},\dots)
-   = \Prob(\bm{x}_{t+1}\mid\bm{x}_t) \equiv W(\bm{x}_t\to\bm{x}_{t+1}).\tag{2.54}
+   = \Prob(\bm{x}_{t+1}\mid\bm{x}_t) \equiv W(\bm{x}_t\to\bm{x}_{t+1}).\tag{2.59}
 \]</div>
 <p>For a finite state space the transition probabilities form a matrix <span class="math notranslate nohighlight">\(\bm{W}\)</span>
 whose columns sum to unity, and the distribution after <span class="math notranslate nohighlight">\(t\)</span> steps is</p>
 <div class="math notranslate nohighlight">
 \[
-\bm{w}(t) = \bm{W}^{t}\bm{w}(0),\tag{2.55}
+\bm{w}(t) = \bm{W}^{t}\bm{w}(0),\tag{2.60}
 \]</div>
 <p>which the reader will recognise as the power method of
 Section <em>The power method</em>.  Under mild conditions – the chain must be
@@ -1729,7 +1901,7 @@ converges to the corresponding eigenvector, the unique <em>stationary
 distribution</em> <span class="math notranslate nohighlight">\(\bm{w}^{*}\)</span> with</p>
 <div class="math notranslate nohighlight">
 \[
-\bm{W}\bm{w}^{*} = \bm{w}^{*} .\tag{2.56}
+\bm{W}\bm{w}^{*} = \bm{w}^{*} .\tag{2.61}
 \]</div>
 <p>The rate of convergence is governed by the second eigenvalue, exactly as in
 Eq. (1.108), and the initial transient during which the chain
@@ -1741,13 +1913,13 @@ construct a chain whose stationary distribution is <span class="math notranslate
 condition is <em>detailed balance</em>,</p>
 <div class="math notranslate nohighlight">
 \[
-p(\bm{x})\,W(\bm{x}\to\bm{x}') = p(\bm{x}')\,W(\bm{x}'\to\bm{x}),\tag{2.57}
+p(\bm{x})\,W(\bm{x}\to\bm{x}') = p(\bm{x}')\,W(\bm{x}'\to\bm{x}),\tag{2.62}
 \]</div>
 <p>which states that in equilibrium the flow of probability from <span class="math notranslate nohighlight">\(\bm{x}\)</span> to
-<span class="math notranslate nohighlight">\(\bm{x}'\)</span> balances the reverse flow.  Summing Eq. (2.57)
+<span class="math notranslate nohighlight">\(\bm{x}'\)</span> balances the reverse flow.  Summing Eq. (2.62)
 over <span class="math notranslate nohighlight">\(\bm{x}\)</span> and using the normalisation of <span class="math notranslate nohighlight">\(W\)</span> gives
 <span class="math notranslate nohighlight">\(\sum_{\bm{x}}p(\bm{x})W(\bm{x}\to\bm{x}')=p(\bm{x}')\)</span>, which is
-Eq. (2.56): any chain satisfying detailed balance has <span class="math notranslate nohighlight">\(p\)</span> as
+Eq. (2.61): any chain satisfying detailed balance has <span class="math notranslate nohighlight">\(p\)</span> as
 a stationary distribution.</p>
 <p><strong>The Metropolis algorithm.</strong>
 It remains to construct such a <span class="math notranslate nohighlight">\(W\)</span>.  Split each move into a <em>proposal</em>
@@ -1758,19 +1930,19 @@ detailed balance reduces to</p>
 <div class="math notranslate nohighlight">
 \[
 \frac{A(\bm{x}\to\bm{x}')}{A(\bm{x}'\to\bm{x})}
-   = \frac{p(\bm{x}')}{p(\bm{x})},\tag{2.58}
+   = \frac{p(\bm{x}')}{p(\bm{x})},\tag{2.63}
 \]</div>
 <p>and the Metropolis choice</p>
 <div class="math notranslate nohighlight">
 \[
 \boxed{\;
-  A(\bm{x}\to\bm{x}') = \min\left(1,\;\frac{p(\bm{x}')}{p(\bm{x})}\right) \;}\tag{2.59}
+  A(\bm{x}\to\bm{x}') = \min\left(1,\;\frac{p(\bm{x}')}{p(\bm{x})}\right) \;}\tag{2.64}
 \]</div>
 <p>satisfies it.  The algorithm is then simply: propose a move; if it increases
 the probability, accept it; if it decreases the probability, accept it anyway
 with probability <span class="math notranslate nohighlight">\(p(\bm{x}')/p(\bm{x})\)</span>; otherwise stay where you are and
 count the current state again.</p>
-<p>The decisive feature of Eq. (2.59) is that only the
+<p>The decisive feature of Eq. (2.64) is that only the
 <em>ratio</em> of probabilities appears.  Any normalisation constant cancels, so
 we may sample from a distribution we can evaluate only up to a factor – which
 is exactly the situation for the Boltzmann distribution
@@ -1778,7 +1950,7 @@ is exactly the situation for the Boltzmann distribution
 function is intractable, and for the posterior distributions of Bayesian
 inference, whose evidence integral is equally so.  Dropping the symmetry
 requirement on <span class="math notranslate nohighlight">\(T\)</span> gives the more general Metropolis-Hastings algorithm, in
-which Eq. (2.59) acquires a ratio of proposal probabilities.</p>
+which Eq. (2.64) acquires a ratio of proposal probabilities.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
@@ -1838,8 +2010,8 @@ independently, and this is exactly what the correlation time quantifies.  The
 histogram on the right shows that the stationary distribution is nevertheless
 the intended one, reproducing <span class="math notranslate nohighlight">\(\mathcal{N}(0,1)\)</span> accurately although the
 normalisation of the target was never supplied to the algorithm.</p>
-<p><img alt="Metropolis sampling of an unnormalised standard Gaussian, Eq. 2.59.  L" src="_images/metropolis_sampling.png" /></p>
-<p><em>Figure 2.5: Metropolis sampling of an unnormalised standard Gaussian, Eq. (2.59).  Left: the first <span class="math notranslate nohighlight">\(600\)</span> states of the chain, showing the correlation between successive samples.  Right: the sampled histogram against the exact density.</em></p>
+<p><img alt="Metropolis sampling of an unnormalised standard Gaussian, Eq. 2.64.  L" src="_images/metropolis_sampling.png" /></p>
+<p><em>Figure 2.5: Metropolis sampling of an unnormalised standard Gaussian, Eq. (2.64).  Left: the first <span class="math notranslate nohighlight">\(600\)</span> states of the chain, showing the correlation between successive samples.  Right: the sampled histogram against the exact density.</em></p>
 <div class="tip admonition">
 <p class="admonition-title">Machine learning connection</p>
 <p>The Metropolis algorithm is the sampling
@@ -1852,7 +2024,7 @@ weights by Hamiltonian Monte Carlo, a Metropolis method whose proposal follows
 the gradient of the log-density.  And the denoising process of a diffusion
 model is a learned approximation to the reverse of a stochastic chain of
 exactly this type.  In all three cases the acceptance
-criterion (2.59) is doing the same work: it lets us sample
+criterion (2.64) is doing the same work: it lets us sample
 from a distribution we can score but cannot normalise.</p>
 </div>
 </section>
@@ -1878,7 +2050,7 @@ least-squares estimator, the same machinery gave
 statistical uncertainty of a fit directly to the conditioning of the design
 matrix discussed in Chapter 1.</p>
 <p>The third part concerned models rather than numbers.  The bias-variance
-decomposition (2.47) explains the characteristic shape of
+decomposition (2.52) explains the characteristic shape of
 the test error as a function of model complexity, and identifies the
 irreducible noise floor beneath it.  The bootstrap manufactures the ensemble
 of training sets that the decomposition presupposes but that we never possess,
@@ -1973,7 +2145,7 @@ Generate data from Eq. (2.37) with known <span class="math notranslate nohighlig
 (a) Fit <span class="math notranslate nohighlight">\(\hat{\bm{\theta}}\)</span> many times with fresh noise and compute the
 empirical covariance of the estimates.
 (b) Compare with the prediction <span class="math notranslate nohighlight">\(\sigma^{2}(\bm{X}^{T}\bm{X})^{-1}\)</span> of
-Eq. (2.42).
+Eq. (2.47).
 (c) Repeat with two nearly collinear columns in <span class="math notranslate nohighlight">\(\bm{X}\)</span> and relate the
 result to the singular values, using
 Eq. (1.122).</p></li>

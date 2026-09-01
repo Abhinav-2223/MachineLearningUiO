@@ -391,19 +391,20 @@ document.write(`
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#scaling-centring-and-the-intercept">3.13. Scaling, centring and the intercept</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#a-complete-example-the-franke-function">3.14. A complete example: the Franke function</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#a-second-example-the-one-dimensional-ising-model">3.15. A second example: the one-dimensional Ising model</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-model-and-the-design-matrix">3.15.1. The model and the design matrix</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#fitting-with-p-four-times-n">3.15.2. Fitting with <span class="math notranslate nohighlight">\(p\)</span> four times <span class="math notranslate nohighlight">\(n\)</span></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#why-the-symmetry-and-why-only-for-two-of-the-three">3.15.3. Why the symmetry, and why only for two of the three</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-penalty-over-eight-decades">3.15.4. The penalty, over eight decades</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#what-the-example-is-for">3.15.5. What the example is for</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#choosing-the-penalty-cross-validation-for-ridge-and-lasso">3.14. Choosing the penalty: cross-validation for Ridge and Lasso</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#a-complete-example-the-franke-function">3.15. A complete example: the Franke function</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#a-second-example-the-one-dimensional-ising-model">3.16. A second example: the one-dimensional Ising model</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-model-and-the-design-matrix">3.16.1. The model and the design matrix</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#fitting-with-p-four-times-n">3.16.2. Fitting with <span class="math notranslate nohighlight">\(p\)</span> four times <span class="math notranslate nohighlight">\(n\)</span></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#why-the-symmetry-and-why-only-for-two-of-the-three">3.16.3. Why the symmetry, and why only for two of the three</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-penalty-over-eight-decades">3.16.4. The penalty, over eight decades</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#what-the-example-is-for">3.16.5. What the example is for</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#summary-and-the-programs">3.16. Summary and the programs</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercises">3.17. Exercises</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#warm-up-exercises">3.17.1. Warm-up exercises</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#project-style-exercise-regression-analysis-of-the-franke-function">3.17.2. Project-style exercise: regression analysis of the Franke function</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#summary-and-the-programs">3.17. Summary and the programs</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercises">3.18. Exercises</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#warm-up-exercises">3.18.1. Warm-up exercises</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#project-style-exercise-regression-analysis-of-the-franke-function">3.18.2. Project-style exercise: regression analysis of the Franke function</a></li>
 </ul>
 </li>
 </ul>
@@ -450,8 +451,9 @@ penalty that gives Ridge regression and then the <span class="math notranslate n
 the Lasso, and show that the two behave very differently for reasons that are
 entirely geometric.  A Bayesian reading unifies all three as maximum-a-posteriori
 estimates under different priors.  We close with the practical questions of
-scaling and the intercept, and with a complete worked analysis of the Franke
-function.</p>
+scaling and the intercept, with the procedure by which the penalty is
+actually chosen – cross-validation, done properly, and compared with the
+bootstrap – and with a complete worked analysis of the Franke function.</p>
 <section id="the-regression-problem">
 <h2><span class="section-number">3.1. </span>The regression problem<a class="headerlink" href="#the-regression-problem" title="Link to this heading">#</a></h2>
 <p>We are given <span class="math notranslate nohighlight">\(n\)</span> observations of <span class="math notranslate nohighlight">\(p\)</span> features, collected in the design matrix
@@ -3033,8 +3035,790 @@ scaling of every remaining point.  Whichever scaler is chosen, the rule
 derived earlier in this section stands unchanged: its statistics are computed
 on the training data and applied, frozen, to everything that comes later.</p>
 </section>
+<section id="choosing-the-penalty-cross-validation-for-ridge-and-lasso">
+<h2><span class="section-number">3.14. </span>Choosing the penalty: cross-validation for Ridge and Lasso<a class="headerlink" href="#choosing-the-penalty-cross-validation-for-ridge-and-lasso" title="Link to this heading">#</a></h2>
+<p>Everything said about Ridge regression and the Lasso so far has taken the
+penalty <span class="math notranslate nohighlight">\(\lambda\)</span> as given.  Theorem 3.6 guarantees that a
+good value exists and Eq. (3.55) tells us what it depends on –
+the true parameters and the noise variance, which we do not know – so in
+practice <span class="math notranslate nohighlight">\(\lambda\)</span> must be estimated from the data like everything else.
+Section <em>Cross-validation</em> gave the recipe in outline: define a grid,
+cross-validate, take the minimum, refit.  The present section carries it out
+properly, because the details are where the mistakes live, and closes by
+asking why cross-validation rather than the bootstrap of
+Section <em>Resampling: the jackknife and the bootstrap</em> is the standard tool for the job.</p>
+<p><strong>Parameters and hyperparameters.</strong>
+A penalised regression has two kinds of unknowns.  The <em>model
+parameters</em> – the intercept <span class="math notranslate nohighlight">\(\theta_0\)</span> and the slopes <span class="math notranslate nohighlight">\(\bm{\theta}\)</span> – are
+fixed, for a given <span class="math notranslate nohighlight">\(\lambda\)</span>, by minimising the cost, Eq. (3.43)
+or (3.57).  The penalty <span class="math notranslate nohighlight">\(\lambda\)</span> is a
+<em>hyperparameter</em>: it cannot be fixed by the same minimisation, and the
+reason is worth stating exactly.  Write <span class="math notranslate nohighlight">\(\mathrm{Err}_{\mathrm{Train}}(\lambda)\)</span>
+for the training error <span class="math notranslate nohighlight">\(\tfrac1n\|\bm{y}-\bm{X}\hat{\bm{\theta}}(\lambda)\|_2^{2}\)</span>
+of the fitted model.  The unpenalised estimator <span class="math notranslate nohighlight">\(\hat{\bm{\theta}}(0)\)</span>
+minimises that quantity over <em>all</em> <span class="math notranslate nohighlight">\(\bm{\theta}\)</span>, so for any
+<span class="math notranslate nohighlight">\(\lambda&gt;0\)</span>,</p>
+<div class="math notranslate nohighlight">
+\[
+\mathrm{Err}_{\mathrm{Train}}(\lambda)\;\ge\;\mathrm{Err}_{\mathrm{Train}}(0),\tag{3.91}
+\]</div>
+<p>and a stronger statement holds: the training error is non-decreasing in
+<span class="math notranslate nohighlight">\(\lambda\)</span> along the whole path (this is proved as an exercise).  Minimising the
+training error over <span class="math notranslate nohighlight">\(\lambda\)</span> therefore always returns <span class="math notranslate nohighlight">\(\lambda=0\)</span>, which is
+ordinary least squares, and the whole discussion of
+Section <em>Ridge regression</em> would be pointless.  The hyperparameter must be
+chosen by an estimate of the <em>test</em> error, and cross-validation is that
+estimate.  There are accordingly three errors in play, and it is essential to
+keep them apart: the training error, which is minimised to obtain the
+parameters at fixed <span class="math notranslate nohighlight">\(\lambda\)</span>; the cross-validation error, which is minimised
+over <span class="math notranslate nohighlight">\(\lambda\)</span> to obtain the hyperparameter; and the test error, which is
+computed once, at the very end, and minimised over nothing.</p>
+<p><strong>The procedure, precisely.</strong>
+Let the training data have <span class="math notranslate nohighlight">\(n\)</span> observations and let
+<span class="math notranslate nohighlight">\(\kappa:\{0,\dots,n-1\}\to\{1,\dots,K\}\)</span> assign each observation to one of
+<span class="math notranslate nohighlight">\(K\)</span> folds of equal size, after a random shuffle.  For every fold <span class="math notranslate nohighlight">\(k\)</span> and every
+<span class="math notranslate nohighlight">\(\lambda\)</span> on the grid, let <span class="math notranslate nohighlight">\(\hat{\theta}_{0}^{(-k)}(\lambda)\)</span> and
+<span class="math notranslate nohighlight">\(\hat{\bm{\theta}}^{(-k)}(\lambda)\)</span> be the intercept and slopes fitted to the
+observations <em>not</em> in fold <span class="math notranslate nohighlight">\(k\)</span>, with the standardisation of
+Section <em>Scaling, centring and the intercept</em> also computed from those observations
+alone.  The cross-validation error is the average squared error of every
+observation predicted by the model that did not see it,</p>
+<div class="math notranslate nohighlight">
+\[
+\mathrm{CV}_K(\lambda)
+   = \frac{1}{n}\sum_{i=0}^{n-1}
+     \left(y_i-\hat{\theta}_{0}^{(-\kappa(i))}(\lambda)
+       -\bm{x}_i^{T}\hat{\bm{\theta}}^{(-\kappa(i))}(\lambda)\right)^{2}
+   = \frac{1}{K}\sum_{k=1}^{K}\mathrm{MSE}_k(\lambda),\tag{3.92}
+\]</div>
+<p>where <span class="math notranslate nohighlight">\(\mathrm{MSE}_k(\lambda)\)</span> is the mean squared error on fold <span class="math notranslate nohighlight">\(k\)</span> and the
+second equality holds for folds of equal size.  The spread of the <span class="math notranslate nohighlight">\(K\)</span> fold
+errors gives the standard error of the estimate,</p>
+<div class="math notranslate nohighlight">
+\[
+\mathrm{SE}_K(\lambda)
+   = \frac{1}{\sqrt{K}}
+     \sqrt{\frac{1}{K-1}\sum_{k=1}^{K}
+       \left(\mathrm{MSE}_k(\lambda)-\mathrm{CV}_K(\lambda)\right)^{2}} ,\tag{3.93}
+\]</div>
+<p>which is Eq. (2.24) applied to the fold errors.  It should be
+read as a rough guide rather than as a confidence interval: the <span class="math notranslate nohighlight">\(K\)</span> training
+sets overlap, each pair sharing a fraction <span class="math notranslate nohighlight">\((K-2)/(K-1)\)</span> of its points, so the
+fold errors are positively correlated and Eq. (3.93) understates
+the true uncertainty.  The selected penalty is</p>
+<div class="math notranslate nohighlight">
+\[
+\lambda_{\min} = \arg\min_{\lambda}\mathrm{CV}_K(\lambda),\tag{3.94}
+\]</div>
+<p>and the final model is a <em>new</em> fit at <span class="math notranslate nohighlight">\(\lambda_{\min}\)</span> to all <span class="math notranslate nohighlight">\(n\)</span>
+training observations, standardised with the statistics of all <span class="math notranslate nohighlight">\(n\)</span>.  The
+<span class="math notranslate nohighlight">\(K\)</span> sets of fold coefficients were temporary; they served to evaluate
+candidate penalties and are discarded.  Only after this refit is the test set
+touched, once, to report the generalisation error of the completed procedure.
+The whole recipe is:</p>
+<ol class="arabic simple">
+<li><p>Set aside a test set and do not look at it again until step 6.</p></li>
+<li><p>Choose a logarithmic grid of penalties.</p></li>
+<li><p>Shuffle the training data and split it into <span class="math notranslate nohighlight">\(K\)</span> folds, <span class="math notranslate nohighlight">\(K\)</span> between
+five and ten.</p></li>
+<li><p>For every fold and every <span class="math notranslate nohighlight">\(\lambda\)</span>: standardise with the training
+folds’ statistics, fit on the training folds, predict the held-out
+fold, record the squared error.  Average to obtain
+Eqs. (3.92) and (3.93).</p></li>
+<li><p>Select <span class="math notranslate nohighlight">\(\lambda_{\min}\)</span>, or the one-standard-error choice described
+below, and refit on all training data at that penalty.</p></li>
+<li><p>Evaluate the refitted model on the test set.  Report the selected
+<span class="math notranslate nohighlight">\(\lambda\)</span>, the final coefficients, the cross-validation error with its
+standard error, and the test error.</p></li>
+</ol>
+<p><strong>Which <span class="math notranslate nohighlight">\(\lambda\)</span> is being compared: the factor <span class="math notranslate nohighlight">\(n\)</span>.</strong>
+There is a detail in step 5 that is easy to miss.  The models of step 4 are
+fitted to <span class="math notranslate nohighlight">\(n(K-1)/K\)</span> observations, the final model to <span class="math notranslate nohighlight">\(n\)</span>, and the question is
+whether the same numerical <span class="math notranslate nohighlight">\(\lambda\)</span> means the same thing for both.  It
+depends on the convention.  With the cost written as in
+Eq. (3.43), squared error <em>divided by <span class="math notranslate nohighlight">\(n\)</span></em> plus
+<span class="math notranslate nohighlight">\(\lambda\|\bm{\theta}\|_2^{2}\)</span>, the normal equations become</p>
+<div class="math notranslate nohighlight">
+\[
+\hat{\bm{\theta}}_{\mathrm{Ridge}}
+   = \left(\bm{X}^{T}\bm{X}+n\lambda\bm{I}\right)^{-1}\bm{X}^{T}\bm{y},\tag{3.95}
+\]</div>
+<p>which differs from Eq. (3.44) by the factor <span class="math notranslate nohighlight">\(n\)</span> on the
+penalty.  Every entry of <span class="math notranslate nohighlight">\(\bm{X}^{T}\bm{X}\)</span> is a sum of <span class="math notranslate nohighlight">\(n\)</span> products and grows
+in proportion to <span class="math notranslate nohighlight">\(n\)</span>; in Eq. (3.95) the penalty <span class="math notranslate nohighlight">\(n\lambda\)</span>
+grows with it, so the balance between fit and penalty is independent of the
+sample size and <span class="math notranslate nohighlight">\(\lambda\)</span> is a penalty <em>per observation</em>.  A value found
+on folds of <span class="math notranslate nohighlight">\(80\)</span> points is then the right value for the refit on <span class="math notranslate nohighlight">\(100\)</span>.  In
+the convention of Eq. (3.44), where nothing divides the
+squared error, the penalty is a fixed number set against a matrix that grows
+with <span class="math notranslate nohighlight">\(n\)</span>: the same <span class="math notranslate nohighlight">\(\lambda\)</span> is weaker, by the factor <span class="math notranslate nohighlight">\((K-1)/K\)</span>, on the full
+training set than it was inside the folds, and a faithful transfer would
+multiply it by <span class="math notranslate nohighlight">\(K/(K-1)\)</span>.  The effect is a single step on a fine grid and is
+usually invisible, but it is the reason we keep the <span class="math notranslate nohighlight">\(1/n\)</span> of
+Eqs. (3.43) and (3.57) throughout this
+section, and it is one more entry for the checklist of
+Section <em>Scaling, centring and the intercept</em>: <code class="docutils literal notranslate"><span class="pre">scikit-learn</span></code>’s <code class="docutils literal notranslate"><span class="pre">Ridge</span></code>
+uses the unnormalised convention, so its <code class="docutils literal notranslate"><span class="pre">alpha</span></code> is our <span class="math notranslate nohighlight">\(n\lambda\)</span>,
+while its <code class="docutils literal notranslate"><span class="pre">Lasso</span></code> divides by <span class="math notranslate nohighlight">\(2n\)</span> and its <code class="docutils literal notranslate"><span class="pre">alpha</span></code> is our
+<span class="math notranslate nohighlight">\(\lambda/2\)</span>.  The Lasso penalty of Eq. (3.57) is likewise
+per observation, and the threshold <span class="math notranslate nohighlight">\(\lambda_{\max}\)</span> of
+Proposition 3.8, being <span class="math notranslate nohighlight">\(2/n\)</span> times a sum of <span class="math notranslate nohighlight">\(n\)</span> products,
+is independent of <span class="math notranslate nohighlight">\(n\)</span> in the same sense.</p>
+<p><strong>The grid.</strong>
+For the Lasso the grid has a natural top: above <span class="math notranslate nohighlight">\(\lambda_{\max}\)</span> of
+Eq. (3.67) every coefficient is zero and there is nothing to
+compute.  The standard choice is a geometric sequence of fifty to a hundred
+values from <span class="math notranslate nohighlight">\(\lambda_{\max}\)</span> down to <span class="math notranslate nohighlight">\(10^{-3}\lambda_{\max}\)</span> or
+<span class="math notranslate nohighlight">\(10^{-4}\lambda_{\max}\)</span>, traversed from the top so that each coordinate
+descent can start from the previous solution – the <em>warm start</em> that
+makes the whole path cheaper than a handful of cold fits.  For Ridge there is
+no finite <span class="math notranslate nohighlight">\(\lambda_{\max}\)</span>, but the shrinkage factors of
+Eq. (3.48), which in the convention of
+Eq. (3.95) read <span class="math notranslate nohighlight">\(\sigma_i^{2}/(\sigma_i^{2}+n\lambda)\)</span>, tell
+us where the action is: between <span class="math notranslate nohighlight">\(n\lambda\approx\sigma_{\min}^{2}\)</span>, below
+which the fit is indistinguishable from OLS, and
+<span class="math notranslate nohighlight">\(n\lambda\approx\sigma_{\max}^{2}\)</span>, above which every direction is suppressed
+and the model predicts the mean.  For standardised columns
+<span class="math notranslate nohighlight">\(\bm{X}^{T}\bm{X}/n\)</span> is the correlation matrix of the features, whose
+eigenvalues are of order one, so <span class="math notranslate nohighlight">\(\sigma_i^{2}/n\)</span> is of order one and the
+natural unit of <span class="math notranslate nohighlight">\(\lambda\)</span> is <span class="math notranslate nohighlight">\(1\)</span>: a penalty <span class="math notranslate nohighlight">\(\lambda=1\)</span> shrinks a typical
+direction by about half.  A grid from <span class="math notranslate nohighlight">\(10^{-4}\)</span> to <span class="math notranslate nohighlight">\(10\)</span> covers every regime
+for moderately correlated features, and this is what the code below uses.
+Either way the grid should be logarithmic, since the cross-validation curve
+varies on a logarithmic scale in <span class="math notranslate nohighlight">\(\lambda\)</span>, and it should be inspected: a
+minimum at the end of the grid means the grid was wrong, not that the end is
+the answer.</p>
+<p><strong>Standardisation inside the loop.</strong>
+Section <em>Scaling, centring and the intercept</em> established that the penalised methods are
+not equivariant under rescaling of the features, so the columns must be
+standardised, and that the intercept must be left unpenalised, which is done
+by centring and then recovering <span class="math notranslate nohighlight">\(\theta_0\)</span> from Eq. (3.90).
+Cross-validation adds the requirement that the means and standard deviations
+be computed <em>inside</em> each fold, from the <span class="math notranslate nohighlight">\(K-1\)</span> training folds alone, and
+applied frozen to the held-out fold.  Standardising the full training set
+once, before the loop, lets every training fold see the mean and variance of
+its own held-out fold.  For scaling alone the leak is small.  It becomes
+large for any preprocessing that looks at the targets: screening the features
+by their correlation with <span class="math notranslate nohighlight">\(\bm{y}\)</span> on the full data set and then
+cross-validating a model on the survivors is the classic example, and it can
+produce a cross-validation error far below the noise floor for features that
+are pure noise.  The rule is that the held-out fold must be treated exactly as
+future data will be treated, which means that nothing computed from it may
+enter the fit.  In <code class="docutils literal notranslate"><span class="pre">scikit-learn</span></code> the mechanism that enforces this is
+the <code class="docutils literal notranslate"><span class="pre">Pipeline</span></code>; in the code below it is done by hand so that there is
+nothing hidden.</p>
+<p><strong>The one-standard-error rule.</strong></p>
+<p>Near its minimum the cross-validation curve is flat, and the location of the
+minimum is determined only to within the noise of the estimate.  Among
+penalties whose cross-validation errors cannot be told apart, the sensible
+choice is the most strongly regularised, and the <em>one-standard-error
+rule</em> makes that precise:</p>
+<div class="math notranslate nohighlight">
+\[
+\lambda_{1\mathrm{SE}}
+   = \max\left\{\lambda :\;
+       \mathrm{CV}_K(\lambda)\le
+       \mathrm{CV}_K(\lambda_{\min})+\mathrm{SE}_K(\lambda_{\min})\right\},\tag{3.96}
+\]</div>
+<p>the largest penalty whose error lies within one standard error of the best.
+For Ridge this buys a smaller variance at the cost of a little bias that the
+data cannot detect; for the Lasso it buys a sparser model, which is often the
+point of using the Lasso at all.  The rule is a convention, not a theorem,
+and it errs deliberately on the side of simplicity: the improvement offered
+by the more complex model is not larger than the uncertainty with which the
+improvement is measured, so the improvement is not believed.</p>
+<p><strong>An example with a sparse truth.</strong>
+The Franke study of Section <em>A complete example: the Franke function</em> will apply all this to a
+polynomial fit; here we use a problem designed to show the two estimators
+behaving differently.  There are <span class="math notranslate nohighlight">\(p=30\)</span> features, Gaussian with the
+correlation <span class="math notranslate nohighlight">\(\rho^{|i-j|}\)</span>, <span class="math notranslate nohighlight">\(\rho=0.7\)</span>, between features <span class="math notranslate nohighlight">\(i\)</span> and <span class="math notranslate nohighlight">\(j\)</span>, so that
+neighbouring columns are strongly collinear; only the first eight coefficients
+are non-zero; the noise has <span class="math notranslate nohighlight">\(\sigma=1\)</span>, so the floor of
+Eq. (2.47) is at <span class="math notranslate nohighlight">\(1\)</span>; and there are <span class="math notranslate nohighlight">\(n=100\)</span> training
+observations and <span class="math notranslate nohighlight">\(50\)</span> test observations.  The code implements every step of
+the recipe from scratch, with Ridge in the closed form (3.95)
+and the Lasso from <code class="docutils literal notranslate"><span class="pre">scikit-learn</span></code> with the factor of two accounted
+for.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">sklearn.linear_model</span> <span class="kn">import</span> <span class="n">Lasso</span>
+
+<span class="k">def</span> <span class="nf">make_data</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">rho</span><span class="p">,</span> <span class="n">sigma</span><span class="p">,</span> <span class="n">rng</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Correlated Gaussian features, cov[i, j] = rho^|i-j|, and a sparse truth:</span>
+<span class="sd">    only the first eight of the p coefficients are non-zero.&quot;&quot;&quot;</span>
+    <span class="n">cov</span> <span class="o">=</span> <span class="n">rho</span> <span class="o">**</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">subtract</span><span class="o">.</span><span class="n">outer</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">p</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">p</span><span class="p">)))</span>
+    <span class="n">X</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">multivariate_normal</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">p</span><span class="p">),</span> <span class="n">cov</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">n</span><span class="p">)</span>
+    <span class="n">theta</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+    <span class="n">theta</span><span class="p">[:</span><span class="mi">8</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mf">3.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">2.0</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.8</span><span class="p">,</span> <span class="mf">0.6</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.5</span><span class="p">]</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="mf">2.0</span> <span class="o">+</span> <span class="n">X</span> <span class="o">@</span> <span class="n">theta</span> <span class="o">+</span> <span class="n">sigma</span> <span class="o">*</span> <span class="n">rng</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">n</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">theta</span>
+
+<span class="k">def</span> <span class="nf">ridge_fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">lmbda</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Minimiser of ||y - X theta||^2 / n + lmbda ||theta||_2^2, Eq. (3.ridgeproblem),</span>
+<span class="sd">    for centred X and y: theta = (X^T X + n lmbda I)^{-1} X^T y, Eq. (3.ridgepern).&quot;&quot;&quot;</span>
+    <span class="n">n</span><span class="p">,</span> <span class="n">p</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">X</span> <span class="o">+</span> <span class="n">n</span> <span class="o">*</span> <span class="n">lmbda</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">p</span><span class="p">),</span> <span class="n">X</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">y</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">lasso_fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">lmbda</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Minimiser of ||y - X theta||^2 / n + lmbda ||theta||_1, Eq. (3.lassoproblem).</span>
+<span class="sd">    scikit-learn minimises ||y - X theta||^2 / (2n) + alpha ||theta||_1: alpha = lmbda/2.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">Lasso</span><span class="p">(</span><span class="n">alpha</span><span class="o">=</span><span class="n">lmbda</span> <span class="o">/</span> <span class="mf">2.0</span><span class="p">,</span> <span class="n">fit_intercept</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                 <span class="n">max_iter</span><span class="o">=</span><span class="mi">100000</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="mf">1e-10</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span><span class="o">.</span><span class="n">coef_</span>
+
+<span class="k">def</span> <span class="nf">cv_curve</span><span class="p">(</span><span class="n">fit</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">lambdas</span><span class="p">,</span> <span class="n">K</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">rng</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;K-fold cross-validation error for every lambda: mean and standard error.&quot;&quot;&quot;</span>
+    <span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">()</span> <span class="k">if</span> <span class="n">rng</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">rng</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">folds</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array_split</span><span class="p">(</span><span class="n">rng</span><span class="o">.</span><span class="n">permutation</span><span class="p">(</span><span class="n">n</span><span class="p">),</span> <span class="n">K</span><span class="p">)</span>          <span class="c1"># shuffle, then split</span>
+    <span class="n">errors</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="n">K</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">lambdas</span><span class="p">)))</span>
+    <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">held_out</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">folds</span><span class="p">):</span>
+        <span class="n">train</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">setdiff1d</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">n</span><span class="p">),</span> <span class="n">held_out</span><span class="p">)</span>
+        <span class="c1"># standardise with the statistics of the K-1 training folds only</span>
+        <span class="n">mu</span><span class="p">,</span> <span class="n">sd</span><span class="p">,</span> <span class="n">y_mean</span> <span class="o">=</span> <span class="n">X</span><span class="p">[</span><span class="n">train</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">X</span><span class="p">[</span><span class="n">train</span><span class="p">]</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">y</span><span class="p">[</span><span class="n">train</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+        <span class="n">X_tr</span><span class="p">,</span> <span class="n">X_va</span> <span class="o">=</span> <span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="n">train</span><span class="p">]</span> <span class="o">-</span> <span class="n">mu</span><span class="p">)</span> <span class="o">/</span> <span class="n">sd</span><span class="p">,</span> <span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="n">held_out</span><span class="p">]</span> <span class="o">-</span> <span class="n">mu</span><span class="p">)</span> <span class="o">/</span> <span class="n">sd</span>
+        <span class="k">for</span> <span class="n">j</span><span class="p">,</span> <span class="n">lmbda</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">lambdas</span><span class="p">):</span>
+            <span class="n">theta</span> <span class="o">=</span> <span class="n">fit</span><span class="p">(</span><span class="n">X_tr</span><span class="p">,</span> <span class="n">y</span><span class="p">[</span><span class="n">train</span><span class="p">]</span> <span class="o">-</span> <span class="n">y_mean</span><span class="p">,</span> <span class="n">lmbda</span><span class="p">)</span>
+            <span class="n">errors</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">((</span><span class="n">y</span><span class="p">[</span><span class="n">held_out</span><span class="p">]</span> <span class="o">-</span> <span class="n">y_mean</span> <span class="o">-</span> <span class="n">X_va</span> <span class="o">@</span> <span class="n">theta</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">errors</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span> <span class="n">errors</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">ddof</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">K</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">select</span><span class="p">(</span><span class="n">lambdas</span><span class="p">,</span> <span class="n">cv_mean</span><span class="p">,</span> <span class="n">cv_se</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;The minimum-CV lambda, and the largest lambda within one standard error of it.&quot;&quot;&quot;</span>
+    <span class="n">i_min</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmin</span><span class="p">(</span><span class="n">cv_mean</span><span class="p">)</span>
+    <span class="n">within</span> <span class="o">=</span> <span class="n">cv_mean</span> <span class="o">&lt;=</span> <span class="n">cv_mean</span><span class="p">[</span><span class="n">i_min</span><span class="p">]</span> <span class="o">+</span> <span class="n">cv_se</span><span class="p">[</span><span class="n">i_min</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">lambdas</span><span class="p">[</span><span class="n">i_min</span><span class="p">],</span> <span class="n">lambdas</span><span class="p">[</span><span class="n">within</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
+
+<span class="k">def</span> <span class="nf">refit</span><span class="p">(</span><span class="n">fit</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">lmbda</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;The final model: one fit on all training data, mapped back to the raw scale.&quot;&quot;&quot;</span>
+    <span class="n">mu</span><span class="p">,</span> <span class="n">sd</span><span class="p">,</span> <span class="n">y_mean</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">X</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">y</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+    <span class="n">theta</span> <span class="o">=</span> <span class="n">fit</span><span class="p">((</span><span class="n">X</span> <span class="o">-</span> <span class="n">mu</span><span class="p">)</span> <span class="o">/</span> <span class="n">sd</span><span class="p">,</span> <span class="n">y</span> <span class="o">-</span> <span class="n">y_mean</span><span class="p">,</span> <span class="n">lmbda</span><span class="p">)</span>
+    <span class="n">theta_0</span> <span class="o">=</span> <span class="n">y_mean</span> <span class="o">-</span> <span class="p">(</span><span class="n">mu</span> <span class="o">/</span> <span class="n">sd</span><span class="p">)</span> <span class="o">@</span> <span class="n">theta</span>               <span class="c1"># intercept, Eq. (3.intercept)</span>
+    <span class="k">return</span> <span class="n">theta_0</span><span class="p">,</span> <span class="n">theta</span> <span class="o">/</span> <span class="n">sd</span>
+
+<span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="mi">3155</span><span class="p">)</span>
+<span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">theta_true</span> <span class="o">=</span> <span class="n">make_data</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="mi">150</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">rho</span><span class="o">=</span><span class="mf">0.7</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">rng</span><span class="o">=</span><span class="n">rng</span><span class="p">)</span>
+<span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">y_test</span> <span class="o">=</span> <span class="n">X</span><span class="p">[:</span><span class="mi">100</span><span class="p">],</span> <span class="n">y</span><span class="p">[:</span><span class="mi">100</span><span class="p">],</span> <span class="n">X</span><span class="p">[</span><span class="mi">100</span><span class="p">:],</span> <span class="n">y</span><span class="p">[</span><span class="mi">100</span><span class="p">:]</span>
+<span class="n">lambdas</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logspace</span><span class="p">(</span><span class="o">-</span><span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">60</span><span class="p">)</span>
+
+<span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">fit</span> <span class="ow">in</span> <span class="p">((</span><span class="s2">&quot;Ridge&quot;</span><span class="p">,</span> <span class="n">ridge_fit</span><span class="p">),</span> <span class="p">(</span><span class="s2">&quot;Lasso&quot;</span><span class="p">,</span> <span class="n">lasso_fit</span><span class="p">)):</span>
+    <span class="n">cv_mean</span><span class="p">,</span> <span class="n">cv_se</span> <span class="o">=</span> <span class="n">cv_curve</span><span class="p">(</span><span class="n">fit</span><span class="p">,</span> <span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">lambdas</span><span class="p">,</span> <span class="n">K</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+                              <span class="n">rng</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="mi">2024</span><span class="p">))</span>
+    <span class="k">for</span> <span class="n">rule</span><span class="p">,</span> <span class="n">lmbda</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">((</span><span class="s2">&quot;min-CV&quot;</span><span class="p">,</span> <span class="s2">&quot;one-SE&quot;</span><span class="p">),</span> <span class="n">select</span><span class="p">(</span><span class="n">lambdas</span><span class="p">,</span> <span class="n">cv_mean</span><span class="p">,</span> <span class="n">cv_se</span><span class="p">)):</span>
+        <span class="n">theta_0</span><span class="p">,</span> <span class="n">theta</span> <span class="o">=</span> <span class="n">refit</span><span class="p">(</span><span class="n">fit</span><span class="p">,</span> <span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">lmbda</span><span class="p">)</span>
+        <span class="n">test_mse</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">((</span><span class="n">y_test</span> <span class="o">-</span> <span class="n">theta_0</span> <span class="o">-</span> <span class="n">X_test</span> <span class="o">@</span> <span class="n">theta</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>   <span class="c1"># used once</span>
+        <span class="n">j</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">searchsorted</span><span class="p">(</span><span class="n">lambdas</span><span class="p">,</span> <span class="n">lmbda</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">rule</span><span class="si">}</span><span class="s2">: lambda </span><span class="si">{</span><span class="n">lmbda</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">  CV </span><span class="si">{</span><span class="n">cv_mean</span><span class="p">[</span><span class="n">j</span><span class="p">]</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2"> +- </span><span class="si">{</span><span class="n">cv_se</span><span class="p">[</span><span class="n">j</span><span class="p">]</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">&quot;</span>
+              <span class="sa">f</span><span class="s2">&quot;  test </span><span class="si">{</span><span class="n">test_mse</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">  non-zero </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">theta</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="si">:</span><span class="s2">2d</span><span class="si">}</span><span class="s2">&quot;</span>
+              <span class="sa">f</span><span class="s2">&quot;  true ones kept </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">theta</span><span class="p">[:</span><span class="mi">8</span><span class="p">]</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Ridge</span> <span class="nb">min</span><span class="o">-</span><span class="n">CV</span><span class="p">:</span> <span class="k">lambda</span> <span class="mf">0.0131</span>  <span class="n">CV</span> <span class="mf">1.205</span> <span class="o">+-</span> <span class="mf">0.141</span>  <span class="n">test</span> <span class="mf">1.374</span>  <span class="n">non</span><span class="o">-</span><span class="n">zero</span> <span class="mi">30</span>  <span class="n">true</span> <span class="n">ones</span> <span class="n">kept</span> <span class="mi">8</span>
+<span class="n">Ridge</span> <span class="n">one</span><span class="o">-</span><span class="n">SE</span><span class="p">:</span> <span class="k">lambda</span> <span class="mf">0.0424</span>  <span class="n">CV</span> <span class="mf">1.324</span> <span class="o">+-</span> <span class="mf">0.192</span>  <span class="n">test</span> <span class="mf">1.139</span>  <span class="n">non</span><span class="o">-</span><span class="n">zero</span> <span class="mi">30</span>  <span class="n">true</span> <span class="n">ones</span> <span class="n">kept</span> <span class="mi">8</span>
+<span class="n">Lasso</span> <span class="nb">min</span><span class="o">-</span><span class="n">CV</span><span class="p">:</span> <span class="k">lambda</span> <span class="mf">0.0626</span>  <span class="n">CV</span> <span class="mf">1.098</span> <span class="o">+-</span> <span class="mf">0.126</span>  <span class="n">test</span> <span class="mf">1.059</span>  <span class="n">non</span><span class="o">-</span><span class="n">zero</span> <span class="mi">21</span>  <span class="n">true</span> <span class="n">ones</span> <span class="n">kept</span> <span class="mi">8</span>
+<span class="n">Lasso</span> <span class="n">one</span><span class="o">-</span><span class="n">SE</span><span class="p">:</span> <span class="k">lambda</span> <span class="mf">0.1366</span>  <span class="n">CV</span> <span class="mf">1.216</span> <span class="o">+-</span> <span class="mf">0.130</span>  <span class="n">test</span> <span class="mf">1.140</span>  <span class="n">non</span><span class="o">-</span><span class="n">zero</span> <span class="mi">13</span>  <span class="n">true</span> <span class="n">ones</span> <span class="n">kept</span> <span class="mi">8</span>
+</pre></div>
+</div>
+<p>Figure 3.4 shows the two cross-validation curves behind
+these four lines, together with two curves that are never available in
+practice: the training error of the refitted model, and its <em>true</em>
+expected test error, computed on twenty thousand fresh observations from the
+same process.  Several things are visible at once.</p>
+<p>The training error, dotted, increases monotonically with <span class="math notranslate nohighlight">\(\lambda\)</span>, as
+Eq. (3.91) says it must, and it lies far below the test
+error everywhere: at the OLS end it is <span class="math notranslate nohighlight">\(0.49\)</span> against a true error of <span class="math notranslate nohighlight">\(1.46\)</span>.
+This is the optimism of Section <em>Statistical properties of the least-squares estimator</em> at a ratio <span class="math notranslate nohighlight">\(p/n=0.3\)</span>
+that makes it severe, and it is why the training error can select nothing.
+Both cross-validation curves have the shape of the test-error curve –
+flat for small <span class="math notranslate nohighlight">\(\lambda\)</span>, then a shallow minimum, then a steep rise as the
+model is shrunk towards predicting the mean – and they track it within their
+own standard error.  For Ridge, cross-validation selects <span class="math notranslate nohighlight">\(\lambda_{\min}=0.013\)</span>
+where the true curve has its minimum at <span class="math notranslate nohighlight">\(0.024\)</span>; the true error at the
+selected value is <span class="math notranslate nohighlight">\(1.316\)</span> against a best possible <span class="math notranslate nohighlight">\(1.291\)</span>, so the choice costs
+nothing measurable.  For the Lasso the selected value coincides with the
+minimum of the true curve.</p>
+<p>The Lasso does better than Ridge on this problem, <span class="math notranslate nohighlight">\(1.15\)</span> against <span class="math notranslate nohighlight">\(1.29\)</span> at
+the respective optima, and the reason is the one Section <em>A Bayesian reading</em>
+gave: the truth is sparse, twenty-two of thirty coefficients are exactly
+zero, and the Laplace prior is the right prior.  In the Franke study, where
+the truth is a smooth surface with no exactly-zero monomials, the two
+estimators will finish level.  The Lasso’s sparsity is, however, less clean
+than one might hope.  At <span class="math notranslate nohighlight">\(\lambda_{\min}\)</span> it keeps <span class="math notranslate nohighlight">\(21\)</span> of the <span class="math notranslate nohighlight">\(30\)</span>
+coefficients: all eight true ones and thirteen spurious ones.  This is
+typical and should be expected.  Cross-validation minimises the
+<em>prediction</em> error, and a spurious coefficient with a small non-zero
+value costs almost nothing in prediction while removing it costs a little; the
+prediction-optimal penalty therefore includes a tail of small, false
+coefficients.  The one-standard-error choice, <span class="math notranslate nohighlight">\(\lambda_{1\mathrm{SE}}=0.137\)</span>,
+removes eight of them, keeping <span class="math notranslate nohighlight">\(13\)</span> coefficients with all eight true ones
+still present, at a true error of <span class="math notranslate nohighlight">\(1.28\)</span> instead of <span class="math notranslate nohighlight">\(1.15\)</span>.  That is the
+trade the rule offers: a measurably simpler model for a barely measurable loss
+of accuracy.  For Ridge, whose thirty coefficients are all non-zero at every
+<span class="math notranslate nohighlight">\(\lambda\)</span>, the same rule moves the penalty from <span class="math notranslate nohighlight">\(0.013\)</span> to <span class="math notranslate nohighlight">\(0.042\)</span> and the
+true error from <span class="math notranslate nohighlight">\(1.316\)</span> to <span class="math notranslate nohighlight">\(1.338\)</span>.</p>
+<p><img alt="Five-fold cross-validation of Ridge left and the Lasso right on the sp" src="../BookML/BookFigures/chapter03_linear_regression/cv_ridge_lasso.png" /></p>
+<p><em>Figure 3.4: Five-fold cross-validation of Ridge (left) and the Lasso (right) on the sparse problem of the text: <span class="math notranslate nohighlight">\(n=100\)</span>, <span class="math notranslate nohighlight">\(p=30\)</span>, correlation <span class="math notranslate nohighlight">\(0.7^{|i-j|}\)</span>, eight non-zero coefficients, <span class="math notranslate nohighlight">\(\sigma=1\)</span>.  The cross-validation error (3.92) is shown with its one-standard-error band (3.93); the dashed curve is the true expected test error of the model refitted at each <span class="math notranslate nohighlight">\(\lambda\)</span>, measured on <span class="math notranslate nohighlight">\(20\,000\)</span> fresh observations, and the dotted curve the training error.  The horizontal line is the noise floor <span class="math notranslate nohighlight">\(\sigma^{2}=1\)</span>.  The vertical lines mark <span class="math notranslate nohighlight">\(\lambda_{\min}\)</span> of Eq. (3.94) and <span class="math notranslate nohighlight">\(\lambda_{1\mathrm{SE}}\)</span> of Eq. (3.96); for the Lasso the number of non-zero coefficients is drawn against the right-hand axis.</em></p>
+<p>The four test errors in the output deserve a comment of their own, because
+they illustrate a point that is easy to forget.  They range from <span class="math notranslate nohighlight">\(1.06\)</span> to
+<span class="math notranslate nohighlight">\(1.37\)</span> and would seem to say that the one-standard-error Ridge beats the
+minimum-CV Ridge by a wide margin.  They say no such thing.  A mean squared
+error computed from <span class="math notranslate nohighlight">\(50\)</span> residuals is itself an estimate, and for Gaussian
+residuals its standard error is about <span class="math notranslate nohighlight">\(\mathrm{MSE}\sqrt{2/50}\approx0.2\)</span>
+(the squared residuals have variance <span class="math notranslate nohighlight">\(2\,\mathrm{MSE}^{2}\)</span>, and
+Eq. (2.24) does the rest).  The honest summary of the last
+column is that all four models generalise with an error of about
+<span class="math notranslate nohighlight">\(1.2\pm0.2\)</span>, in agreement with their cross-validation estimates and above
+the floor of <span class="math notranslate nohighlight">\(1\)</span>, and that a test set of fifty points cannot resolve
+differences of a tenth.  The true errors quoted above, which can resolve
+them, were available only because we wrote the generating process ourselves.</p>
+<p>Two further remarks on the cross-validation curves.  First, the curve in the
+left panel lies <em>below</em> the true error for small <span class="math notranslate nohighlight">\(\lambda\)</span>, by about
+<span class="math notranslate nohighlight">\(0.2\)</span>.  Cross-validation is if anything pessimistic – its models are fitted
+to <span class="math notranslate nohighlight">\(80\)</span> points rather than <span class="math notranslate nohighlight">\(100\)</span> – so this is not a systematic effect but the
+fluctuation of a single training set, of the size the standard error
+suggests; the repeated experiment later in this section will put a number on
+it.  Second, the flatness of the curves near the minimum has a consequence
+for the selected penalty.  Repeating the five-fold procedure with twenty
+different shuffles of the same training data,</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">fit</span> <span class="ow">in</span> <span class="p">((</span><span class="s2">&quot;Ridge&quot;</span><span class="p">,</span> <span class="n">ridge_fit</span><span class="p">),</span> <span class="p">(</span><span class="s2">&quot;Lasso&quot;</span><span class="p">,</span> <span class="n">lasso_fit</span><span class="p">)):</span>
+    <span class="n">selected</span> <span class="o">=</span> <span class="p">[</span><span class="n">select</span><span class="p">(</span><span class="n">lambdas</span><span class="p">,</span> <span class="o">*</span><span class="n">cv_curve</span><span class="p">(</span><span class="n">fit</span><span class="p">,</span> <span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">lambdas</span><span class="p">,</span> <span class="n">K</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+                                          <span class="n">rng</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="n">seed</span><span class="p">)))[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="k">for</span> <span class="n">seed</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">20</span><span class="p">)]</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">: lambda_min over 20 shuffles between&quot;</span>
+          <span class="sa">f</span><span class="s2">&quot; </span><span class="si">{</span><span class="nb">min</span><span class="p">(</span><span class="n">selected</span><span class="p">)</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2"> and </span><span class="si">{</span><span class="nb">max</span><span class="p">(</span><span class="n">selected</span><span class="p">)</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Ridge</span><span class="p">:</span> <span class="n">lambda_min</span> <span class="n">over</span> <span class="mi">20</span> <span class="n">shuffles</span> <span class="n">between</span> <span class="mf">0.0028</span> <span class="ow">and</span> <span class="mf">0.0131</span>
+<span class="n">Lasso</span><span class="p">:</span> <span class="n">lambda_min</span> <span class="n">over</span> <span class="mi">20</span> <span class="n">shuffles</span> <span class="n">between</span> <span class="mf">0.0050</span> <span class="ow">and</span> <span class="mf">0.0626</span>
+</pre></div>
+</div>
+<p>moves <span class="math notranslate nohighlight">\(\lambda_{\min}\)</span> by a factor of five for Ridge and by more than an
+order of magnitude for the Lasso.  Read against the dashed curves of
+Figure 3.4, the Ridge choices all lie on the flat part and
+cost between nothing and a tenth in true error; the Lasso choices span true
+errors from <span class="math notranslate nohighlight">\(1.15\)</span> to <span class="math notranslate nohighlight">\(1.41\)</span> and retain anywhere between <span class="math notranslate nohighlight">\(21\)</span> and all <span class="math notranslate nohighlight">\(30\)</span>
+coefficients.  The penalty selected from a single five-fold split is, in
+other words, a noisy quantity, and the Lasso’s support inherits the noise.
+<em>Repeated</em> cross-validation, which averages the curves over several
+shuffles before taking the minimum, reduces the wandering at a proportional
+cost; the one-standard-error rule is the cheaper remedy, since it moves the
+choice off the flat part and onto the rising flank, where the curve
+determines its own position; and the bootstrap experiment at the end of the
+section is the way to see how much of the selected support to trust.</p>
+<p><strong>The same procedure with scikit-learn.</strong>
+Once the mechanics are understood, the library does the bookkeeping.  A
+<code class="docutils literal notranslate"><span class="pre">Pipeline</span></code> refits the scaler inside every fold, <code class="docutils literal notranslate"><span class="pre">GridSearchCV</span></code>
+runs the loop over folds and penalties, and with <code class="docutils literal notranslate"><span class="pre">refit=True</span></code> it ends
+by fitting the whole pipeline on all training data at the selected value.
+The folds are passed explicitly so that they coincide with those of the code
+above, and <code class="docutils literal notranslate"><span class="pre">alpha</span></code> is set to <span class="math notranslate nohighlight">\(n_{\mathrm{fold}}\lambda=80\lambda\)</span> so
+that, inside the folds, <code class="docutils literal notranslate"><span class="pre">Ridge</span></code> solves exactly
+Eq. (3.95).</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.linear_model</span> <span class="kn">import</span> <span class="n">Ridge</span>
+<span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">GridSearchCV</span>
+<span class="kn">from</span> <span class="nn">sklearn.pipeline</span> <span class="kn">import</span> <span class="n">Pipeline</span>
+<span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span class="n">StandardScaler</span>
+
+<span class="n">folds</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array_split</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="mi">2024</span><span class="p">)</span><span class="o">.</span><span class="n">permutation</span><span class="p">(</span><span class="mi">100</span><span class="p">),</span> <span class="mi">5</span><span class="p">)</span>
+<span class="n">cv</span> <span class="o">=</span> <span class="p">[(</span><span class="n">np</span><span class="o">.</span><span class="n">setdiff1d</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">100</span><span class="p">),</span> <span class="n">f</span><span class="p">),</span> <span class="n">f</span><span class="p">)</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">folds</span><span class="p">]</span>  <span class="c1"># the same folds as above</span>
+
+<span class="n">model</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="p">([(</span><span class="s2">&quot;scale&quot;</span><span class="p">,</span> <span class="n">StandardScaler</span><span class="p">()),</span> <span class="p">(</span><span class="s2">&quot;ridge&quot;</span><span class="p">,</span> <span class="n">Ridge</span><span class="p">())])</span>
+<span class="c1"># scikit-learn&#39;s Ridge minimises ||y - X theta||^2 + alpha ||theta||^2, so</span>
+<span class="c1"># alpha = n lambda, with n = 80 the size of the training folds</span>
+<span class="n">search</span> <span class="o">=</span> <span class="n">GridSearchCV</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;ridge__alpha&quot;</span><span class="p">:</span> <span class="mi">80</span> <span class="o">*</span> <span class="n">lambdas</span><span class="p">},</span>
+                      <span class="n">scoring</span><span class="o">=</span><span class="s2">&quot;neg_mean_squared_error&quot;</span><span class="p">,</span> <span class="n">cv</span><span class="o">=</span><span class="n">cv</span><span class="p">,</span> <span class="n">refit</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">search</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+
+<span class="n">lambda_star</span> <span class="o">=</span> <span class="n">search</span><span class="o">.</span><span class="n">best_params_</span><span class="p">[</span><span class="s2">&quot;ridge__alpha&quot;</span><span class="p">]</span> <span class="o">/</span> <span class="mi">80</span>
+<span class="n">cv_curve_sklearn</span> <span class="o">=</span> <span class="o">-</span><span class="n">search</span><span class="o">.</span><span class="n">cv_results_</span><span class="p">[</span><span class="s2">&quot;mean_test_score&quot;</span><span class="p">]</span>
+<span class="n">final_model</span> <span class="o">=</span> <span class="n">search</span><span class="o">.</span><span class="n">best_estimator_</span>    <span class="c1"># a new fit on all of X_train, not a fold fit</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;lambda* </span><span class="si">{</span><span class="n">lambda_star</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">, CV </span><span class="si">{</span><span class="o">-</span><span class="n">search</span><span class="o">.</span><span class="n">best_score_</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">, &quot;</span>
+      <span class="sa">f</span><span class="s2">&quot;test </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">((</span><span class="n">y_test</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">final_model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_test</span><span class="p">))</span><span class="w"> </span><span class="o">**</span><span class="w"> </span><span class="mi">2</span><span class="p">)</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="n">cv_mean</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">cv_curve</span><span class="p">(</span><span class="n">ridge_fit</span><span class="p">,</span> <span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">lambdas</span><span class="p">,</span> <span class="n">K</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+                      <span class="n">rng</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="mi">2024</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;largest difference from the hand-written curve:&quot;</span><span class="p">,</span>
+      <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">cv_curve_sklearn</span> <span class="o">-</span> <span class="n">cv_mean</span><span class="p">)))</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">lambda</span><span class="o">*</span> <span class="mf">0.0131</span><span class="p">,</span> <span class="n">CV</span> <span class="mf">1.205</span><span class="p">,</span> <span class="n">test</span> <span class="mf">1.422</span>
+<span class="n">largest</span> <span class="n">difference</span> <span class="kn">from</span> <span class="nn">the</span> <span class="n">hand</span><span class="o">-</span><span class="n">written</span> <span class="n">curve</span><span class="p">:</span> <span class="mf">1.7763568394002505e-15</span>
+</pre></div>
+</div>
+<p>The two cross-validation curves agree to rounding error, which is the check
+one should always make before trusting a library with a convention.  The
+test error does not agree – <span class="math notranslate nohighlight">\(1.422\)</span> against <span class="math notranslate nohighlight">\(1.374\)</span> from the hand-written
+refit – and the reason is the factor <span class="math notranslate nohighlight">\(n\)</span> once more, now acting on the
+refit: <code class="docutils literal notranslate"><span class="pre">GridSearchCV</span></code> refits with the same <code class="docutils literal notranslate"><span class="pre">alpha</span></code><span class="math notranslate nohighlight">\(=80\lambda^{\ast}\)</span>
+on all <span class="math notranslate nohighlight">\(100\)</span> observations, which in the per-observation convention is a
+penalty of <span class="math notranslate nohighlight">\(0.8\lambda^{\ast}\)</span>, and the final model is therefore slightly
+less regularised than the one selected.  Setting <code class="docutils literal notranslate"><span class="pre">alpha</span></code> to
+<span class="math notranslate nohighlight">\(100\lambda\)</span> instead makes the refit exact but applies the full-sample
+conversion inside <span class="math notranslate nohighlight">\(80\)</span>-point folds, which moves the selected value one grid
+point, to <span class="math notranslate nohighlight">\(0.0108\)</span>, with the cross-validation error unchanged in the third
+decimal.  Neither discrepancy matters here, both being a fraction of a grid
+step on a flat curve, but both are the factor-<span class="math notranslate nohighlight">\(n\)</span> effect described above,
+and knowing where it enters is what allows one to say so.  Letting <code class="docutils literal notranslate"><span class="pre">KFold(5,</span> <span class="pre">shuffle=True,</span> <span class="pre">random_state=2024)</span></code>
+choose its own folds instead of ours moves it much further, to
+<span class="math notranslate nohighlight">\(\lambda^{\ast}=0.0034\)</span> with a cross-validation error of <span class="math notranslate nohighlight">\(1.00\)</span>: the
+wandering of the minimum along a flat valley again, and a reminder that
+the second decimal of <span class="math notranslate nohighlight">\(\lambda_{\min}\)</span> is not a property of the data.</p>
+<p><strong>Leave-one-out and generalised cross-validation, revisited.</strong>
+For Ridge regression Section <em>Statistical properties of the least-squares estimator</em> derived the
+leave-one-out error in closed form, Eq. (3.40), and its
+rotation-invariant relative GCV, Eq. (3.41), both at the price of a
+single fit per <span class="math notranslate nohighlight">\(\lambda\)</span>.  When they apply they are excellent, and for small
+<span class="math notranslate nohighlight">\(n\)</span> they are the natural choice.  Two things limit them.  Their cost is that
+of forming the <span class="math notranslate nohighlight">\(n\times n\)</span> smoother matrix, which for large <span class="math notranslate nohighlight">\(n\)</span> exceeds that
+of <span class="math notranslate nohighlight">\(K\)</span> fits; and, more fundamentally, they require the fitted values to be a
+<em>linear</em> function of <span class="math notranslate nohighlight">\(\bm{y}\)</span>.  The Lasso fails this test: which
+coefficients are non-zero depends on <span class="math notranslate nohighlight">\(\bm{y}\)</span>, so <span class="math notranslate nohighlight">\(\tilde{\bm{y}}\)</span> is
+piecewise linear in <span class="math notranslate nohighlight">\(\bm{y}\)</span> and no smoother matrix exists.  (There is a
+remarkable partial substitute – the number of non-zero coefficients is an
+unbiased estimate of the Lasso’s effective degrees of freedom, so a
+GCV-like criterion can be written down – but it is not standard practice.)
+For the Lasso, and for every method in the later chapters of this book,
+<span class="math notranslate nohighlight">\(K\)</span>-fold cross-validation is the tool, and it is as well to learn it on a
+problem where its answer can be checked.</p>
+<p><strong>The bootstrap as an alternative.</strong></p>
+<p>Section <em>The bias-variance tradeoff</em> used the bootstrap of
+Section <em>Resampling: the jackknife and the bootstrap</em> to manufacture the ensemble of training sets that
+the bias-variance decomposition requires, and it is natural to ask whether
+the same device could estimate the test error and so replace
+cross-validation in the selection of <span class="math notranslate nohighlight">\(\lambda\)</span>.  It can be made to, and the
+care this takes is instructive, so we go through it.</p>
+<p>Start with a fact about resampling with replacement.  Each of the <span class="math notranslate nohighlight">\(n\)</span> draws
+picks observation <span class="math notranslate nohighlight">\(i\)</span> with probability <span class="math notranslate nohighlight">\(1/n\)</span>, so the probability that <span class="math notranslate nohighlight">\(i\)</span>
+appears in none of them is</p>
+<div class="math notranslate nohighlight">
+\[
+\Prob(i\notin\bm{x}^{*})
+   = \left(1-\frac{1}{n}\right)^{n}
+   \;\xrightarrow{\;n\to\infty\;}\; e^{-1}\approx0.368 ,\tag{3.97}
+\]</div>
+<p>already <span class="math notranslate nohighlight">\(0.366\)</span> at <span class="math notranslate nohighlight">\(n=100\)</span>.  A bootstrap sample therefore contains, on
+average, only <span class="math notranslate nohighlight">\(63.2\%\)</span> of the distinct observations, the remainder appearing
+as duplicates; the <span class="math notranslate nohighlight">\(36.8\%\)</span> left out are the <em>out-of-bag</em> observations
+of the replica.  This number governs everything that follows.</p>
+<p>Three estimates of the prediction error can be built from bootstrap
+replicas.  The <em>apparent</em> error is the training error
+<span class="math notranslate nohighlight">\(\overline{\mathrm{err}}\)</span> of the model fitted to the full sample; it is
+optimistic for the reasons of Section <em>Statistical properties of the least-squares estimator</em> and needs no
+bootstrap at all.  The naive bootstrap estimate – fit to each replica,
+evaluate on the original <span class="math notranslate nohighlight">\(n\)</span> observations, average – is nearly as
+optimistic, because <span class="math notranslate nohighlight">\(63\%\)</span> of the observations it is evaluated on were in the
+sample it was fitted to.  The estimate that respects the training-test
+separation is the <em>leave-one-out bootstrap</em>,</p>
+<div class="math notranslate nohighlight">
+\[
+\mathrm{Err}^{(1)}
+   = \frac{1}{n}\sum_{i=0}^{n-1}
+     \frac{1}{|C_{-i}|}\sum_{b\in C_{-i}}
+     \left(y_i-\hat{f}^{*b}(\bm{x}_i)\right)^{2},\tag{3.98}
+\]</div>
+<p>where <span class="math notranslate nohighlight">\(C_{-i}\)</span> is the set of replicas in which observation <span class="math notranslate nohighlight">\(i\)</span> does not
+appear and <span class="math notranslate nohighlight">\(\hat{f}^{*b}\)</span> is the model fitted to replica <span class="math notranslate nohighlight">\(b\)</span>: every
+observation is predicted only by models that never saw it, exactly as in
+cross-validation.  But each of those models was fitted to about <span class="math notranslate nohighlight">\(0.632n\)</span>
+distinct points, so Eq. (3.98) estimates the error of a
+model trained on a substantially smaller sample and is <em>pessimistic</em>.
+In terms of Eq. (3.92) it behaves like <span class="math notranslate nohighlight">\(K\)</span>-fold cross-validation
+with <span class="math notranslate nohighlight">\((K-1)/K=0.632\)</span>, that is <span class="math notranslate nohighlight">\(K\approx2.7\)</span>, whereas five folds train on
+<span class="math notranslate nohighlight">\(80\%\)</span> of the data and ten on <span class="math notranslate nohighlight">\(90\%\)</span>.  Efron’s remedy is to average the two
+biases away against each other,</p>
+<div class="math notranslate nohighlight">
+\[
+\mathrm{Err}^{(.632)}
+   = 0.368\,\overline{\mathrm{err}} + 0.632\,\mathrm{Err}^{(1)},\tag{3.99}
+\]</div>
+<p>the <em>.632 estimator</em>, whose weights are those of
+Eq. (3.97).  It is a heuristic rather than a theorem, and it
+has a known failure: for a model that interpolates its training data,
+<span class="math notranslate nohighlight">\(\overline{\mathrm{err}}=0\)</span> and Eq. (3.99) returns <span class="math notranslate nohighlight">\(0.632\)</span> of a
+pessimistic number, which can be badly optimistic.  The <em>.632+</em>
+estimator repairs this by making the weight depend on an estimate of the
+degree of overfitting, at the price of further heuristics.</p>
+<p>The following code computes the three bootstrap quantities for the problem
+of Figure 3.4, at the OLS end of the grid and at the two
+selected penalties, and sets them beside the five-fold estimate and the true
+error.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">bootstrap_errors</span><span class="p">(</span><span class="n">fit</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">lmbda</span><span class="p">,</span> <span class="n">B</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span> <span class="n">rng</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Training (apparent) error, leave-one-out bootstrap error, .632 estimate.&quot;&quot;&quot;</span>
+    <span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">()</span> <span class="k">if</span> <span class="n">rng</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">rng</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">theta_0</span><span class="p">,</span> <span class="n">theta</span> <span class="o">=</span> <span class="n">refit</span><span class="p">(</span><span class="n">fit</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">lmbda</span><span class="p">)</span>
+    <span class="n">apparent</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">((</span><span class="n">y</span> <span class="o">-</span> <span class="n">theta_0</span> <span class="o">-</span> <span class="n">X</span> <span class="o">@</span> <span class="n">theta</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
+    <span class="n">err_sum</span><span class="p">,</span> <span class="n">err_count</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">B</span><span class="p">):</span>
+        <span class="n">idx</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">integers</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span>                         <span class="c1"># draw n with replacement</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">setdiff1d</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">n</span><span class="p">),</span> <span class="n">idx</span><span class="p">)</span>               <span class="c1"># the points left out</span>
+        <span class="n">theta_0</span><span class="p">,</span> <span class="n">theta</span> <span class="o">=</span> <span class="n">refit</span><span class="p">(</span><span class="n">fit</span><span class="p">,</span> <span class="n">X</span><span class="p">[</span><span class="n">idx</span><span class="p">],</span> <span class="n">y</span><span class="p">[</span><span class="n">idx</span><span class="p">],</span> <span class="n">lmbda</span><span class="p">)</span>
+        <span class="n">err_sum</span><span class="p">[</span><span class="n">out</span><span class="p">]</span> <span class="o">+=</span> <span class="p">(</span><span class="n">y</span><span class="p">[</span><span class="n">out</span><span class="p">]</span> <span class="o">-</span> <span class="n">theta_0</span> <span class="o">-</span> <span class="n">X</span><span class="p">[</span><span class="n">out</span><span class="p">]</span> <span class="o">@</span> <span class="n">theta</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span>
+        <span class="n">err_count</span><span class="p">[</span><span class="n">out</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+    <span class="n">seen</span> <span class="o">=</span> <span class="n">err_count</span> <span class="o">&gt;</span> <span class="mi">0</span>
+    <span class="n">loo_boot</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">err_sum</span><span class="p">[</span><span class="n">seen</span><span class="p">]</span> <span class="o">/</span> <span class="n">err_count</span><span class="p">[</span><span class="n">seen</span><span class="p">])</span>    <span class="c1"># Eq. (3.loobootstrap)</span>
+    <span class="k">return</span> <span class="n">apparent</span><span class="p">,</span> <span class="n">loo_boot</span><span class="p">,</span> <span class="mf">0.368</span> <span class="o">*</span> <span class="n">apparent</span> <span class="o">+</span> <span class="mf">0.632</span> <span class="o">*</span> <span class="n">loo_boot</span>
+
+<span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="mi">3155</span><span class="p">)</span>
+<span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">theta_true</span> <span class="o">=</span> <span class="n">make_data</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="mi">150</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">rho</span><span class="o">=</span><span class="mf">0.7</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">rng</span><span class="o">=</span><span class="n">rng</span><span class="p">)</span>
+<span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span> <span class="o">=</span> <span class="n">X</span><span class="p">[:</span><span class="mi">100</span><span class="p">],</span> <span class="n">y</span><span class="p">[:</span><span class="mi">100</span><span class="p">]</span>
+<span class="c1"># The generating process is known, so the true error of any fit can be measured</span>
+<span class="c1"># on a large fresh sample -- a luxury never available in practice.</span>
+<span class="n">X_big</span><span class="p">,</span> <span class="n">y_big</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">make_data</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="mi">20000</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">rho</span><span class="o">=</span><span class="mf">0.7</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
+                            <span class="n">rng</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+<span class="n">lambdas</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logspace</span><span class="p">(</span><span class="o">-</span><span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">60</span><span class="p">)</span>
+
+<span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">fit</span> <span class="ow">in</span> <span class="p">((</span><span class="s2">&quot;Ridge&quot;</span><span class="p">,</span> <span class="n">ridge_fit</span><span class="p">),</span> <span class="p">(</span><span class="s2">&quot;Lasso&quot;</span><span class="p">,</span> <span class="n">lasso_fit</span><span class="p">)):</span>
+    <span class="n">cv_mean</span><span class="p">,</span> <span class="n">cv_se</span> <span class="o">=</span> <span class="n">cv_curve</span><span class="p">(</span><span class="n">fit</span><span class="p">,</span> <span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">lambdas</span><span class="p">,</span> <span class="n">K</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+                              <span class="n">rng</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="mi">2024</span><span class="p">))</span>
+    <span class="n">lambda_min</span><span class="p">,</span> <span class="n">lambda_1se</span> <span class="o">=</span> <span class="n">select</span><span class="p">(</span><span class="n">lambdas</span><span class="p">,</span> <span class="n">cv_mean</span><span class="p">,</span> <span class="n">cv_se</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">lmbda</span> <span class="ow">in</span> <span class="p">(</span><span class="mf">1e-4</span><span class="p">,</span> <span class="n">lambda_min</span><span class="p">,</span> <span class="n">lambda_1se</span><span class="p">):</span>
+        <span class="n">j</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">searchsorted</span><span class="p">(</span><span class="n">lambdas</span><span class="p">,</span> <span class="n">lmbda</span><span class="p">)</span>
+        <span class="n">apparent</span><span class="p">,</span> <span class="n">loo_boot</span><span class="p">,</span> <span class="n">e632</span> <span class="o">=</span> <span class="n">bootstrap_errors</span><span class="p">(</span><span class="n">fit</span><span class="p">,</span> <span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">lmbda</span><span class="p">,</span>
+                                                    <span class="n">B</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span> <span class="n">rng</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="mi">2024</span><span class="p">))</span>
+        <span class="n">theta_0</span><span class="p">,</span> <span class="n">theta</span> <span class="o">=</span> <span class="n">refit</span><span class="p">(</span><span class="n">fit</span><span class="p">,</span> <span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">lmbda</span><span class="p">)</span>
+        <span class="n">true</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">((</span><span class="n">y_big</span> <span class="o">-</span> <span class="n">theta_0</span> <span class="o">-</span> <span class="n">X_big</span> <span class="o">@</span> <span class="n">theta</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> lambda </span><span class="si">{</span><span class="n">lmbda</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">: train </span><span class="si">{</span><span class="n">apparent</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">  CV </span><span class="si">{</span><span class="n">cv_mean</span><span class="p">[</span><span class="n">j</span><span class="p">]</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">&quot;</span>
+              <span class="sa">f</span><span class="s2">&quot;  LOO-boot </span><span class="si">{</span><span class="n">loo_boot</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">  .632 </span><span class="si">{</span><span class="n">e632</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">  true </span><span class="si">{</span><span class="n">true</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="c1"># When p approaches n the bootstrap training sets, with only 0.632 n distinct</span>
+<span class="c1"># points, reach the singular regime of the Franke study long before the K-fold ones</span>
+<span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+<span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">make_data</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="mi">60</span><span class="p">,</span> <span class="n">rho</span><span class="o">=</span><span class="mf">0.7</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">rng</span><span class="o">=</span><span class="n">rng</span><span class="p">)</span>
+<span class="n">X_big</span><span class="p">,</span> <span class="n">y_big</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">make_data</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="mi">20000</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="mi">60</span><span class="p">,</span> <span class="n">rho</span><span class="o">=</span><span class="mf">0.7</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
+                            <span class="n">rng</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="mi">6</span><span class="p">))</span>
+<span class="n">apparent</span><span class="p">,</span> <span class="n">loo_boot</span><span class="p">,</span> <span class="n">e632</span> <span class="o">=</span> <span class="n">bootstrap_errors</span><span class="p">(</span><span class="n">ridge_fit</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="mf">1e-4</span><span class="p">,</span> <span class="n">B</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span> <span class="n">rng</span><span class="o">=</span><span class="n">rng</span><span class="p">)</span>
+<span class="n">cv_mean</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">cv_curve</span><span class="p">(</span><span class="n">ridge_fit</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1e-4</span><span class="p">]),</span> <span class="n">K</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">rng</span><span class="o">=</span><span class="n">rng</span><span class="p">)</span>
+<span class="n">theta_0</span><span class="p">,</span> <span class="n">theta</span> <span class="o">=</span> <span class="n">refit</span><span class="p">(</span><span class="n">ridge_fit</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="mf">1e-4</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;p = 60, n = 100, lambda 0.0001: train </span><span class="si">{</span><span class="n">apparent</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">  CV </span><span class="si">{</span><span class="n">cv_mean</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">&quot;</span>
+      <span class="sa">f</span><span class="s2">&quot;  LOO-boot </span><span class="si">{</span><span class="n">loo_boot</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">  .632 </span><span class="si">{</span><span class="n">e632</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">&quot;</span>
+      <span class="sa">f</span><span class="s2">&quot;  true </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">((</span><span class="n">y_big</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">theta_0</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">X_big</span><span class="w"> </span><span class="o">@</span><span class="w"> </span><span class="n">theta</span><span class="p">)</span><span class="w"> </span><span class="o">**</span><span class="w"> </span><span class="mi">2</span><span class="p">)</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Ridge</span> <span class="k">lambda</span> <span class="mf">0.0001</span><span class="p">:</span> <span class="n">train</span> <span class="mf">0.491</span>  <span class="n">CV</span> <span class="mf">1.258</span>  <span class="n">LOO</span><span class="o">-</span><span class="n">boot</span> <span class="mf">1.476</span>  <span class="mf">.632</span> <span class="mf">1.114</span>  <span class="n">true</span> <span class="mf">1.459</span>
+<span class="n">Ridge</span> <span class="k">lambda</span> <span class="mf">0.0131</span><span class="p">:</span> <span class="n">train</span> <span class="mf">0.517</span>  <span class="n">CV</span> <span class="mf">1.205</span>  <span class="n">LOO</span><span class="o">-</span><span class="n">boot</span> <span class="mf">1.409</span>  <span class="mf">.632</span> <span class="mf">1.080</span>  <span class="n">true</span> <span class="mf">1.316</span>
+<span class="n">Ridge</span> <span class="k">lambda</span> <span class="mf">0.0424</span><span class="p">:</span> <span class="n">train</span> <span class="mf">0.659</span>  <span class="n">CV</span> <span class="mf">1.324</span>  <span class="n">LOO</span><span class="o">-</span><span class="n">boot</span> <span class="mf">1.647</span>  <span class="mf">.632</span> <span class="mf">1.284</span>  <span class="n">true</span> <span class="mf">1.338</span>
+<span class="n">Lasso</span> <span class="k">lambda</span> <span class="mf">0.0001</span><span class="p">:</span> <span class="n">train</span> <span class="mf">0.491</span>  <span class="n">CV</span> <span class="mf">1.258</span>  <span class="n">LOO</span><span class="o">-</span><span class="n">boot</span> <span class="mf">1.476</span>  <span class="mf">.632</span> <span class="mf">1.114</span>  <span class="n">true</span> <span class="mf">1.460</span>
+<span class="n">Lasso</span> <span class="k">lambda</span> <span class="mf">0.0626</span><span class="p">:</span> <span class="n">train</span> <span class="mf">0.648</span>  <span class="n">CV</span> <span class="mf">1.098</span>  <span class="n">LOO</span><span class="o">-</span><span class="n">boot</span> <span class="mf">1.286</span>  <span class="mf">.632</span> <span class="mf">1.051</span>  <span class="n">true</span> <span class="mf">1.145</span>
+<span class="n">Lasso</span> <span class="k">lambda</span> <span class="mf">0.1366</span><span class="p">:</span> <span class="n">train</span> <span class="mf">0.896</span>  <span class="n">CV</span> <span class="mf">1.216</span>  <span class="n">LOO</span><span class="o">-</span><span class="n">boot</span> <span class="mf">1.526</span>  <span class="mf">.632</span> <span class="mf">1.294</span>  <span class="n">true</span> <span class="mf">1.277</span>
+<span class="n">p</span> <span class="o">=</span> <span class="mi">60</span><span class="p">,</span> <span class="n">n</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span> <span class="k">lambda</span> <span class="mf">0.0001</span><span class="p">:</span> <span class="n">train</span> <span class="mf">0.480</span>  <span class="n">CV</span> <span class="mf">5.088</span>  <span class="n">LOO</span><span class="o">-</span><span class="n">boot</span> <span class="mf">24.969</span>  <span class="mf">.632</span> <span class="mf">15.957</span>  <span class="n">true</span> <span class="mf">3.255</span>
+</pre></div>
+</div>
+<p>The pattern predicted above is the pattern observed.  The training error is
+optimistic by a factor of up to three; the leave-one-out bootstrap is
+pessimistic at every penalty, by an amount that grows with <span class="math notranslate nohighlight">\(\lambda\)</span> and
+reaches <span class="math notranslate nohighlight">\(0.3\)</span>; the .632 estimator lands between them, on this training set
+below the truth at the smaller penalties by up to <span class="math notranslate nohighlight">\(0.35\)</span>; and the five-fold
+estimate is within one to one and a half of its own standard errors of the
+truth at every penalty.
+Figure 3.5 shows the same four estimates along the
+whole grid, with the true curve, and marks the minimum of each.  The
+last line of the output is the case where the difference stops being a
+matter of tenths.  With <span class="math notranslate nohighlight">\(p=60\)</span> features and <span class="math notranslate nohighlight">\(n=100\)</span> observations the
+five-fold models, fitted to <span class="math notranslate nohighlight">\(80\)</span> points, are still comfortably
+overdetermined, and cross-validation overestimates the true error of <span class="math notranslate nohighlight">\(3.3\)</span>
+by a factor of <span class="math notranslate nohighlight">\(1.5\)</span> – pessimistic, as models trained on fewer points must
+be near the <span class="math notranslate nohighlight">\(p\approx n\)</span> cliff of Section <em>A complete example: the Franke function</em>.  The bootstrap
+models are fitted to about <span class="math notranslate nohighlight">\(63\)</span> distinct points, right at the edge of that
+cliff, and their out-of-bag error is <span class="math notranslate nohighlight">\(25\)</span>; the .632 correction brings it
+down to <span class="math notranslate nohighlight">\(16\)</span>, still five times the truth.  Duplicated rows make the matter
+worse than the count of distinct points suggests: a replica is a weighted
+least-squares problem with integer weights, so its design matrix has the
+column space of the <span class="math notranslate nohighlight">\(63\)</span> distinct rows but a distorted geometry, and for the
+Lasso the duplicates change which variables enter.</p>
+<p><img alt="Four estimates of the test error of Ridge left and the Lasso right alo" src="../BookML/BookFigures/chapter03_linear_regression/cv_versus_bootstrap.png" /></p>
+<p><em>Figure 3.5: Four estimates of the test error of Ridge (left) and the Lasso (right) along the penalty grid, for the training set of Figure 3.4: the training error, five-fold cross-validation (3.92), the leave-one-out bootstrap (3.98) and the .632 estimator (3.99), with <span class="math notranslate nohighlight">\(B=100\)</span> replicas per grid point.  The dashed curve is the true expected test error.  Dots mark the minimum of each curve: the .632 minimum sits to the left of the true one because the estimator inherits <span class="math notranslate nohighlight">\(0.368\)</span> of the training error, which decreases towards <span class="math notranslate nohighlight">\(\lambda=0\)</span>.</em></p>
+<p>A single training set cannot separate bias from luck, so we repeat the
+comparison over a hundred fresh training sets at a fixed penalty and record,
+for each estimator, the mean and the spread of its deviation from the true
+error of the model it is estimating.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">X_big</span><span class="p">,</span> <span class="n">y_big</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">make_data</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="mi">20000</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">rho</span><span class="o">=</span><span class="mf">0.7</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
+                            <span class="n">rng</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+<span class="c1"># bias and spread of the four estimators over 100 fresh training sets, at fixed lambda</span>
+<span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">fit</span><span class="p">,</span> <span class="n">lmbda</span> <span class="ow">in</span> <span class="p">((</span><span class="s2">&quot;Ridge&quot;</span><span class="p">,</span> <span class="n">ridge_fit</span><span class="p">,</span> <span class="mf">0.0131</span><span class="p">),</span> <span class="p">(</span><span class="s2">&quot;Lasso&quot;</span><span class="p">,</span> <span class="n">lasso_fit</span><span class="p">,</span> <span class="mf">0.0626</span><span class="p">)):</span>
+    <span class="n">rows</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">seed</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">100</span><span class="p">):</span>
+        <span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="mi">100</span> <span class="o">+</span> <span class="n">seed</span><span class="p">)</span>
+        <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">make_data</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">rho</span><span class="o">=</span><span class="mf">0.7</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">rng</span><span class="o">=</span><span class="n">rng</span><span class="p">)</span>
+        <span class="n">cv_mean</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">cv_curve</span><span class="p">(</span><span class="n">fit</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">lmbda</span><span class="p">]),</span> <span class="n">K</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">rng</span><span class="o">=</span><span class="n">rng</span><span class="p">)</span>
+        <span class="n">apparent</span><span class="p">,</span> <span class="n">loo_boot</span><span class="p">,</span> <span class="n">e632</span> <span class="o">=</span> <span class="n">bootstrap_errors</span><span class="p">(</span><span class="n">fit</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">lmbda</span><span class="p">,</span> <span class="n">B</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">rng</span><span class="o">=</span><span class="n">rng</span><span class="p">)</span>
+        <span class="n">theta_0</span><span class="p">,</span> <span class="n">theta</span> <span class="o">=</span> <span class="n">refit</span><span class="p">(</span><span class="n">fit</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">lmbda</span><span class="p">)</span>
+        <span class="n">true</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">((</span><span class="n">y_big</span> <span class="o">-</span> <span class="n">theta_0</span> <span class="o">-</span> <span class="n">X_big</span> <span class="o">@</span> <span class="n">theta</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="n">rows</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">apparent</span><span class="p">,</span> <span class="n">cv_mean</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">loo_boot</span><span class="p">,</span> <span class="n">e632</span><span class="p">,</span> <span class="n">true</span><span class="p">))</span>
+    <span class="n">rows</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">rows</span><span class="p">)</span>
+    <span class="n">deviation</span> <span class="o">=</span> <span class="n">rows</span><span class="p">[:,</span> <span class="p">:</span><span class="mi">4</span><span class="p">]</span> <span class="o">-</span> <span class="n">rows</span><span class="p">[:,</span> <span class="mi">4</span><span class="p">:</span><span class="mi">5</span><span class="p">]</span>                 <span class="c1"># estimate minus true error</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> at lambda = </span><span class="si">{</span><span class="n">lmbda</span><span class="si">}</span><span class="s2">: mean true error </span><span class="si">{</span><span class="n">rows</span><span class="p">[:,</span><span class="w"> </span><span class="mi">4</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;  bias (training, CV, LOO-bootstrap, .632):&quot;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">deviation</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="mi">3</span><span class="p">))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;  spread                                 :&quot;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">deviation</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="mi">3</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Ridge</span> <span class="n">at</span> <span class="k">lambda</span> <span class="o">=</span> <span class="mf">0.0131</span><span class="p">:</span> <span class="n">mean</span> <span class="n">true</span> <span class="n">error</span> <span class="mf">1.444</span>
+  <span class="n">bias</span> <span class="p">(</span><span class="n">training</span><span class="p">,</span> <span class="n">CV</span><span class="p">,</span> <span class="n">LOO</span><span class="o">-</span><span class="n">bootstrap</span><span class="p">,</span> <span class="mf">.632</span><span class="p">):</span> <span class="p">[</span><span class="o">-</span><span class="mf">0.737</span>  <span class="mf">0.137</span>  <span class="mf">0.477</span>  <span class="mf">0.03</span> <span class="p">]</span>
+  <span class="n">spread</span>                                 <span class="p">:</span> <span class="p">[</span><span class="mf">0.165</span> <span class="mf">0.346</span> <span class="mf">0.323</span> <span class="mf">0.259</span><span class="p">]</span>
+<span class="n">Lasso</span> <span class="n">at</span> <span class="k">lambda</span> <span class="o">=</span> <span class="mf">0.0626</span><span class="p">:</span> <span class="n">mean</span> <span class="n">true</span> <span class="n">error</span> <span class="mf">1.327</span>
+  <span class="n">bias</span> <span class="p">(</span><span class="n">training</span><span class="p">,</span> <span class="n">CV</span><span class="p">,</span> <span class="n">LOO</span><span class="o">-</span><span class="n">bootstrap</span><span class="p">,</span> <span class="mf">.632</span><span class="p">):</span> <span class="p">[</span><span class="o">-</span><span class="mf">0.532</span>  <span class="mf">0.055</span>  <span class="mf">0.287</span> <span class="o">-</span><span class="mf">0.014</span><span class="p">]</span>
+  <span class="n">spread</span>                                 <span class="p">:</span> <span class="p">[</span><span class="mf">0.164</span> <span class="mf">0.274</span> <span class="mf">0.267</span> <span class="mf">0.225</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>The biases are as advertised: the training error is optimistic by half a
+unit or more, the leave-one-out bootstrap pessimistic by <span class="math notranslate nohighlight">\(0.3\)</span> to <span class="math notranslate nohighlight">\(0.5\)</span>, and
+five-fold cross-validation pessimistic by <span class="math notranslate nohighlight">\(0.05\)</span> to <span class="math notranslate nohighlight">\(0.14\)</span>, which is the
+price of fitting to <span class="math notranslate nohighlight">\(80\)</span> points instead of <span class="math notranslate nohighlight">\(100\)</span> and shrinks as <span class="math notranslate nohighlight">\(K\)</span> grows.
+The gap of <span class="math notranslate nohighlight">\(0.2\)</span> noticed in Figure 3.4 was, as claimed,
+a fluctuation, of about one spread.  What the table also shows, and
+what an honest account must say, is that at a <em>fixed</em> penalty the .632
+estimator is the best of the four: nearly unbiased, and with a spread
+smaller than that of cross-validation by a fifth to a quarter.  This is Efron and
+Tibshirani’s finding and it is not a coincidence – averaging over <span class="math notranslate nohighlight">\(B\)</span>
+replicas is a smoother operation than averaging over five folds.  If the
+question were “what is the test error of this model at this <span class="math notranslate nohighlight">\(\lambda\)</span>”, the
+bootstrap would have a strong claim.</p>
+<p>That is not the question.  The question is which <span class="math notranslate nohighlight">\(\lambda\)</span> to choose, and
+for that purpose cross-validation is preferred for four reasons which the
+experiments above have made concrete.  First, selection depends on the
+<em>location</em> of the minimum, not on the level of the curve.  A bias that
+is nearly constant in <span class="math notranslate nohighlight">\(\lambda\)</span>, which is what cross-validation has, leaves
+the minimum where it is; the .632 estimator adds <span class="math notranslate nohighlight">\(0.368\)</span> of the training
+error, a function that decreases monotonically towards <span class="math notranslate nohighlight">\(\lambda=0\)</span>, and its
+minimum is thereby dragged towards under-regularisation.  In
+Figure 3.5 it selects <span class="math notranslate nohighlight">\(0.007\)</span> for Ridge and <span class="math notranslate nohighlight">\(0.029\)</span>
+for the Lasso, against true optima of <span class="math notranslate nohighlight">\(0.024\)</span> and <span class="math notranslate nohighlight">\(0.063\)</span> and
+cross-validation choices of <span class="math notranslate nohighlight">\(0.013\)</span> and <span class="math notranslate nohighlight">\(0.063\)</span>; for the Lasso the .632
+choice keeps <span class="math notranslate nohighlight">\(26\)</span> coefficients where cross-validation keeps <span class="math notranslate nohighlight">\(21\)</span>.  Second,
+cost: five or ten fits per grid point against one or two hundred, which for
+the sixty-point grid above is three hundred fits against twelve thousand,
+and the ratio is the same for a neural network taking an hour per fit.
+Third, sample size: the bootstrap models see <span class="math notranslate nohighlight">\(63\%\)</span> of the distinct data and
+fall off the <span class="math notranslate nohighlight">\(p\approx n\)</span> cliff first, as the last line of the table shows,
+while <span class="math notranslate nohighlight">\(K\)</span>-fold models see <span class="math notranslate nohighlight">\((K-1)/K\)</span> of it and can be pushed as close to the
+full sample as one is willing to pay for.  Fourth, simplicity: every
+observation is predicted exactly once, by a model that did not see it, from a
+training set of the same character as the final one, and no correction
+constants are needed – whereas the bootstrap estimate requires the .632
+heuristic, and the .632 heuristic requires the .632+ repair as soon as the
+apparent error approaches zero, which for <span class="math notranslate nohighlight">\(p\ge n\)</span> it does.</p>
+<p><strong>What the bootstrap is for: the stability of the selection.</strong></p>
+<p>None of this retires the bootstrap.  It remains the tool for estimating the
+<em>distribution</em> of a statistic when no formula exists, which is how
+Chapter 2 used it, and cross-validation produces a
+statistic to which no formula applies: the set of coefficients the Lasso
+selects.  The output above found <span class="math notranslate nohighlight">\(21\)</span> non-zero coefficients at
+<span class="math notranslate nohighlight">\(\lambda_{\min}\)</span>, eight true and thirteen spurious, and nothing in the
+cross-validation curve says which are which.  The bootstrap can.  Refit the
+Lasso, at the selected penalty, to <span class="math notranslate nohighlight">\(B\)</span> replicas of the training set and
+record how often each coefficient is non-zero:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">cv_mean</span><span class="p">,</span> <span class="n">cv_se</span> <span class="o">=</span> <span class="n">cv_curve</span><span class="p">(</span><span class="n">lasso_fit</span><span class="p">,</span> <span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">lambdas</span><span class="p">,</span> <span class="n">K</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+                          <span class="n">rng</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="mi">2024</span><span class="p">))</span>
+<span class="n">lambda_min</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">select</span><span class="p">(</span><span class="n">lambdas</span><span class="p">,</span> <span class="n">cv_mean</span><span class="p">,</span> <span class="n">cv_se</span><span class="p">)</span>
+
+<span class="c1"># selection frequency of every feature over B bootstrap replicas at lambda_min</span>
+<span class="n">rng</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">n</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="mi">2024</span><span class="p">),</span> <span class="mi">200</span><span class="p">,</span> <span class="mi">100</span>
+<span class="n">count</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">X_train</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+<span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">B</span><span class="p">):</span>
+    <span class="n">idx</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">integers</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span>
+    <span class="n">theta_0</span><span class="p">,</span> <span class="n">theta</span> <span class="o">=</span> <span class="n">refit</span><span class="p">(</span><span class="n">lasso_fit</span><span class="p">,</span> <span class="n">X_train</span><span class="p">[</span><span class="n">idx</span><span class="p">],</span> <span class="n">y_train</span><span class="p">[</span><span class="n">idx</span><span class="p">],</span> <span class="n">lambda_min</span><span class="p">)</span>
+    <span class="n">count</span> <span class="o">+=</span> <span class="n">theta</span> <span class="o">!=</span> <span class="mi">0</span>
+<span class="n">frequency</span> <span class="o">=</span> <span class="n">count</span> <span class="o">/</span> <span class="n">B</span>
+<span class="n">theta_0</span><span class="p">,</span> <span class="n">theta</span> <span class="o">=</span> <span class="n">refit</span><span class="p">(</span><span class="n">lasso_fit</span><span class="p">,</span> <span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">lambda_min</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;selected on the full training set:&quot;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">flatnonzero</span><span class="p">(</span><span class="n">theta</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;frequency, the eight true features:&quot;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">frequency</span><span class="p">[:</span><span class="mi">8</span><span class="p">],</span> <span class="mi">2</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;frequency, the spurious ones selected:&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">frequency</span><span class="p">[</span><span class="mi">8</span><span class="p">:][</span><span class="n">theta</span><span class="p">[</span><span class="mi">8</span><span class="p">:]</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">],</span> <span class="mi">2</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;selected in more than 80</span><span class="si">% o</span><span class="s2">f the replicas:&quot;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">flatnonzero</span><span class="p">(</span><span class="n">frequency</span> <span class="o">&gt;</span> <span class="mf">0.8</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">selected</span> <span class="n">on</span> <span class="n">the</span> <span class="n">full</span> <span class="n">training</span> <span class="nb">set</span><span class="p">:</span> <span class="p">[</span> <span class="mi">0</span>  <span class="mi">1</span>  <span class="mi">2</span>  <span class="mi">3</span>  <span class="mi">4</span>  <span class="mi">5</span>  <span class="mi">6</span>  <span class="mi">7</span> <span class="mi">10</span> <span class="mi">12</span> <span class="mi">13</span> <span class="mi">14</span> <span class="mi">16</span> <span class="mi">17</span> <span class="mi">20</span> <span class="mi">23</span> <span class="mi">24</span> <span class="mi">26</span> <span class="mi">27</span> <span class="mi">28</span> <span class="mi">29</span><span class="p">]</span>
+<span class="n">frequency</span><span class="p">,</span> <span class="n">the</span> <span class="n">eight</span> <span class="n">true</span> <span class="n">features</span><span class="p">:</span> <span class="p">[</span><span class="mf">1.</span>   <span class="mf">1.</span>   <span class="mf">1.</span>   <span class="mf">1.</span>   <span class="mf">1.</span>   <span class="mf">1.</span>   <span class="mf">0.97</span> <span class="mf">1.</span>  <span class="p">]</span>
+<span class="n">frequency</span><span class="p">,</span> <span class="n">the</span> <span class="n">spurious</span> <span class="n">ones</span> <span class="n">selected</span><span class="p">:</span>
+<span class="p">[</span><span class="mf">0.64</span> <span class="mf">0.74</span> <span class="mf">0.78</span> <span class="mf">0.72</span> <span class="mf">0.53</span> <span class="mf">0.68</span> <span class="mf">0.56</span> <span class="mf">0.64</span> <span class="mf">0.86</span> <span class="mf">0.75</span> <span class="mf">0.61</span> <span class="mf">0.51</span> <span class="mf">0.82</span><span class="p">]</span>
+<span class="n">selected</span> <span class="ow">in</span> <span class="n">more</span> <span class="n">than</span> <span class="mi">80</span><span class="o">%</span> <span class="n">of</span> <span class="n">the</span> <span class="n">replicas</span><span class="p">:</span> <span class="p">[</span> <span class="mi">0</span>  <span class="mi">1</span>  <span class="mi">2</span>  <span class="mi">3</span>  <span class="mi">4</span>  <span class="mi">5</span>  <span class="mi">6</span>  <span class="mi">7</span> <span class="mi">24</span> <span class="mi">29</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>The eight true features are selected in <span class="math notranslate nohighlight">\(97\)</span> to <span class="math notranslate nohighlight">\(100\)</span> per cent of the
+replicas; the thirteen spurious ones in <span class="math notranslate nohighlight">\(51\)</span> to <span class="math notranslate nohighlight">\(86\)</span> per cent, most of them
+in around two thirds.  A coefficient that appears in two replicas out of
+three is one whose presence depends on which observations happened to be
+drawn, and that is the operational meaning of “spurious” when the truth is
+unknown.  Keeping only the features selected in more than <span class="math notranslate nohighlight">\(80\%\)</span> of the
+replicas leaves the eight true ones and two impostors, which is a far better
+support than the <span class="math notranslate nohighlight">\(21\)</span> the cross-validation minimum returned – and it was
+obtained without the one-standard-error rule, without knowing the truth, and
+without any estimate of the test error at all.  This procedure, refined and
+supplied with an error bound on the number of false selections, is
+<em>stability selection</em>, and it is the natural companion to a
+cross-validated Lasso: cross-validation chooses the penalty for prediction,
+and the bootstrap tells us which parts of the resulting model to believe.
+The same replicas can be used to attach a standard error to every non-zero
+coefficient, to the cross-validation curve itself, and to <span class="math notranslate nohighlight">\(\lambda_{\min}\)</span>,
+which is how the wandering reported earlier would be quantified in
+practice.</p>
+<p><strong>Nested cross-validation.</strong></p>
+<p>One question remains, and it is the one the test set answered above: what is
+the generalisation error of the <em>whole procedure</em>, selection included?
+The temptation is to report <span class="math notranslate nohighlight">\(\mathrm{CV}_K(\lambda_{\min})\)</span>, the smallest
+value on the curve, and it is a mistake, for the same reason that the
+training error is a mistake one level down.  The minimum of sixty noisy
+estimates is biased downwards – among sixty candidates, the one with the
+luckiest noise wins – and the more penalties one tries, the larger the
+effect.  With a test set the question does not arise: the test error of the
+refitted model is an unbiased estimate of exactly the right thing.  Without
+one, the remedy is to nest the selection inside a second cross-validation
+loop: an outer split into <span class="math notranslate nohighlight">\(K_{\mathrm{out}}\)</span> folds, and within each outer
+training set the full inner procedure – grid, <span class="math notranslate nohighlight">\(K\)</span> folds, selection, refit –
+followed by evaluation on the outer held-out fold.  Every outer fold then
+tests a model whose <span class="math notranslate nohighlight">\(\lambda\)</span> was chosen without it, the outer average
+estimates the error of the procedure rather than of a particular <span class="math notranslate nohighlight">\(\lambda\)</span>,
+and the cost is <span class="math notranslate nohighlight">\(K_{\mathrm{out}}\)</span> times that of the inner loop.  For the
+linear models of this chapter the cost is negligible and the selection bias
+is small – the cross-validation minimum of <span class="math notranslate nohighlight">\(1.10\)</span> for the Lasso above sits
+below the true <span class="math notranslate nohighlight">\(1.15\)</span> by an amount well inside the noise – but for flexible
+models with several hyperparameters tuned on a fine grid it is neither, and
+nested cross-validation is the honest estimate.</p>
+<div class="tip admonition">
+<p class="admonition-title">Machine learning connection</p>
+<p>The procedure of this section is not
+specific to <span class="math notranslate nohighlight">\(\lambda\)</span>.  Every method in the remainder of this book has
+hyperparameters – the learning rate and batch size of Chapter 4,
+the depth of a tree, the kernel width of Chapter 6, the width
+and depth of a network – and none of them can be chosen by minimising the
+training error, for the reason of Eq. (3.91): a
+more flexible model always fits the training data better.  They are all
+chosen the way <span class="math notranslate nohighlight">\(\lambda\)</span> was chosen here, by cross-validation on the
+training data, with the preprocessing inside the loop, with a refit at the
+selected values, and with the test set used exactly once afterwards.  Two
+things change as the models grow.  The cost of a fit grows, which is why one
+sees <span class="math notranslate nohighlight">\(K=3\)</span> and single validation splits in deep learning where this chapter
+used <span class="math notranslate nohighlight">\(K=5\)</span> and could have afforded leave-one-out; and the number of
+hyperparameters grows, so that the grid becomes a random or adaptive search
+over a space rather than a line, and the selection bias that nested
+cross-validation guards against becomes real.  The discipline is the same.
+Cross-validation chooses the hyperparameters; refitting produces the final
+parameters; the test set is a test set only as long as it has been used
+once.</p>
+</div>
+</section>
 <section id="a-complete-example-the-franke-function">
-<h2><span class="section-number">3.14. </span>A complete example: the Franke function<a class="headerlink" href="#a-complete-example-the-franke-function" title="Link to this heading">#</a></h2>
+<h2><span class="section-number">3.15. </span>A complete example: the Franke function<a class="headerlink" href="#a-complete-example-the-franke-function" title="Link to this heading">#</a></h2>
 <p>We now assemble everything into a single study.  The Franke function is a
 weighted sum of four exponentials on the unit square,</p>
 <div class="math notranslate nohighlight">
@@ -3055,8 +3839,8 @@ cannot be captured by a low-order polynomial and is well captured by a
 moderate one.  Adding Gaussian noise gives us a problem with a known truth, a
 known noise level and a tunable complexity – everything needed to see the
 bias-variance trade-off of Section <em>The bias-variance tradeoff</em> in action.</p>
-<p><img alt="The Franke function 3.91 on the unit square left and a contour view wi" src="_images/franke_function.png" /></p>
-<p><em>Figure 3.4: The Franke function (3.91) on the unit square (left) and a contour view with the <span class="math notranslate nohighlight">\(n=100\)</span> noisy samples used in this section marked (right).  Two peaks, a saddle and a depression make it too rich for a low-order polynomial and well within reach of a moderate one.</em></p>
+<p><img alt="The Franke function 3.100 on the unit square left and a contour view w" src="_images/franke_function.png" /></p>
+<p><em>Figure 3.6: The Franke function (3.100) on the unit square (left) and a contour view with the <span class="math notranslate nohighlight">\(n=100\)</span> noisy samples used in this section marked (right).  Two peaks, a saddle and a depression make it too rich for a low-order polynomial and well within reach of a moderate one.</em></p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
@@ -3086,7 +3870,8 @@ of Eq. (3.5) for polynomial degrees from one to some
 maximum; we split the data into training and test sets; we standardise using
 training statistics only; we fit by OLS, Ridge and Lasso; and we report test
 errors, choosing <span class="math notranslate nohighlight">\(\lambda\)</span> by the <span class="math notranslate nohighlight">\(k\)</span>-fold cross-validation of
-Section <em>Cross-validation</em>.</p>
+Section <em>Choosing the penalty: cross-validation for Ridge and Lasso</em>, with the scaler refitted inside every fold and
+the model refitted on the full training set at the selected value.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
@@ -3187,7 +3972,7 @@ rounding error.  That failure is one of conditioning rather than of
 statistics, and it is the only one of the three that no amount of clean data
 will cure.  The best model is a property of the data set – its size and its
 noise level – and not of the function being approximated.</p>
-<p>Figure 3.5 presents the whole experiment at a glance.
+<p>Figure 3.7 presents the whole experiment at a glance.
 The left panel is the test error, on a logarithmic scale so that the seven
 orders of magnitude are visible at all; the right panel counts the coefficients
 the Lasso retains.  Read together they make the argument of this chapter: all
@@ -3195,7 +3980,7 @@ three methods reach the same floor, set by the irreducible <span class="math not
 only the penalised ones stay near it when the complexity is chosen badly, and
 only the Lasso tells us how many terms were needed.</p>
 <p><img alt="Test error against polynomial degree for the three estimators on the F" src="_images/franke_model_selection.png" /></p>
-<p><em>Figure 3.5: Test error against polynomial degree for the three estimators on the Franke data (left, logarithmic), with the noise floor <span class="math notranslate nohighlight">\(\sigma^{2}=0.04\)</span> marked; and the number of coefficients the Lasso retains against the total number available (right).</em></p>
+<p><em>Figure 3.7: Test error against polynomial degree for the three estimators on the Franke data (left, logarithmic), with the noise floor <span class="math notranslate nohighlight">\(\sigma^{2}=0.04\)</span> marked; and the number of coefficients the Lasso retains against the total number available (right).</em></p>
 <div class="tip admonition">
 <p class="admonition-title">Machine learning connection</p>
 <p>The whole analysis rests on one number
@@ -3215,7 +4000,7 @@ concern.</p>
 </div>
 </section>
 <section id="a-second-example-the-one-dimensional-ising-model">
-<h2><span class="section-number">3.15. </span>A second example: the one-dimensional Ising model<a class="headerlink" href="#a-second-example-the-one-dimensional-ising-model" title="Link to this heading">#</a></h2>
+<h2><span class="section-number">3.16. </span>A second example: the one-dimensional Ising model<a class="headerlink" href="#a-second-example-the-one-dimensional-ising-model" title="Link to this heading">#</a></h2>
 <p>The Franke function was a regression problem dressed as a surface.  This
 section is a regression problem dressed as a piece of physics, and it is worth
 the detour for three reasons.  The design matrix is singular <em>exactly</em>,
@@ -3226,30 +4011,30 @@ same question, and the differences are the ones the theory predicts rather than
 accidents of the solver.  And the correct answer is known, so we can ask not
 only which estimator predicts well but which one is <em>right</em>.</p>
 <section id="the-model-and-the-design-matrix">
-<h3><span class="section-number">3.15.1. </span>The model and the design matrix<a class="headerlink" href="#the-model-and-the-design-matrix" title="Link to this heading">#</a></h3>
+<h3><span class="section-number">3.16.1. </span>The model and the design matrix<a class="headerlink" href="#the-model-and-the-design-matrix" title="Link to this heading">#</a></h3>
 <p>Consider <span class="math notranslate nohighlight">\(L\)</span> classical spins <span class="math notranslate nohighlight">\(s_j\in\{-1,+1\}\)</span> arranged on a ring, with the
 nearest-neighbour Hamiltonian</p>
 <div class="math notranslate nohighlight">
 \[
 H(\bm{s}) \;=\; -J\sum_{j=1}^{L}s_j s_{j+1},
-  \qquad s_{L+1}\equiv s_1 .\tag{3.92}
+  \qquad s_{L+1}\equiv s_1 .\tag{3.101}
 \]</div>
 <p>This is the one-dimensional Ising model, and <span class="math notranslate nohighlight">\(J&gt;0\)</span> favours aligned neighbours.
-Now forget that we know Eq. (3.92) and suppose instead that we are
+Now forget that we know Eq. (3.101) and suppose instead that we are
 handed a pile of configurations <span class="math notranslate nohighlight">\(\bm{s}^{(i)}\)</span> together with their energies
 <span class="math notranslate nohighlight">\(y_i=H(\bm{s}^{(i)})\)</span>, and are asked to discover the physics.  A reasonable
 thing to assume is that the interaction is pairwise but otherwise unrestricted,</p>
 <div class="math notranslate nohighlight">
 \[
-H(\bm{s}) \;=\; -\sum_{j=1}^{L}\sum_{k=1}^{L}J_{jk}\,s_j s_k ,\tag{3.93}
+H(\bm{s}) \;=\; -\sum_{j=1}^{L}\sum_{k=1}^{L}J_{jk}\,s_j s_k ,\tag{3.102}
 \]</div>
 <p>with an unknown coupling matrix <span class="math notranslate nohighlight">\(\bm{J}\)</span>.  The point of writing it this way is
-that Eq. (3.93) is <em>linear in the unknowns</em>: the
+that Eq. (3.102) is <em>linear in the unknowns</em>: the
 <span class="math notranslate nohighlight">\(L^{2}\)</span> numbers <span class="math notranslate nohighlight">\(J_{jk}\)</span> enter multiplied by the observable products
 <span class="math notranslate nohighlight">\(s_js_k\)</span>.  Setting <span class="math notranslate nohighlight">\(\theta_{jL+k}=-J_{jk}\)</span> and</p>
 <div class="math notranslate nohighlight">
 \[
-X_{i,\,jL+k} \;=\; s^{(i)}_j s^{(i)}_k\tag{3.94}
+X_{i,\,jL+k} \;=\; s^{(i)}_j s^{(i)}_k\tag{3.103}
 \]</div>
 <p>turns the problem into <span class="math notranslate nohighlight">\(\bm{y}=\bm{X}\bm{\theta}\)</span>, an ordinary linear model
 with <span class="math notranslate nohighlight">\(p=L^{2}\)</span> features, and every tool of this chapter applies unchanged.
@@ -3271,15 +4056,15 @@ the phrase <em>feature engineering</em> means.</p>
 </div>
 </div>
 <p>There is a price for the convenience, and it is paid immediately.  The design
-matrix (3.94) is not of full column rank, and not by a
+matrix (3.103) is not of full column rank, and not by a
 little.</p>
 <div class="important admonition">
 <p class="admonition-title">Proposition 3.14 (The Ising design matrix is exactly rank deficient)</p>
-<p>Let <span class="math notranslate nohighlight">\(\bm{X}\)</span> be given by Eq. (3.94) for spins
+<p>Let <span class="math notranslate nohighlight">\(\bm{X}\)</span> be given by Eq. (3.103) for spins
 <span class="math notranslate nohighlight">\(s_j\in\{-1,+1\}\)</span>.  Then</p>
 <div class="math notranslate nohighlight">
 \[
-\operatorname{rank}\bm{X} \;\le\; \frac{L(L-1)}{2}+1\tag{3.95}
+\operatorname{rank}\bm{X} \;\le\; \frac{L(L-1)}{2}+1\tag{3.104}
 \]</div>
 <p>for every sample size <span class="math notranslate nohighlight">\(n\)</span>, whereas the number of columns is <span class="math notranslate nohighlight">\(L^{2}\)</span>.</p>
 </div>
@@ -3315,18 +4100,18 @@ program confirms both the identities and the bound:</p>
 </div>
 <p>The bound is attained, and the singular value spectrum falls off a cliff
 exactly at index <span class="math notranslate nohighlight">\(781\)</span>, dropping by fourteen orders of magnitude between one
-singular value and the next.  Figure 3.6 shows it.  In
+singular value and the next.  Figure 3.8 shows it.  In
 the expansion (3.11) the least-squares coefficient along each
 right singular vector is <span class="math notranslate nohighlight">\(\bm{u}_i^{T}\bm{y}/\sigma_i\)</span>; here <span class="math notranslate nohighlight">\(819\)</span> of those
 denominators are zero, and the pseudoinverse of
 Section <em>Ordinary least squares</em> handles them by declaring the corresponding coefficients
 to be zero – the minimum-norm choice.  That convention is about to have a
 visible physical consequence.</p>
-<p><img alt="Singular values of the 10000times1600 Ising design matrix 3.94 for L40" src="../BookML/BookFigures/chapter03_linear_regression/ising_spectrum.png" /></p>
-<p><em>Figure 3.6: Singular values of the <span class="math notranslate nohighlight">\(10000\times1600\)</span> Ising design matrix (3.94) for <span class="math notranslate nohighlight">\(L=40\)</span>.  The spectrum collapses precisely at the index <span class="math notranslate nohighlight">\(L(L-1)/2+1=781\)</span> predicted by Proposition 3.14: the rank deficiency is a property of the features, not of the sample.</em></p>
+<p><img alt="Singular values of the 10000times1600 Ising design matrix 3.103 for L4" src="../BookML/BookFigures/chapter03_linear_regression/ising_spectrum.png" /></p>
+<p><em>Figure 3.8: Singular values of the <span class="math notranslate nohighlight">\(10000\times1600\)</span> Ising design matrix (3.103) for <span class="math notranslate nohighlight">\(L=40\)</span>.  The spectrum collapses precisely at the index <span class="math notranslate nohighlight">\(L(L-1)/2+1=781\)</span> predicted by Proposition 3.14: the rank deficiency is a property of the features, not of the sample.</em></p>
 </section>
 <section id="fitting-with-p-four-times-n">
-<h3><span class="section-number">3.15.2. </span>Fitting with <span class="math notranslate nohighlight">\(p\)</span> four times <span class="math notranslate nohighlight">\(n\)</span><a class="headerlink" href="#fitting-with-p-four-times-n" title="Link to this heading">#</a></h3>
+<h3><span class="section-number">3.16.2. </span>Fitting with <span class="math notranslate nohighlight">\(p\)</span> four times <span class="math notranslate nohighlight">\(n\)</span><a class="headerlink" href="#fitting-with-p-four-times-n" title="Link to this heading">#</a></h3>
 <p>We use <span class="math notranslate nohighlight">\(n_{\mathrm{train}}=400\)</span> configurations to fit <span class="math notranslate nohighlight">\(p=1600\)</span> coefficients
 and keep the remaining <span class="math notranslate nohighlight">\(9600\)</span> for testing.  The problem is therefore
 underdetermined twice over: once because <span class="math notranslate nohighlight">\(p&gt;n\)</span>, and once more because of
@@ -3348,14 +4133,14 @@ is not a bug and is discussed below.  And the Lasso is essentially perfect on
 data it has never seen, using <span class="math notranslate nohighlight">\(78\)</span> of the <span class="math notranslate nohighlight">\(1600\)</span> coefficients.</p>
 <p>The last number is the interesting one, because <span class="math notranslate nohighlight">\(78=2\times39\)</span> is very nearly
 <span class="math notranslate nohighlight">\(2L=80\)</span>: the Lasso has found the nearest-neighbour couplings and almost
-nothing else.  Figure 3.7 shows the three recovered
+nothing else.  Figure 3.9 shows the three recovered
 coupling matrices, and the difference is not subtle.</p>
 <p><img alt="The coupling matrices Jjk recovered from 400 configurations of the L40" src="../BookML/BookFigures/chapter03_linear_regression/ising_couplings.png" /></p>
-<p><em>Figure 3.7: The coupling matrices <span class="math notranslate nohighlight">\(J_{jk}\)</span> recovered from <span class="math notranslate nohighlight">\(400\)</span> configurations of the <span class="math notranslate nohighlight">\(L=40\)</span> Ising chain.  The truth is a single off-diagonal band.  OLS and Ridge spread the interaction over the whole matrix and split each coupling symmetrically between <span class="math notranslate nohighlight">\((j,k)\)</span> and <span class="math notranslate nohighlight">\((k,j)\)</span>; the Lasso finds the band and puts each coupling entirely on one side of the pair.  Both behaviours are forced, by Proposition 3.15.</em></p>
+<p><em>Figure 3.9: The coupling matrices <span class="math notranslate nohighlight">\(J_{jk}\)</span> recovered from <span class="math notranslate nohighlight">\(400\)</span> configurations of the <span class="math notranslate nohighlight">\(L=40\)</span> Ising chain.  The truth is a single off-diagonal band.  OLS and Ridge spread the interaction over the whole matrix and split each coupling symmetrically between <span class="math notranslate nohighlight">\((j,k)\)</span> and <span class="math notranslate nohighlight">\((k,j)\)</span>; the Lasso finds the band and puts each coupling entirely on one side of the pair.  Both behaviours are forced, by Proposition 3.15.</em></p>
 </section>
 <section id="why-the-symmetry-and-why-only-for-two-of-the-three">
-<h3><span class="section-number">3.15.3. </span>Why the symmetry, and why only for two of the three<a class="headerlink" href="#why-the-symmetry-and-why-only-for-two-of-the-three" title="Link to this heading">#</a></h3>
-<p>The pattern in Figure 3.7 is not a quirk of this data
+<h3><span class="section-number">3.16.3. </span>Why the symmetry, and why only for two of the three<a class="headerlink" href="#why-the-symmetry-and-why-only-for-two-of-the-three" title="Link to this heading">#</a></h3>
+<p>The pattern in Figure 3.9 is not a quirk of this data
 set.  It is a theorem about duplicated columns, and it explains the behaviour
 of all three estimators at once.</p>
 <div class="important admonition">
@@ -3437,7 +4222,7 @@ over the <span class="math notranslate nohighlight">\(1520\)</span> entries that
 what destroys the test score.</p>
 </section>
 <section id="the-penalty-over-eight-decades">
-<h3><span class="section-number">3.15.4. </span>The penalty, over eight decades<a class="headerlink" href="#the-penalty-over-eight-decades" title="Link to this heading">#</a></h3>
+<h3><span class="section-number">3.16.4. </span>The penalty, over eight decades<a class="headerlink" href="#the-penalty-over-eight-decades" title="Link to this heading">#</a></h3>
 <p>The one puzzle left in the first table is why Ridge and OLS agreed to four
 decimals at <span class="math notranslate nohighlight">\(\lambda=10^{-2}\)</span>.  Equation (3.46) answers it:
 the Ridge shrinkage factor is <span class="math notranslate nohighlight">\(\sigma_i^{2}/(\sigma_i^{2}+\lambda)\)</span>, so the
@@ -3484,12 +4269,12 @@ which point the test score collapses to <span class="math notranslate nohighligh
 though the training score is still <span class="math notranslate nohighlight">\(1\)</span>.  Above it we pass
 Proposition 3.8, the coefficients are driven to zero one
 after another, and at <span class="math notranslate nohighlight">\(\lambda=10\)</span> none survive.
-Figure 3.8 plots both curves.</p>
+Figure 3.10 plots both curves.</p>
 <p><img alt="Test and training R2 against the penalty for the Ising problem, with t" src="../BookML/BookFigures/chapter03_linear_regression/ising_penalty.png" /></p>
-<p><em>Figure 3.8: Test and training <span class="math notranslate nohighlight">\(R^{2}\)</span> against the penalty for the Ising problem, with the OLS test score marked.  Ridge (a) needs <span class="math notranslate nohighlight">\(\lambda\sim10^{3}\)</span> before anything happens, and never beats OLS.  The Lasso (b) has a broad plateau on which it is exact, and the count of non-zero coefficients (right axis, dashed) sits at about <span class="math notranslate nohighlight">\(2L=80\)</span> across it.</em></p>
+<p><em>Figure 3.10: Test and training <span class="math notranslate nohighlight">\(R^{2}\)</span> against the penalty for the Ising problem, with the OLS test score marked.  Ridge (a) needs <span class="math notranslate nohighlight">\(\lambda\sim10^{3}\)</span> before anything happens, and never beats OLS.  The Lasso (b) has a broad plateau on which it is exact, and the count of non-zero coefficients (right axis, dashed) sits at about <span class="math notranslate nohighlight">\(2L=80\)</span> across it.</em></p>
 </section>
 <section id="what-the-example-is-for">
-<h3><span class="section-number">3.15.5. </span>What the example is for<a class="headerlink" href="#what-the-example-is-for" title="Link to this heading">#</a></h3>
+<h3><span class="section-number">3.16.5. </span>What the example is for<a class="headerlink" href="#what-the-example-is-for" title="Link to this heading">#</a></h3>
 <p>The headline is that on a problem with a sparse truth the Lasso reached
 <span class="math notranslate nohighlight">\(R^{2}=0.99996\)</span> on unseen data from <span class="math notranslate nohighlight">\(400\)</span> samples and <span class="math notranslate nohighlight">\(1600\)</span> parameters, while
 OLS and Ridge reached <span class="math notranslate nohighlight">\(0.52\)</span>.  But the headline is the least transferable part,
@@ -3541,7 +4326,7 @@ reason Proposition 3.15 gives.</p>
 </section>
 </section>
 <section id="summary-and-the-programs">
-<h2><span class="section-number">3.16. </span>Summary and the programs<a class="headerlink" href="#summary-and-the-programs" title="Link to this heading">#</a></h2>
+<h2><span class="section-number">3.17. </span>Summary and the programs<a class="headerlink" href="#summary-and-the-programs" title="Link to this heading">#</a></h2>
 <p>Linear regression has given us, in closed form, every quantity the rest of
 this book will only be able to estimate.</p>
 <p>The estimator itself arrived three times over.  As an optimisation problem it
@@ -3579,7 +4364,18 @@ regularisation parameter is its strength.</p>
 <p>Finally, none of this survives careless practice.  Penalties are meaningless
 unless the features are on comparable scales; the intercept must be excluded
 from the penalty; every transformation must be fitted on training data alone;
-and the number one reports must come from data the model has never seen.</p>
+and the number one reports must come from data the model has never seen.
+The penalty itself is chosen by the cross-validation of
+Section <em>Choosing the penalty: cross-validation for Ridge and Lasso</em>: a logarithmic grid, <span class="math notranslate nohighlight">\(K\)</span> folds with the
+standardisation inside each, the minimum of Eq. (3.92) or the
+one-standard-error choice (3.96), a refit on all training data,
+and one look at the test set.  Cross-validation is preferred to the
+bootstrap for this purpose because its bias is nearly constant in <span class="math notranslate nohighlight">\(\lambda\)</span>
+and so leaves the minimum in place, because it costs <span class="math notranslate nohighlight">\(K\)</span> fits rather than
+hundreds, and because its models see <span class="math notranslate nohighlight">\((K-1)/K\)</span> of the data rather than the
+<span class="math notranslate nohighlight">\(63\%\)</span> of Eq. (3.97); the bootstrap keeps its role of
+estimating the distribution of whatever cross-validation selects, above all
+the Lasso’s support.</p>
 <p>A last thread runs underneath all three estimators and is the subject of
 Section <em>Kernel methods: regression without coordinates</em>.  The <span class="math notranslate nohighlight">\(2\)</span>-norm penalty is invariant under a
 change of orthonormal basis in the feature space, so it can be expressed
@@ -3610,6 +4406,15 @@ formula (3.37) and leave-one-out in closed form.</p></li>
 the Lasso by coordinate descent with soft thresholding, and the
 coefficient paths of Section <em>Comparing the three estimators</em> compared against
 the analytical results.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">cross_validation.py</span></code> – the procedure of
+Section <em>Choosing the penalty: cross-validation for Ridge and Lasso</em> from scratch: <span class="math notranslate nohighlight">\(K\)</span>-fold cross-validation
+with standardisation inside the folds for Ridge and the Lasso, the
+minimum-CV and one-standard-error choices, the refit and the single
+test evaluation, the <code class="docutils literal notranslate"><span class="pre">GridSearchCV</span></code> equivalent checked to
+rounding error, the leave-one-out bootstrap and .632 estimators
+against cross-validation and the true error, the repeated experiment
+behind the bias and spread table, and the bootstrap selection
+frequencies of the Lasso support.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">franke.py</span></code> – the complete study of Section <em>A complete example: the Franke function</em>:
 design matrices for two-dimensional polynomials, the train-test
 split, cross-validated selection of <span class="math notranslate nohighlight">\(\lambda\)</span>, test error against
@@ -3631,9 +4436,9 @@ An executable version is available as a Jupyter notebook in the accompanying
 Jupyter-book.</p>
 </section>
 <section id="exercises">
-<h2><span class="section-number">3.17. </span>Exercises<a class="headerlink" href="#exercises" title="Link to this heading">#</a></h2>
+<h2><span class="section-number">3.18. </span>Exercises<a class="headerlink" href="#exercises" title="Link to this heading">#</a></h2>
 <section id="warm-up-exercises">
-<h3><span class="section-number">3.17.1. </span>Warm-up exercises<a class="headerlink" href="#warm-up-exercises" title="Link to this heading">#</a></h3>
+<h3><span class="section-number">3.18.1. </span>Warm-up exercises<a class="headerlink" href="#warm-up-exercises" title="Link to this heading">#</a></h3>
 <ol class="arabic simple">
 <li><p><strong>The normal equations by hand.</strong>
 For the toy problem of Eq. (3.70):
@@ -3745,14 +4550,67 @@ test error of a Ridge fit against <span class="math notranslate nohighlight">\(\
 of Section <em>The bias-variance tradeoff</em>.  Verify that the bias increases
 monotonically, the variance decreases monotonically, and the minimum of the
 sum occurs at <span class="math notranslate nohighlight">\(\lambda&gt;0\)</span>.</p></li>
+<li><p><strong>The training error is monotone in the penalty.</strong>
+Let <span class="math notranslate nohighlight">\(\hat{\bm{\theta}}(\lambda)\)</span> minimise <span class="math notranslate nohighlight">\(L(\bm{\theta})+\lambda P(\bm{\theta})\)</span>
+for a loss <span class="math notranslate nohighlight">\(L\)</span> and a penalty <span class="math notranslate nohighlight">\(P\)</span>, both arbitrary.  For <span class="math notranslate nohighlight">\(\lambda_1&lt;\lambda_2\)</span>
+write down the two inequalities expressing that each minimiser beats the
+other at its own penalty, add them, and conclude that
+<span class="math notranslate nohighlight">\(P(\hat{\bm{\theta}}(\lambda_2))\le P(\hat{\bm{\theta}}(\lambda_1))\)</span> and
+<span class="math notranslate nohighlight">\(L(\hat{\bm{\theta}}(\lambda_1))\le L(\hat{\bm{\theta}}(\lambda_2))\)</span>.  This
+proves Eq. (3.91) along the whole path, for Ridge and
+the Lasso alike, and shows that the training error can never select a
+penalty.  Verify it numerically on the dotted curves of
+Figure 3.4.</p></li>
+<li><p><strong>The factor <span class="math notranslate nohighlight">\(n\)</span>.</strong>
+(a) Show that the minimiser of <span class="math notranslate nohighlight">\(\|\bm{y}-\bm{X}\bm{\theta}\|_2^{2}/n
++\lambda\|\bm{\theta}\|_2^{2}\)</span> is Eq. (3.95), and that
+the same estimator minimises <span class="math notranslate nohighlight">\(\|\bm{y}-\bm{X}\bm{\theta}\|_2^{2}
++\lambda'\|\bm{\theta}\|_2^{2}\)</span> with <span class="math notranslate nohighlight">\(\lambda'=n\lambda\)</span>.
+(b) A penalty <span class="math notranslate nohighlight">\(\lambda'\)</span> is selected by five-fold cross-validation in the
+second convention and then used to refit on all <span class="math notranslate nohighlight">\(n\)</span> training points.
+By what factor is the effective per-observation penalty changed
+between selection and refit, and in which direction?
+(c) Repeat the <code class="docutils literal notranslate"><span class="pre">GridSearchCV</span></code> run of Section <em>Choosing the penalty: cross-validation for Ridge and Lasso</em>
+with <code class="docutils literal notranslate"><span class="pre">alpha</span></code> set to <span class="math notranslate nohighlight">\(100\lambda\)</span> instead of <span class="math notranslate nohighlight">\(80\lambda\)</span> and
+confirm the shift of one grid point.</p></li>
+<li><p><strong>Out of the bag.</strong>
+(a) Prove Eq. (3.97) and evaluate <span class="math notranslate nohighlight">\((1-1/n)^{n}\)</span> for
+<span class="math notranslate nohighlight">\(n=10\)</span>, <span class="math notranslate nohighlight">\(100\)</span> and <span class="math notranslate nohighlight">\(1000\)</span>.
+(b) Show that the expected number of <em>distinct</em> observations in a
+bootstrap sample is <span class="math notranslate nohighlight">\(n[1-(1-1/n)^{n}]\)</span>, and that the expected number
+of replicas out of <span class="math notranslate nohighlight">\(B\)</span> in which a given observation is absent is
+<span class="math notranslate nohighlight">\(B(1-1/n)^{n}\)</span>; hence explain why the <code class="docutils literal notranslate"><span class="pre">seen</span></code> mask in the code
+of Section <em>Choosing the penalty: cross-validation for Ridge and Lasso</em> is almost never needed for <span class="math notranslate nohighlight">\(B=200\)</span>.
+(c) For which <span class="math notranslate nohighlight">\(K\)</span> does <span class="math notranslate nohighlight">\(K\)</span>-fold cross-validation train on the same
+fraction of the data as the leave-one-out bootstrap?</p></li>
+<li><p><strong>The one-standard-error rule (numerical).</strong>
+For the sparse problem of Section <em>Choosing the penalty: cross-validation for Ridge and Lasso</em>, generate <span class="math notranslate nohighlight">\(200\)</span>
+training sets and, for each, select the Lasso penalty by the minimum-CV
+rule and by the one-standard-error rule.
+(a) Record for each rule the number of retained coefficients, the number of
+true coefficients retained, and the true test error measured on a
+large fresh sample.  Report the averages.
+(b) Which rule retains fewer spurious coefficients, and what does it cost
+in test error on average?
+(c) Repeat with <span class="math notranslate nohighlight">\(\rho=0\)</span> and with <span class="math notranslate nohighlight">\(\rho=0.9\)</span> and explain what the
+correlation between features does to both rules.</p></li>
+<li><p><strong>Nested cross-validation (numerical).</strong>
+Without using a test set, estimate the generalisation error of the
+complete Ridge procedure of Section <em>Choosing the penalty: cross-validation for Ridge and Lasso</em> – grid,
+five-fold selection, refit – by nesting it in an outer five-fold loop.
+Compare the outer estimate with <span class="math notranslate nohighlight">\(\mathrm{CV}_5(\lambda_{\min})\)</span> from the
+inner loop and with the true error from a large fresh sample, then
+repeat with a grid of <span class="math notranslate nohighlight">\(600\)</span> penalties instead of <span class="math notranslate nohighlight">\(60\)</span> and with <span class="math notranslate nohighlight">\(n=40\)</span>
+instead of <span class="math notranslate nohighlight">\(100\)</span>.  When does the difference between the inner minimum and
+the outer estimate become important?</p></li>
 </ol>
 </section>
 <section id="project-style-exercise-regression-analysis-of-the-franke-function">
-<h3><span class="section-number">3.17.2. </span>Project-style exercise: regression analysis of the Franke function<a class="headerlink" href="#project-style-exercise-regression-analysis-of-the-franke-function" title="Link to this heading">#</a></h3>
+<h3><span class="section-number">3.18.2. </span>Project-style exercise: regression analysis of the Franke function<a class="headerlink" href="#project-style-exercise-regression-analysis-of-the-franke-function" title="Link to this heading">#</a></h3>
 <p>This extended exercise assembles the whole chapter, and follows the structure
 of the first project of the course.</p>
 <p><strong>Part a: ordinary least squares.</strong>
-Generate a data set from the Franke function (3.91) with
+Generate a data set from the Franke function (3.100) with
 <span class="math notranslate nohighlight">\(x,y\in[0,1]\)</span> and added noise <span class="math notranslate nohighlight">\(\mathcal{N}(0,\sigma^{2})\)</span>.  Write your own
 code – using either a matrix inversion or, preferably, the singular value
 decomposition – and perform a standard least-squares analysis with
@@ -3765,7 +4623,10 @@ a substantially larger data set and account for the shift in the optimum.</p>
 <p><strong>Part c: cross-validation.</strong>
 Implement <span class="math notranslate nohighlight">\(k\)</span>-fold cross-validation from scratch, with <span class="math notranslate nohighlight">\(k\)</span> between five and
 ten, and compare its estimate of the test error with the bootstrap estimate of
-part b.  Which is cheaper, and which has the smaller variance?</p>
+part b.  Which is cheaper, and which has the smaller variance?  Relate your
+findings to the comparison of Section <em>Choosing the penalty: cross-validation for Ridge and Lasso</em>, in particular to
+the fraction of distinct observations in a bootstrap sample,
+Eq. (3.97).</p>
 <p><strong>Part d: Ridge regression.</strong>
 Repeat parts a to c for Ridge regression, as a function of both the polynomial
 degree and the penalty <span class="math notranslate nohighlight">\(\lambda\)</span>.  Present your results as a heat map of the
@@ -3873,19 +4734,20 @@ the light of Section <em>Correlated data and the autocorrelation function</em>.<
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#scaling-centring-and-the-intercept">3.13. Scaling, centring and the intercept</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#a-complete-example-the-franke-function">3.14. A complete example: the Franke function</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#a-second-example-the-one-dimensional-ising-model">3.15. A second example: the one-dimensional Ising model</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-model-and-the-design-matrix">3.15.1. The model and the design matrix</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#fitting-with-p-four-times-n">3.15.2. Fitting with <span class="math notranslate nohighlight">\(p\)</span> four times <span class="math notranslate nohighlight">\(n\)</span></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#why-the-symmetry-and-why-only-for-two-of-the-three">3.15.3. Why the symmetry, and why only for two of the three</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-penalty-over-eight-decades">3.15.4. The penalty, over eight decades</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#what-the-example-is-for">3.15.5. What the example is for</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#choosing-the-penalty-cross-validation-for-ridge-and-lasso">3.14. Choosing the penalty: cross-validation for Ridge and Lasso</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#a-complete-example-the-franke-function">3.15. A complete example: the Franke function</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#a-second-example-the-one-dimensional-ising-model">3.16. A second example: the one-dimensional Ising model</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-model-and-the-design-matrix">3.16.1. The model and the design matrix</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#fitting-with-p-four-times-n">3.16.2. Fitting with <span class="math notranslate nohighlight">\(p\)</span> four times <span class="math notranslate nohighlight">\(n\)</span></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#why-the-symmetry-and-why-only-for-two-of-the-three">3.16.3. Why the symmetry, and why only for two of the three</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-penalty-over-eight-decades">3.16.4. The penalty, over eight decades</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#what-the-example-is-for">3.16.5. What the example is for</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#summary-and-the-programs">3.16. Summary and the programs</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercises">3.17. Exercises</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#warm-up-exercises">3.17.1. Warm-up exercises</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#project-style-exercise-regression-analysis-of-the-franke-function">3.17.2. Project-style exercise: regression analysis of the Franke function</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#summary-and-the-programs">3.17. Summary and the programs</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercises">3.18. Exercises</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#warm-up-exercises">3.18.1. Warm-up exercises</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#project-style-exercise-regression-analysis-of-the-franke-function">3.18.2. Project-style exercise: regression analysis of the Franke function</a></li>
 </ul>
 </li>
 </ul>
