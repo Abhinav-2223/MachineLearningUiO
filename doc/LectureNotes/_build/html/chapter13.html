@@ -657,12 +657,12 @@ Sometimes a position must not see another.  In autoregressive generation, the
 prediction at step <span class="math notranslate nohighlight">\(i\)</span> may depend only on steps <span class="math notranslate nohighlight">\(j\le i\)</span>, or the model would be
 allowed to read its own answer.  This is imposed by adding a <em>mask</em> to the
 scores before the softmax,</p>
-<div class="math notranslate nohighlight">
-\[\begin{split}
+<div class="amsmath math notranslate nohighlight">
+\[\begin{equation*}
 s_{ij} \;\longleftarrow\; s_{ij} + M_{ij},
   \qquad
   M_{ij} = \begin{cases}0, &amp; j\le i,\\ -\infty, &amp; j&gt;i,\end{cases}\tag{13.8}
-\end{split}\]</div>
+\end{equation*}\]</div>
 <p>so that <span class="math notranslate nohighlight">\(\exp(s_{ij})=0\)</span> above the diagonal and <span class="math notranslate nohighlight">\(\bm{A}\)</span> becomes lower
 triangular.  The implementation adds <span class="math notranslate nohighlight">\(-\infty\)</span> rather than deleting entries so
 that the shape of the computation is unchanged.</p>
@@ -775,15 +775,15 @@ work.</p>
 Attention is one sublayer of a <em>transformer block</em>, which also contains a
 position-wise feed-forward network, residual connections and normalisation.  In
 the pre-norm arrangement now standard,</p>
-<div class="math notranslate nohighlight">
-\[\begin{split}
+<div class="amsmath math notranslate nohighlight">
+\[\begin{equation*}
 \begin{split}
     \bm{X} &amp;\;\longleftarrow\; \bm{X}
       + \mathrm{MultiHead}\!\left(\mathrm{LN}(\bm{X})\right),\\
     \bm{X} &amp;\;\longleftarrow\; \bm{X}
       + \mathrm{MLP}\!\left(\mathrm{LN}(\bm{X})\right),
   \end{split}\tag{13.14}
-\end{split}\]</div>
+\end{equation*}\]</div>
 <p>where the MLP is applied to each token separately,
 <span class="math notranslate nohighlight">\(\mathrm{MLP}(\bm{z})=\bm{W}_2\,\mathrm{GELU}(\bm{W}_1\bm{z}+\bm{b}_1)+\bm{b}_2\)</span>,
 with the GELU activation of Section <em>Activation functions</em>, and layer
@@ -976,7 +976,7 @@ vocabulary of eight symbols, so that chance is <span class="math notranslate noh
 </table>
 </div>
 <p><em>Table 13.1: Associative recall with <span class="math notranslate nohighlight">\(L\)</span> key-value pairs, so sequence length
-<span class="math notranslate nohighlight">\(T=2L+1\)</span>.  All models trained by Adam with <span class="math notranslate nohighlight">\(\eta=3\times10^{-3}\)</span> on freshly
+<span class="math notranslate nohighlight">\(T=2L+1\)</span>.  All models trained by Adam with <span class="math notranslate nohighlight">\(\gamma=3\times10^{-3}\)</span> on freshly
 generated batches; accuracy on <span class="math notranslate nohighlight">\(400\)</span> unseen sequences, ranges over two seeds.
 Chance is <span class="math notranslate nohighlight">\(0.125\)</span>.</em></p>
 <p>At <span class="math notranslate nohighlight">\(L=2\)</span> the sequence is five tokens long and everything works.  At <span class="math notranslate nohighlight">\(L=4\)</span> both
