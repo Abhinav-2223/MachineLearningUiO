@@ -147,6 +147,7 @@ def inline(s):
     def _stash(m):
         _st.append(m.group(0)); return f"\x01M{len(_st)-1}\x01"
     s = re.sub(r"\$\$.*?\$\$", _stash, s, flags=re.S)
+    s = re.sub(r"\\begin\{equation\*\}.*?\\end\{equation\*\}", _stash, s, flags=re.S)
     s = re.sub(r"\$(?:[^$\n]|\n(?!\n))*?\$", _stash, s)
     s = re.sub(r"\\(?:Eq|Section|Chapter|Table|Figure)?~?\\?ref\{([^}]*)\}",
                lambda m: resolve_ref(m.group(1)), s)
@@ -294,7 +295,19 @@ def convert_prose(s, chnum):
         return f"\n\n```{{admonition}} Proof\n:class: note\n{inner}\n```\n\n"
     s = re.sub(r"\\begin\{proof\}(.*?)\\end\{proof\}", proof_repl, s, flags=re.S)
 
-    # display math
+    # display math.  Bodies of theorem-like environments, noteboxes and
+    # proofs were converted by a recursive convert_prose call above, so
+    # their math is already in its final form; protect it, otherwise the
+    # \begin{align} inside a finished $$...$$ block (or a bare tagged
+    # equation*) would be matched and wrapped a second time.
+    done = []
+    def _keep(m):
+        txt = m.group(0)
+        if txt.startswith("\\begin{equation*}") and "\\tag{" not in txt:
+            return txt          # a plain equation* from the LaTeX source
+        done.append(txt); return f"\x02D{len(done)-1}\x02"
+    s = re.sub(r"\$\$.*?\$\$", _keep, s, flags=re.S)
+    s = re.sub(r"\\begin\{equation\*\}.*?\\end\{equation\*\}", _keep, s, flags=re.S)
     def math_repl(m):
         env, body = m.group(1), m.group(2)
         labels = re.findall(r"\\label\{([^}]*)\}", body)
@@ -302,11 +315,22 @@ def convert_prose(s, chnum):
         if labels and labels[0] in EQ: tag = "\\tag{%s}" % EQ[labels[0]]
         body = re.sub(r"\\label\{[^}]*\}", "", body)
         if env.startswith("equation"):
+            if tag and "\\\\" in body:
+                # Sphinx's MathJax writer wraps any $$...$$ block that contains
+                # a line break (\\ -- matrices, cases, split, aligned) in
+                # \begin{split}...\end{split}, and MathJax then rejects the
+                # \tag: "\tag not allowed in split environment".  A bare
+                # starred amsmath environment goes through MyST's amsmath
+                # extension instead, which passes it to MathJax untouched and
+                # adds no Sphinx equation number of its own.
+                return ("\n\n\\begin{equation*}\n"+body.strip()+tag
+                        +"\n\\end{equation*}\n\n")
             return "\n\n$$\n"+body.strip()+tag+"\n$$\n\n"
         return "\n\n$$\n\\begin{"+env+"}\n"+body.strip()+"\n\\end{"+env+"}\n$$\n\n"
     s = re.sub(r"\\begin\{(equation\*?|align\*?|eqnarray\*?)\}(.*?)\\end\{\1\}", math_repl, s, flags=re.S)
     s = re.sub(r"(?<!\\)\\\[(.*?)(?<!\\)\\\]",
                lambda m: "\n\n$$\n"+m.group(1).strip()+"\n$$\n\n", s, flags=re.S)
+    s = re.sub(r"\x02D(\d+)\x02", lambda m: done[int(m.group(1))], s)
 
     # lists, innermost first so that nesting is handled correctly
     def list_repl(body, ordered, indent):
@@ -357,6 +381,9 @@ def convert_prose(s, chnum):
     def stash(m):
         store.append(m.group(0)); return f"\x00MATH{len(store)-1}\x00"
     s = re.sub(r"\$\$.*?\$\$", stash, s, flags=re.S)
+    # bare starred environments emitted by math_repl for tagged multi-line
+    # equations (see the comment there) need the same protection
+    s = re.sub(r"\\begin\{equation\*\}.*?\\end\{equation\*\}", stash, s, flags=re.S)
     s = re.sub(r"\$(?:[^$\n]|\n(?!\n))*?\$", stash, s)
 
     s = inline(s)
