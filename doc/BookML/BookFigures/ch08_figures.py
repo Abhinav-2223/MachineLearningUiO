@@ -54,14 +54,14 @@ save(fig,8,"vanishing_gradients")
 # 4. training curves and the effect of the activation
 fig,axes=plt.subplots(1,2,figsize=(9.4,3.3))
 for act in ["sigmoid","tanh","relu"]:
-    net=NeuralNetwork([64,50,10],act,"classification",eta=0.1,lmbd=1e-4,epochs=60,
+    net=NeuralNetwork([64,50,10],act,"classification",gamma=0.1,lmbd=1e-4,epochs=60,
                       batch_size=32,rng=np.random.default_rng(2024)).fit(Xtr,ytr)
     axes[0].semilogy(net.loss_,label=f"{act} (test {np.mean(net.predict(Xte)==yte):.3f})")
 axes[0].set_xlabel("epoch"); axes[0].set_ylabel("training cross entropy"); axes[0].legend(fontsize=8)
 axes[0].set_title("64-50-10 on the digits",fontsize=10)
 units=[2,5,10,20,50,100,200]; tr=[];te=[]
 for u in units:
-    net=NeuralNetwork([64,u,10],"relu","classification",eta=0.1,lmbd=1e-4,epochs=60,
+    net=NeuralNetwork([64,u,10],"relu","classification",gamma=0.1,lmbd=1e-4,epochs=60,
                       batch_size=32,rng=np.random.default_rng(2024)).fit(Xtr,ytr)
     tr.append(np.mean(net.predict(Xtr)==ytr)); te.append(np.mean(net.predict(Xte)==yte))
 axes[1].semilogx(units,tr,"o-",label="training"); axes[1].semilogx(units,te,"s-",label="test")
@@ -133,7 +133,7 @@ Xtr,Xte,ytr,yte=train_test_split(Xs,d.target,test_size=0.2,random_state=42)
 acts=["sigmoid","tanh","relu","leaky_relu","elu","gelu","swish","mish"]
 mean=[];sd=[]
 for act in acts:
-    a=[np.mean(NeuralNetwork([64,30,30,30,10],act,"classification",eta=0.1,lmbd=1e-4,
+    a=[np.mean(NeuralNetwork([64,30,30,30,10],act,"classification",gamma=0.1,lmbd=1e-4,
         epochs=60,batch_size=32,rng=np.random.default_rng(s)).fit(Xtr,ytr).predict(Xte)==yte)
         for s in range(5)]
     mean.append(np.mean(a)); sd.append(np.std(a))

@@ -14,7 +14,7 @@ from nn_de import init_parameters
 # ---------- PINN diffusion with recorded history ----------
 terms=[("pde",1.0,D.r_pde,D.X_col),("ic",10.0,D.r_ic,D.X_ic),
        ("bcL",10.0,D.r_bc,D.X_l),("bcR",10.0,D.r_bc,D.X_r)]
-P_pinn,hist=pinn_solve(terms,[2,30,30,1],"tanh",n_iter=4000,eta=1e-2,
+P_pinn,hist=pinn_solve(terms,[2,30,30,1],"tanh",n_iter=4000,gamma=1e-2,
                        rng=anp.random.default_rng(1),every=50)
 # ---------- hard-constraint reference ----------
 def trial(P,X):
@@ -24,7 +24,7 @@ ut=d_dxk(trial,1); ux=d_dxk(trial,0); uxx=d_dxk(ux,0)
 xs=anp.linspace(0,1,20); Xg,Tg=anp.meshgrid(xs,xs,indexing="ij")
 Xall=anp.column_stack([Xg.ravel(),Tg.ravel()])
 P_hard,_=solve_de(lambda P,X: ut(P,X)-uxx(P,X),[2,30,30,1],Xall,"tanh",
-                  n_iter=4000,eta=1e-2,rng=anp.random.default_rng(1))
+                  n_iter=4000,gamma=1e-2,rng=anp.random.default_rng(1))
 
 fig,axs=plt.subplots(1,3,figsize=(13,3.8))
 its=[h[0] for h in hist]
