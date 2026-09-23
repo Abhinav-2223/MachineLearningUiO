@@ -1357,7 +1357,7 @@ rate (4.33) needs 28.  Note that the best <span class="math notranslate nohighli
 to <span class="math notranslate nohighlight">\(\kappa\)</span>: the default <span class="math notranslate nohighlight">\(0.9\)</span> is right for <span class="math notranslate nohighlight">\(\kappa\approx400\)</span> and too much
 for <span class="math notranslate nohighlight">\(\kappa=10\)</span>, where it makes the iterate ring for longer than plain
 descent takes to converge.</p>
-<p><img alt="Following the steps of gradient descent with and without momentum.  Le" src="../BookML/BookFigures/chapter04_optimization/gd_steps.png" /></p>
+<p><img alt="Following the steps of gradient descent with and without momentum.  Le" src="_images/gd_steps.png" /></p>
 <p><em>Figure 4.4: Following the steps of gradient descent with and without momentum.  Left: the quartic <span class="math notranslate nohighlight">\(f(x)=x^{4}-3x^{2}+x\)</span> from <span class="math notranslate nohighlight">\(x_0=2\)</span> with <span class="math notranslate nohighlight">\(\gamma=0.05\)</span>; plain descent stops in the nearer, shallower minimum, momentum with <span class="math notranslate nohighlight">\(\beta=0.7\)</span> carries the iterate over the hump into the global one.  Right: forty steps on the bowl <span class="math notranslate nohighlight">\(\frac12(\theta_1^{2}+10\theta_2^{2})\)</span> with <span class="math notranslate nohighlight">\(\kappa=10\)</span>, at a small learning rate, at <span class="math notranslate nohighlight">\(0.9\)</span> of the stability bound (4.20), and with momentum <span class="math notranslate nohighlight">\(\beta=0.3\)</span> at the same learning rate.</em></p>
 <div class="tip admonition">
 <p class="admonition-title">Machine learning connection</p>
@@ -1818,7 +1818,7 @@ has completed its <em>first</em> step.  The constant-learning-rate runs make
 the other point of this section: they are as fast at the start and then
 level off, at <span class="math notranslate nohighlight">\(10^{-2}\)</span> for <span class="math notranslate nohighlight">\(\gamma=0.02\)</span> and <span class="math notranslate nohighlight">\(3\times10^{-3}\)</span> for
 <span class="math notranslate nohighlight">\(\gamma=0.005\)</span>, the signature of the noise that does not decay.</p>
-<p><img alt="Excess cost against floating-point operations on a least-squares probl" src="../BookML/BookFigures/chapter04_optimization/sgd_vs_gd.png" /></p>
+<p><img alt="Excess cost against floating-point operations on a least-squares probl" src="_images/sgd_vs_gd.png" /></p>
 <p><em>Figure 4.5: Excess cost against floating-point operations on a least-squares problem with <span class="math notranslate nohighlight">\(n=10^{5}\)</span>, <span class="math notranslate nohighlight">\(p=20\)</span> and <span class="math notranslate nohighlight">\(\kappa=213\)</span>, from <span class="math notranslate nohighlight">\(\bm{\theta}_0=\bm{0}\)</span>.  Full-batch gradient descent at <span class="math notranslate nohighlight">\(\gamma^{*}\)</span> and momentum with tuned parameters against minibatch SGD (<span class="math notranslate nohighlight">\(M=32\)</span>) at two constant learning rates and with the schedule (4.52).  The dotted line is the estimation error <span class="math notranslate nohighlight">\(\sigma^{2}p/n\)</span> of Eq. (4.48); SGD with the schedule is there within five epochs, momentum in <span class="math notranslate nohighlight">\(81\)</span> full gradients and gradient descent in <span class="math notranslate nohighlight">\(640\)</span>.</em></p>
 <p>A held-out set of <span class="math notranslate nohighlight">\(20\,000\)</span> points from the same model confirms that the
 dotted line is the right place to stop.  The validation error is <span class="math notranslate nohighlight">\(1.0005\)</span> at
@@ -2164,7 +2164,7 @@ into the overhead of the interpreter and of the library calls.  The
 throughput rises from <span class="math notranslate nohighlight">\(2\times10^{5}\)</span> examples per second at <span class="math notranslate nohighlight">\(M=1\)</span> to
 <span class="math notranslate nohighlight">\(1.5\times10^{7}\)</span> at <span class="math notranslate nohighlight">\(M\approx2000\)</span>, where it saturates, and <em>falls</em>
 again for the full batch of <span class="math notranslate nohighlight">\(10^{5}\)</span> rows, which no longer fits in the cache.</p>
-<p><img alt="Left measured time per SGD update and throughput in examples per secon" src="../BookML/BookFigures/chapter04_optimization/sgd_batchsize.png" /></p>
+<p><img alt="Left measured time per SGD update and throughput in examples per secon" src="_images/sgd_batchsize.png" /></p>
 <p><em>Figure 4.6: Left: measured time per SGD update and throughput in examples per second against the minibatch size, for the least-squares problem of Fig. 4.5; the update is nearly free up to <span class="math notranslate nohighlight">\(M\approx30\)</span>, and the throughput saturates near <span class="math notranslate nohighlight">\(M=2000\)</span>, the two regimes of Eq. (4.56).  Right: the excess cost at which SGD with a constant learning rate levels off, for seven combinations of <span class="math notranslate nohighlight">\(\gamma\)</span> and <span class="math notranslate nohighlight">\(M\)</span>, against the prediction <span class="math notranslate nohighlight">\(\gamma\,\mathrm{tr}\,\bm{S}/(4M)\)</span> of Eq. (4.51); the dotted line is the estimation error <span class="math notranslate nohighlight">\(\sigma^{2}p/n\)</span>.</em></p>
 <div class="pst-scrollable-table-container"><table class="table">
 <thead>
@@ -2249,7 +2249,7 @@ that does not yet cost extra epochs – here <span class="math notranslate nohig
 where the throughput saturates, and not <span class="math notranslate nohighlight">\(M=1\)</span>.  Gradient descent, finally, is
 the fastest of all per update and the slowest by a factor of a hundred and
 fifty in time.</p>
-<p><img alt="The same four runs -- gradient descent at gamma and SGD with M1, 32 an" src="../BookML/BookFigures/chapter04_optimization/sgd_three_axes.png" /></p>
+<p><img alt="The same four runs -- gradient descent at gamma and SGD with M1, 32 an" src="_images/sgd_three_axes.png" /></p>
 <p><em>Figure 4.7: The same four runs – gradient descent at <span class="math notranslate nohighlight">\(\gamma^{*}\)</span> and SGD with <span class="math notranslate nohighlight">\(M=1\)</span>, <span class="math notranslate nohighlight">\(32\)</span> and <span class="math notranslate nohighlight">\(512\)</span> and the schedules of Table 4.3 – against three horizontal axes.  Left: parameter updates, which favours gradient descent.  Centre: epochs, that is, the amount of data processed, on which the three SGD runs coincide.  Right: estimated wall time, on which the small batch falls behind.  The dotted line is the estimation error <span class="math notranslate nohighlight">\(\sigma^{2}p/n\)</span>.</em></p>
 <p><strong>Three axes, three stories.</strong>
 Figure 4.7 is a warning as much as a result.  A plot of the
@@ -2373,7 +2373,7 @@ by <span class="math notranslate nohighlight">\(45^\circ\)</span> gradient desce
 Eq. (4.19) depends only on the eigenvalues, while AdaGrad and
 RMSProp no longer reach <span class="math notranslate nohighlight">\(10^{-4}\)</span> in <span class="math notranslate nohighlight">\(5000\)</span> iterations and Adam needs <span class="math notranslate nohighlight">\(635\)</span>.
 The adaptive methods see the diagonal of the Hessian and nothing else.</p>
-<p><img alt="The first hundred steps of five optimisers on the quadratic bowl with " src="../BookML/BookFigures/chapter04_optimization/adaptive_paths.png" /></p>
+<p><img alt="The first hundred steps of five optimisers on the quadratic bowl with " src="_images/adaptive_paths.png" /></p>
 <p><em>Figure 4.8: The first hundred steps of five optimisers on the quadratic bowl with Hessian eigenvalues <span class="math notranslate nohighlight">\(1\)</span> and <span class="math notranslate nohighlight">\(100\)</span>, from the same starting point.  Left: the Hessian is diagonal, and the adaptive methods, which rescale each coordinate by its own gradient history, move diagonally towards the minimum while plain gradient descent zigzags down the steep direction and crawls along the flat one.  Right: the same bowl rotated by <span class="math notranslate nohighlight">\(45^\circ\)</span>, with the same eigenvalues and condition number.  Gradient descent and momentum are unaffected; the adaptive methods, whose diagonal rescaling cannot see the off-diagonal curvature, lose most of their advantage.</em></p>
 <p><strong>Scale invariance.</strong>
 A second consequence of Eq. (4.57) explains why the adaptive
@@ -3241,7 +3241,7 @@ the given input – and that is what makes AD applicable to programs rather
 than to formulae.  A neural network is a particularly regular trace: the
 matrix products, additions and activation functions of Chapter 8,
 one layer after another.</p>
-<p><img alt="The computational graph of the evaluation trace 4.78 for .  Each node " src="../BookML/BookFigures/chapter04_optimization/4-compgraph.png" /></p>
+<p><img alt="The computational graph of the evaluation trace 4.78 for .  Each node " src="_images/4-compgraph.png" /></p>
 <p><em>Figure 4.10: The computational graph of the evaluation trace (4.78) for <span class="math notranslate nohighlight">\(f(x_1,x_2)=\ln x_1+x_1x_2-\sin x_2\)</span>.  Each node is one elementary operation applied to its predecessors.  Forward-mode AD sweeps this graph from left to right, carrying a derivative <span class="math notranslate nohighlight">\(\dot v_i\)</span> with every value; reverse-mode AD first evaluates the values from left to right and then sweeps back from right to left, carrying an adjoint <span class="math notranslate nohighlight">\(\bar v_i=\partial y/\partial v_i\)</span> with every node.</em></p>
 <p>For each node the derivative of the elementary operation with respect to each
 of its arguments – its <em>local</em> or <em>partial</em> derivative – is known
@@ -3540,7 +3540,7 @@ left, and on a chain the two are indistinguishable in cost.  Evaluating
 sweep adds two multiplications, and notice that <span class="math notranslate nohighlight">\(\exp(x^{2})\)</span> is not
 recomputed: it is <span class="math notranslate nohighlight">\(v_2\)</span>, read off the tape.  At <span class="math notranslate nohighlight">\(x=1\)</span> all three agree on
 <span class="math notranslate nohighlight">\(f'(1)=2e=5.437\)</span>.</p>
-<p><img alt="The computational graphs of the two examples of Section Two examples w" src="../BookML/BookFigures/chapter04_optimization/4-adchain.png" /></p>
+<p><img alt="The computational graphs of the two examples of Section Two examples w" src="_images/4-adchain.png" /></p>
 <p><em>Figure 4.11: The computational graphs of the two examples of Section <em>Two examples worked by hand</em>.  Top: <span class="math notranslate nohighlight">\(f(x)=\exp(x^{2})\)</span>, trace (4.91), a chain in which every value is used once. Bottom: <span class="math notranslate nohighlight">\(f(x)=\sqrt{x^{2}+\exp(x^{2})}\)</span>, trace (4.95), where <span class="math notranslate nohighlight">\(v_1=x^{2}\)</span> feeds both the exponential and the sum.  The two paths from <span class="math notranslate nohighlight">\(v_1\)</span> to <span class="math notranslate nohighlight">\(y\)</span> are the two terms of the adjoint <span class="math notranslate nohighlight">\(\bar v_1\)</span> in Eq. (4.97).</em></p>
 <p><strong>A fan-out.</strong>
 The second function reuses an intermediate value,</p>
@@ -4078,7 +4078,7 @@ Figure 4.12 plots the whole curve, and it is worth memorising
 its shape: whenever a finite-difference gradient check is used, as in
 Eq. (4.102), <span class="math notranslate nohighlight">\(h\)</span> must sit near the bottom of this valley, and
 agreement to better than about <span class="math notranslate nohighlight">\(10^{-8}\)</span> relative should not be expected.</p>
-<p><img alt="Absolute error of the central finite difference 4.73 for fxsin2pi xx2 " src="../BookML/BookFigures/chapter04_optimization/fd_vs_ad_error.png" /></p>
+<p><img alt="Absolute error of the central finite difference 4.73 for fxsin2pi xx2 " src="_images/fd_vs_ad_error.png" /></p>
 <p><em>Figure 4.12: Absolute error of the central finite difference (4.73) for <span class="math notranslate nohighlight">\(f(x)=\sin(2\pi x+x^{2})\)</span> at <span class="math notranslate nohighlight">\(x=1\)</span>, as a function of the step <span class="math notranslate nohighlight">\(h\)</span> (points), together with the model (4.75) (dashed): truncation error <span class="math notranslate nohighlight">\(\propto h^{2}\)</span> on the right, rounding error <span class="math notranslate nohighlight">\(\propto1/h\)</span> on the left, and a minimum of about <span class="math notranslate nohighlight">\(10^{-10}\)</span> near <span class="math notranslate nohighlight">\(h\approx\epsilon_M^{1/3}\)</span>.  The reverse-mode derivative computed by JAX has an error at the level of the unit roundoff, shown as the horizontal line, for any <span class="math notranslate nohighlight">\(h\)</span> because it involves no <span class="math notranslate nohighlight">\(h\)</span>.</em></p>
 <p>The transformations of JAX compose: <code class="docutils literal notranslate"><span class="pre">jit(grad(f))</span></code> compiles the
 gradient, <code class="docutils literal notranslate"><span class="pre">vmap(grad(f))</span></code> vectorises it over a batch,
