@@ -14,7 +14,7 @@ d=load_digits(); X=(d.images.reshape(len(d.images),-1)/16.0); X=(X>0.5).astype(f
 Xtr=X[:1200]
 for dh,c in [(2,"C0"),(5,"C1"),(10,"C2"),(20,"C3")]:
     P=vae.init_vae(X.shape[1],dh,hidden=64,rng=anp.random.default_rng(0))
-    P,h=vae.train_vae(P,Xtr,n_iter=1500,batch=64,eta=2e-3,
+    P,h=vae.train_vae(P,Xtr,n_iter=1500,batch=64,gamma=2e-3,
                       rng=anp.random.default_rng(1),every=100)
     h=np.array(h)
     axs[0].plot(h[:,0],h[:,1],c,lw=1.4,label=rf"$d_h={dh}$")
