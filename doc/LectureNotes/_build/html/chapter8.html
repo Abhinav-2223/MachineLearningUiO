@@ -392,8 +392,11 @@ document.write(`
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-cost-function-and-the-optimisation-problem">8.7. The cost function and the optimisation problem</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#backpropagation">8.8. Backpropagation</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-four-equations-of-backpropagation">8.8.1. The four equations of backpropagation</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-algorithm">8.8.2. The algorithm</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#two-scalar-examples-no-hidden-layer-and-one-hidden-layer">8.8.1. Two scalar examples: no hidden layer and one hidden layer</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#two-inputs-two-hidden-nodes-one-output">8.8.2. Two inputs, two hidden nodes, one output</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-general-case-dense-layers">8.8.3. The general case: dense layers</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-four-equations-of-backpropagation">8.8.4. The four equations of backpropagation</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-algorithm">8.8.5. The algorithm</a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#vanishing-and-exploding-gradients">8.9. Vanishing and exploding gradients</a></li>
@@ -480,7 +483,7 @@ needed in Section <em>Scaling, centring and the intercept</em>: without it the n
 constrained to pass through the origin.  Figure 8.1 is
 Eq. (8.1) drawn: the weighted sum on the left, the bias entering
 as an input of its own, and the non-linearity on the right.</p>
-<p><img alt="The artificial neuron of Eq. 8.1.  The inputs  are combined linearly w" src="../BookML/BookFigures/chapter08_neural_networks/8-neuron.png" /></p>
+<p><img alt="The artificial neuron of Eq. 8.1.  The inputs  are combined linearly w" src="_images/8-neuron.png" /></p>
 <p><em>Figure 8.1: The artificial neuron of Eq. (8.1).  The inputs <span class="math notranslate nohighlight">\(x_i\)</span> are combined linearly with the weights <span class="math notranslate nohighlight">\(w_i\)</span>, the bias <span class="math notranslate nohighlight">\(b\)</span> is added – it is drawn as a separate input because that is what it is, an input permanently fixed at one – and the resulting pre-activation <span class="math notranslate nohighlight">\(z\)</span> is passed through the non-linear activation function <span class="math notranslate nohighlight">\(f\)</span> to give the output <span class="math notranslate nohighlight">\(y\)</span>.  Taking <span class="math notranslate nohighlight">\(f\)</span> to be the identity gives linear regression, the logistic function gives logistic regression, and the step function gives Rosenblatt’s perceptron.</em></p>
 <p>Equation (8.1) is not new.  Taking <span class="math notranslate nohighlight">\(f\)</span> to be the identity gives
 the linear model of Chapter 3; taking <span class="math notranslate nohighlight">\(f=\sigma\)</span>, the logistic
@@ -1216,10 +1219,10 @@ subscript names the node it <em>leaves</em> and the second the node it arrives
 at, and that the sum in Eq. (8.18) is therefore over the first
 index.  Every other convention in circulation is a permutation of this one, and
 the only thing that matters is to choose one and never deviate from it.</p>
-<p><img alt="A fully connected feed-forward network in the notation of Section Nota" src="../BookML/BookFigures/chapter08_neural_networks/8-mlp.png" /></p>
+<p><img alt="A fully connected feed-forward network in the notation of Section Nota" src="_images/8-mlp.png" /></p>
 <p><em>Figure 8.5: A fully connected feed-forward network in the notation of Section <em>Notation and the feed-forward pass</em>, here with <span class="math notranslate nohighlight">\(L=3\)</span>.  Layer <span class="math notranslate nohighlight">\(l\)</span> has <span class="math notranslate nohighlight">\(M_l\)</span> nodes and node <span class="math notranslate nohighlight">\(j\)</span> of that layer carries the output <span class="math notranslate nohighlight">\(a_j^{l}\)</span> of Eq. (8.19); the input layer holds <span class="math notranslate nohighlight">\(a_i^{0}=x_i\)</span> and the output layer the prediction <span class="math notranslate nohighlight">\(\tilde{\bm{y}}=\bm{a}^{L}\)</span>.  Every node of one layer is connected to every node of the next, and the highlighted edge carries the weight <span class="math notranslate nohighlight">\(w_{23}^{2}\)</span>, from node <span class="math notranslate nohighlight">\(i=2\)</span> of layer <span class="math notranslate nohighlight">\(l-1=1\)</span> to node <span class="math notranslate nohighlight">\(j=3\)</span> of layer <span class="math notranslate nohighlight">\(l=2\)</span>: the superscript names the <em>receiving</em> layer and the first index names the <em>sending</em> node.</em></p>
-<p><img alt="The index convention of Eqs. 8.18 and 8.19, seen from a single node.  " src="../BookML/BookFigures/chapter08_neural_networks/8-node.png" /></p>
-<p><em>Figure 8.6: The index convention of Eqs. (8.18) and (8.19), seen from a single node.  Node <span class="math notranslate nohighlight">\(j\)</span> of layer <span class="math notranslate nohighlight">\(l\)</span> collects the outputs <span class="math notranslate nohighlight">\(a_i^{l-1}\)</span> of all <span class="math notranslate nohighlight">\(M_{l-1}\)</span> nodes of the previous layer, weighted by <span class="math notranslate nohighlight">\(w_{ij}^{l}\)</span>, adds its own bias <span class="math notranslate nohighlight">\(b_j^{l}\)</span> to form the pre-activation <span class="math notranslate nohighlight">\(z_j^{l}\)</span>, and applies <span class="math notranslate nohighlight">\(f\)</span> to obtain <span class="math notranslate nohighlight">\(a_j^{l}\)</span>, which it then sends on to every node of layer <span class="math notranslate nohighlight">\(l+1\)</span> through the weights <span class="math notranslate nohighlight">\(w_{jk}^{l+1}\)</span>.  The first index of a weight always refers to the layer below and the second to the layer above, so that the sum in Eq. (8.18) runs over the first index and the sum in the backpropagation equation (8.40) runs over the second.</em></p>
+<p><img alt="The index convention of Eqs. 8.18 and 8.19, seen from a single node.  " src="_images/8-node.png" /></p>
+<p><em>Figure 8.6: The index convention of Eqs. (8.18) and (8.19), seen from a single node.  Node <span class="math notranslate nohighlight">\(j\)</span> of layer <span class="math notranslate nohighlight">\(l\)</span> collects the outputs <span class="math notranslate nohighlight">\(a_i^{l-1}\)</span> of all <span class="math notranslate nohighlight">\(M_{l-1}\)</span> nodes of the previous layer, weighted by <span class="math notranslate nohighlight">\(w_{ij}^{l}\)</span>, adds its own bias <span class="math notranslate nohighlight">\(b_j^{l}\)</span> to form the pre-activation <span class="math notranslate nohighlight">\(z_j^{l}\)</span>, and applies <span class="math notranslate nohighlight">\(f\)</span> to obtain <span class="math notranslate nohighlight">\(a_j^{l}\)</span>, which it then sends on to every node of layer <span class="math notranslate nohighlight">\(l+1\)</span> through the weights <span class="math notranslate nohighlight">\(w_{jk}^{l+1}\)</span>.  The first index of a weight always refers to the layer below and the second to the layer above, so that the sum in Eq. (8.18) runs over the first index and the sum in the backpropagation equation (8.64) runs over the second.</em></p>
 <p>The cost of one forward pass is dominated by the matrix products: layer <span class="math notranslate nohighlight">\(l\)</span>
 requires <span class="math notranslate nohighlight">\(M_{l-1}M_l\)</span> multiplications, so the whole pass costs
 <span class="math notranslate nohighlight">\(\bigO\!\left(\sum_l M_{l-1}M_l\right)\)</span>, which is also the number of weights.
@@ -1251,7 +1254,7 @@ differentiable almost everywhere.  Beyond that the choice is open, and it
 matters more than one might expect: the history of deep learning is to a
 surprising extent the history of replacing one activation function by another.</p>
 <p>The property to keep in view throughout is the <em>derivative</em>, because it is
-<span class="math notranslate nohighlight">\(f'\)</span> and not <span class="math notranslate nohighlight">\(f\)</span> that enters the backpropagation recursion (8.42) and
+<span class="math notranslate nohighlight">\(f'\)</span> and not <span class="math notranslate nohighlight">\(f\)</span> that enters the backpropagation recursion (8.66) and
 therefore decides whether a gradient survives its passage through a layer.</p>
 <section id="saturating-activations">
 <h3><span class="section-number">8.6.1. </span>Saturating activations<a class="headerlink" href="#saturating-activations" title="Link to this heading">#</a></h3>
@@ -1378,7 +1381,7 @@ approximator because it is not a polynomial, by Section <em>The universal approx
 which is precisely the situation the sharper characterisation was needed for.</p>
 <p>The derivative maxima are <span class="math notranslate nohighlight">\(1.129\)</span> for GELU, <span class="math notranslate nohighlight">\(1.100\)</span> for Swish and <span class="math notranslate nohighlight">\(1.089\)</span> for
 Mish, against <span class="math notranslate nohighlight">\(1\)</span> for <span class="math notranslate nohighlight">\(\tanh\)</span> and <span class="math notranslate nohighlight">\(\tfrac14\)</span> for the sigmoid.  A factor
-slightly greater than one in Eq. (8.47) means these
+slightly greater than one in Eq. (8.71) means these
 activations can mildly <em>amplify</em> a gradient rather than only attenuate it,
 which is a genuine advantage in depth; it also means they cannot be relied on
 to damp an exploding gradient, so the clipping of
@@ -1507,11 +1510,11 @@ have derivatives that vanish in both tails, and the sigmoid’s never exceeds
 <span class="math notranslate nohighlight">\(\tfrac14\)</span>; the rectified functions have derivative exactly one on the
 positive axis and zero or nearly zero on the negative; the smooth gated
 functions have derivatives that rise slightly <em>above</em> one near the origin
-and decay smoothly on both sides.  Reading the recursion (8.42)
+and decay smoothly on both sides.  Reading the recursion (8.66)
 through these three panels explains the empirical ordering better than any
 list of benchmark numbers.</p>
 <p><img alt="Nine activation functions in three families top and their derivatives " src="_images/activation_families.png" /></p>
-<p><em>Figure 8.9: Nine activation functions in three families (top) and their derivatives (bottom).  Only the derivative enters the backpropagation recursion (8.42).  Dotted lines mark <span class="math notranslate nohighlight">\(\max\sigma'=1/4\)</span> in the left panel and <span class="math notranslate nohighlight">\(f'=1\)</span> in the other two.</em></p>
+<p><em>Figure 8.9: Nine activation functions in three families (top) and their derivatives (bottom).  Only the derivative enters the backpropagation recursion (8.66).  Dotted lines mark <span class="math notranslate nohighlight">\(\max\sigma'=1/4\)</span> in the left panel and <span class="math notranslate nohighlight">\(f'=1\)</span> in the other two.</em></p>
 <p><strong>The output layer is not a free choice.</strong>
 Everything above concerns hidden layers.  The output activation is fixed by the
 range of the target, exactly as the loss is fixed by its distribution in
@@ -1563,14 +1566,760 @@ symmetric copies of a good solution make some good solution easy to reach.</p>
 </section>
 <section id="backpropagation">
 <h2><span class="section-number">8.8. </span>Backpropagation<a class="headerlink" href="#backpropagation" title="Link to this heading">#</a></h2>
-<p>We now derive the gradient.  Everything follows from the chain
+<p>We now derive the gradient.  The derivation is short once the notation of
+Section <em>Notation and the feed-forward pass</em> is in place, but the indices hide what is going
+on, so we first work through the two smallest networks there are: a single
+neuron with a scalar input and a scalar output, which is the logistic
+regression of Figure 5.4 with a different loss, and the same
+neuron with one hidden neuron in front of it, first by hand and then with
+<code class="docutils literal notranslate"><span class="pre">jax.grad</span></code>.  A third example, with two inputs and two hidden nodes,
+then shows where the indices go.  Everything that
+Section <em>The general case: dense layers</em> does with matrices and sums, these
+examples do with a handful of products, and the second of them already
+contains the backpropagation equation.</p>
+<section id="two-scalar-examples-no-hidden-layer-and-one-hidden-layer">
+<h3><span class="section-number">8.8.1. </span>Two scalar examples: no hidden layer and one hidden layer<a class="headerlink" href="#two-scalar-examples-no-hidden-layer-and-one-hidden-layer" title="Link to this heading">#</a></h3>
+<p>Throughout this subsection every layer has one node, so the node indices <span class="math notranslate nohighlight">\(i,j\)</span>
+of Eq. (8.18) are dropped and only the layer superscript remains:
+<span class="math notranslate nohighlight">\(w^{l}\)</span>, <span class="math notranslate nohighlight">\(b^{l}\)</span>, <span class="math notranslate nohighlight">\(z^{l}\)</span> and <span class="math notranslate nohighlight">\(a^{l}\)</span> are numbers, not arrays.  We take the
+sigmoid <span class="math notranslate nohighlight">\(\sigma\)</span> of Eq. (8.22) as activation, with
+<span class="math notranslate nohighlight">\(\sigma'(z)=\sigma(z)(1-\sigma(z))\)</span>, and the half-squared error of
+Eq. (8.32) for a single training pair <span class="math notranslate nohighlight">\((x,y)\)</span>.  Nothing depends on
+these choices; for another activation replace <span class="math notranslate nohighlight">\(\sigma'\)</span> by <span class="math notranslate nohighlight">\(f'\)</span>, and for
+another loss replace <span class="math notranslate nohighlight">\(a^{L}-y\)</span> by <span class="math notranslate nohighlight">\(\partial C/\partial a^{L}\)</span>.</p>
+<p><strong>No hidden layer.</strong>
+The network is one neuron,</p>
+<div class="math notranslate nohighlight">
+\[
+x \;\longrightarrow\; z^{1}=w^{1}x+b^{1}
+    \;\longrightarrow\; a^{1}=\sigma\!\left(z^{1}\right)
+    \;\longrightarrow\; C=\tfrac12\left(a^{1}-y\right)^{2},\tag{8.33}
+\]</div>
+<p>with the two trainable parameters <span class="math notranslate nohighlight">\(\bm{\Theta}=\{w^{1},b^{1}\}\)</span>.  It is the
+neuron of Figure 5.4 with <span class="math notranslate nohighlight">\(p=1\)</span> input and the cross entropy
+replaced by the squared error, and the top panel of
+Figure 8.10 draws it.  Training means moving <span class="math notranslate nohighlight">\(w^{1}\)</span> and
+<span class="math notranslate nohighlight">\(b^{1}\)</span> so as to reduce the discrepancy between the prediction <span class="math notranslate nohighlight">\(a^{1}\)</span> and the
+target <span class="math notranslate nohighlight">\(y\)</span>, and for that we need <span class="math notranslate nohighlight">\(\partial C/\partial w^{1}\)</span> and
+<span class="math notranslate nohighlight">\(\partial C/\partial b^{1}\)</span>.  The cost depends on <span class="math notranslate nohighlight">\(w^{1}\)</span> only along the path
+<span class="math notranslate nohighlight">\(w^{1}\to z^{1}\to a^{1}\to C\)</span>, so the chain rule (1.51) gives</p>
+<div class="math notranslate nohighlight">
+\[
+\frac{\partial C}{\partial w^{1}}
+   = \frac{\partial C}{\partial a^{1}}
+     \frac{\partial a^{1}}{\partial z^{1}}
+     \frac{\partial z^{1}}{\partial w^{1}}
+   = \left(a^{1}-y\right)\sigma'\!\left(z^{1}\right)x ,\tag{8.34}
+\]</div>
+<p>and the same path with <span class="math notranslate nohighlight">\(\partial z^{1}/\partial b^{1}=1\)</span> as its last factor
+gives <span class="math notranslate nohighlight">\(\partial C/\partial b^{1}=(a^{1}-y)\sigma'(z^{1})\)</span>.  The two gradients
+share everything except the last factor, and it pays to give the shared part
+a name.  Define the <em>error</em> of the neuron,</p>
+<div class="math notranslate nohighlight">
+\[
+\delta^{1} = \left(a^{1}-y\right)\sigma'\!\left(z^{1}\right)
+             = \frac{\partial C}{\partial z^{1}} ,\tag{8.35}
+\]</div>
+<p>the sensitivity of the cost to the pre-activation.  Then</p>
+<div class="math notranslate nohighlight">
+\[
+\frac{\partial C}{\partial w^{1}} = \delta^{1}x,
+  \qquad
+  \frac{\partial C}{\partial b^{1}} = \delta^{1},\tag{8.36}
+\]</div>
+<p>and one step of gradient descent with learning rate <span class="math notranslate nohighlight">\(\gamma\)</span> reads</p>
+<div class="math notranslate nohighlight">
+\[
+w^{1}\leftarrow w^{1}-\gamma\,\delta^{1}x ,
+  \qquad
+  b^{1}\leftarrow b^{1}-\gamma\,\delta^{1} .\tag{8.37}
+\]</div>
+<p>Each update is an error term, <span class="math notranslate nohighlight">\(\delta^{1}\)</span>, multiplied by the signal that
+entered the parameter: <span class="math notranslate nohighlight">\(x\)</span> for the weight and the constant <span class="math notranslate nohighlight">\(1\)</span> for the bias.
+This is the delta rule of Eq. (5.37) once more, with one
+difference that is worth pausing on.  For logistic regression the derivative
+of the cross entropy with respect to <span class="math notranslate nohighlight">\(z\)</span> was the bare residual <span class="math notranslate nohighlight">\(\hat p-y\)</span>,
+Eq. (5.36), because the derivative of the softplus cancelled
+the derivative of the sigmoid.  With the squared error nothing cancels and the
+residual is multiplied by <span class="math notranslate nohighlight">\(\sigma'(z^{1})\)</span>, which is at most <span class="math notranslate nohighlight">\(1/4\)</span> and
+decays to zero as soon as <span class="math notranslate nohighlight">\(|z^{1}|\)</span> is a few units.  A saturated neuron
+therefore learns slowly however wrong it is; this is the factor <span class="math notranslate nohighlight">\(f'\)</span> that
+Section <em>The general case: dense layers</em> will find in front of every error, and the
+seed of the vanishing gradients of Section <em>Vanishing and exploding gradients</em>.</p>
+<p><strong>The same neuron, read backwards.</strong></p>
+<p>Section <em>The same algorithm by automatic differentiation</em> computed the gradient of logistic regression by
+writing the neuron as an evaluation trace and sweeping it in reverse.  The
+same can be done here, and the result identifies <span class="math notranslate nohighlight">\(\delta^{1}\)</span>.  With the
+parameters as inputs, <span class="math notranslate nohighlight">\(v_{-1}=b^{1}\)</span> and <span class="math notranslate nohighlight">\(v_{0}=w^{1}\)</span>, and the data as
+constants, the trace of Eq. (8.33) is</p>
+<div class="math notranslate nohighlight">
+\[
+v_{1}=v_{0}\,x,\qquad
+  v_{2}=v_{1}+v_{-1}=z^{1},\qquad
+  v_{3}=\sigma(v_{2})=a^{1},\qquad
+  v_{4}=\tfrac12\left(v_{3}-y\right)^{2}=C .\tag{8.38}
+\]</div>
+<p>The reverse sweep of Eq. (4.87) starts from <span class="math notranslate nohighlight">\(\bar v_{4}=1\)</span>
+and multiplies by the local derivatives on the way back:</p>
+<div class="math notranslate nohighlight">
+\[
+\bar v_{3}=\bar v_{4}\left(v_{3}-y\right)=a^{1}-y,\qquad
+  \bar v_{2}=\bar v_{3}\,\sigma'(v_{2})=\delta^{1},\qquad
+  \bar v_{0}=\bar v_{2}\,x=\delta^{1}x,\qquad
+  \bar v_{-1}=\bar v_{2}=\delta^{1} .\tag{8.39}
+\]</div>
+<p>The error <span class="math notranslate nohighlight">\(\delta^{1}\)</span> is the <em>adjoint of the pre-activation</em>, exactly as
+<span class="math notranslate nohighlight">\(\bar z=\hat p-y\)</span> was in Figure 5.4, and
+Eq. (8.36) is what the sweep delivers when it reaches the two
+inputs.  One sweep gives both gradients; the forward mode of
+Eq. (4.81) would need one sweep per parameter, the same
+comparison as in Section <em>The same algorithm by automatic differentiation</em>.  Backpropagation, we shall see,
+is this sweep continued through as many layers as the network has.</p>
+<p><img alt="The two scalar networks of Section Two scalar examples no hidden layer" src="_images/8-scalargraph.png" /></p>
+<p><em>Figure 8.10: The two scalar networks of Section <em>Two scalar examples: no hidden layer and one hidden layer</em>, drawn in the style of Figure 5.4.  Black arrows are the forward pass: each neuron forms <span class="math notranslate nohighlight">\(z^{l}=w^{l}a^{l-1}+b^{l}\)</span> from its input and its bias (the weight of an input fixed at one) and emits <span class="math notranslate nohighlight">\(a^{l}=\sigma(z^{l})\)</span>; the dashed box is the squared-error loss.  Red dashed arrows are the reverse sweep: the adjoint of the cost is one, it becomes the residual <span class="math notranslate nohighlight">\(a^{L}-y\)</span> at the loss node, the error <span class="math notranslate nohighlight">\(\delta^{L}=\bar z^{L}\)</span> after the activation, and is then multiplied by whatever sits on the edge it travels along – the input <span class="math notranslate nohighlight">\(x\)</span> or <span class="math notranslate nohighlight">\(a^{1}\)</span> to reach a weight, the constant <span class="math notranslate nohighlight">\(1\)</span> to reach a bias, and the weight <span class="math notranslate nohighlight">\(w^{2}\)</span> to reach the hidden neuron, where a further factor <span class="math notranslate nohighlight">\(\sigma'(z^{1})\)</span> produces <span class="math notranslate nohighlight">\(\delta^{1}\)</span>.  The bottom panel is Eq. (8.43); with several nodes per layer the single edge <span class="math notranslate nohighlight">\(w^{2}\)</span> becomes the sum over <span class="math notranslate nohighlight">\(k\)</span> in Eq. (8.64).</em></p>
+<p><strong>One hidden layer.</strong>
+Now place a second neuron in front of the first, so that the network has one
+hidden layer of one node, the bottom panel of Figure 8.10:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{equation*}
+\begin{aligned}
+    z^{1} &amp;= w^{1}x+b^{1},      &amp; a^{1} &amp;= \sigma\!\left(z^{1}\right),\\
+    z^{2} &amp;= w^{2}a^{1}+b^{2},  &amp; a^{2} &amp;= \sigma\!\left(z^{2}\right),\\
+    C &amp;= \tfrac12\left(a^{2}-y\right)^{2},
+  \end{aligned}\tag{8.40}
+\end{equation*}\]</div>
+<p>with <span class="math notranslate nohighlight">\(\bm{\Theta}=\{w^{1},b^{1},w^{2},b^{2}\}\)</span>.  The forward pass computes
+and <em>stores</em> <span class="math notranslate nohighlight">\((z^{1},a^{1},z^{2},a^{2})\)</span>; every one of them is needed
+again on the way back.  The output layer is the previous example with <span class="math notranslate nohighlight">\(a^{1}\)</span>
+in place of <span class="math notranslate nohighlight">\(x\)</span>: the error is</p>
+<div class="math notranslate nohighlight">
+\[
+\delta^{2} = \left(a^{2}-y\right)\sigma'\!\left(z^{2}\right),
+  \qquad
+  \frac{\partial C}{\partial w^{2}} = \delta^{2}a^{1},
+  \qquad
+  \frac{\partial C}{\partial b^{2}} = \delta^{2} .\tag{8.41}
+\]</div>
+<p>For the hidden weight the path to the cost is longer, since <span class="math notranslate nohighlight">\(w^{1}\)</span>
+influences <span class="math notranslate nohighlight">\(C\)</span> only through <span class="math notranslate nohighlight">\(z^{1}\)</span>, <span class="math notranslate nohighlight">\(a^{1}\)</span>, <span class="math notranslate nohighlight">\(z^{2}\)</span> and <span class="math notranslate nohighlight">\(a^{2}\)</span> in turn:</p>
+<div class="math notranslate nohighlight">
+\[
+\frac{\partial C}{\partial w^{1}}
+   = \frac{\partial C}{\partial a^{2}}
+     \frac{\partial a^{2}}{\partial z^{2}}
+     \frac{\partial z^{2}}{\partial a^{1}}
+     \frac{\partial a^{1}}{\partial z^{1}}
+     \frac{\partial z^{1}}{\partial w^{1}}
+   = \left(a^{2}-y\right)\sigma'\!\left(z^{2}\right)\,w^{2}\,
+     \sigma'\!\left(z^{1}\right)\,x .\tag{8.42}
+\]</div>
+<p>The first two factors are <span class="math notranslate nohighlight">\(\delta^{2}\)</span>, which we already have.  Reading the
+product from left to right, the error of the output neuron is carried back
+along the edge <span class="math notranslate nohighlight">\(w^{2}\)</span> to the hidden neuron and there modulated by the local
+derivative of its activation.  Defining the error of the hidden neuron in the
+same way as before, <span class="math notranslate nohighlight">\(\delta^{1}=\partial C/\partial z^{1}\)</span>, we have found</p>
+<div class="math notranslate nohighlight">
+\[
+\boxed{\;\delta^{1} = \delta^{2}\,w^{2}\,\sigma'\!\left(z^{1}\right),\;}
+  \qquad
+  \frac{\partial C}{\partial w^{1}} = \delta^{1}x,
+  \qquad
+  \frac{\partial C}{\partial b^{1}} = \delta^{1} .\tag{8.43}
+\]</div>
+<p>The recurring pattern is now visible.  Forwards, every layer computes
+<span class="math notranslate nohighlight">\(z^{l}=w^{l}a^{l-1}+b^{l}\)</span> and <span class="math notranslate nohighlight">\(a^{l}=\sigma(z^{l})\)</span>.  Backwards, every
+layer computes its error from the error downstream, multiplied by the weight
+that connects them and by its own <span class="math notranslate nohighlight">\(\sigma'(z^{l})\)</span>, and then the gradient of
+each weight is that error times the activation that entered the weight, and
+the gradient of each bias is the error itself.  Nothing is recomputed: the
+long product of Eq. (8.42) is never formed as such, because
+its first half is <span class="math notranslate nohighlight">\(\delta^{2}\)</span> and had already been evaluated for the output
+layer.  With ten hidden neurons in a chain, each error would be obtained from
+the next by one multiplication, and each gradient from its error by one more.</p>
+<p>In the language of Section <em>Automatic differentiation</em>, Eq. (8.43)
+is the reverse sweep of Eq. (8.39) that did not stop at
+the pre-activation.  In Section <em>The same algorithm by automatic differentiation</em> the sweep reached
+<span class="math notranslate nohighlight">\(\bar z=\hat p-y\)</span> and then stepped onto the edges carrying the parameters,
+because the inputs <span class="math notranslate nohighlight">\(x_j\)</span> of the neuron were constants.  Here the input <span class="math notranslate nohighlight">\(a^{1}\)</span>
+of the output neuron is itself the output of a node in the graph, so the
+sweep continues: <span class="math notranslate nohighlight">\(\bar a^{1}=\delta^{2}w^{2}\)</span> by the local derivative
+<span class="math notranslate nohighlight">\(\partial z^{2}/\partial a^{1}=w^{2}\)</span>, then <span class="math notranslate nohighlight">\(\bar z^{1}=\bar a^{1}\sigma'(z^{1})
+=\delta^{1}\)</span>, and only then the edges <span class="math notranslate nohighlight">\(w^{1}\)</span> and <span class="math notranslate nohighlight">\(b^{1}\)</span>.  The point made in
+Section <em>Logistic regression as a single neuron</em>, that the inputs of a neuron will themselves be
+the outputs of other neurons and that the sweep will continue along the edges
+into the layer before, is exactly this.</p>
+<p><strong>Numbers.</strong>
+At the parameters and the observation of Section <em>The same algorithm by automatic differentiation</em>,
+<span class="math notranslate nohighlight">\(w^{1}=0.25\)</span>, <span class="math notranslate nohighlight">\(b^{1}=0.5\)</span>, <span class="math notranslate nohighlight">\(x=2\)</span>, <span class="math notranslate nohighlight">\(y=1\)</span>, the single neuron has <span class="math notranslate nohighlight">\(z^{1}=1\)</span>,
+<span class="math notranslate nohighlight">\(a^{1}=0.731\)</span> and <span class="math notranslate nohighlight">\(C=0.0362\)</span>; then <span class="math notranslate nohighlight">\(\sigma'(z^{1})=0.197\)</span>,
+<span class="math notranslate nohighlight">\(\delta^{1}=-0.0529\)</span>, and the gradient (8.36) is
+<span class="math notranslate nohighlight">\((\partial C/\partial w^{1},\partial C/\partial b^{1})=(-0.106,-0.0529)\)</span>.
+The cross entropy at the same point gave <span class="math notranslate nohighlight">\((-0.538,-0.269)\)</span> in
+Section <em>The same algorithm by automatic differentiation</em>; the two gradients differ by exactly the factor
+<span class="math notranslate nohighlight">\(\sigma'(z^{1})=0.197\)</span> discussed above.  Adding an output neuron with
+<span class="math notranslate nohighlight">\(w^{2}=1\)</span>, <span class="math notranslate nohighlight">\(b^{2}=-0.5\)</span> gives <span class="math notranslate nohighlight">\(z^{2}=0.231\)</span>, <span class="math notranslate nohighlight">\(a^{2}=0.557\)</span>, <span class="math notranslate nohighlight">\(C=0.0979\)</span>,
+<span class="math notranslate nohighlight">\(\delta^{2}=-0.109\)</span>, and by Eq. (8.43)
+<span class="math notranslate nohighlight">\(\delta^{1}=\delta^{2}w^{2}\sigma'(z^{1})=-0.0215\)</span>, so that the four
+gradients are <span class="math notranslate nohighlight">\(\partial C/\partial w^{2}=-0.0798\)</span>,
+<span class="math notranslate nohighlight">\(\partial C/\partial b^{2}=-0.109\)</span>, <span class="math notranslate nohighlight">\(\partial C/\partial w^{1}=-0.0429\)</span> and
+<span class="math notranslate nohighlight">\(\partial C/\partial b^{1}=-0.0215\)</span>.  The following program is
+Eqs. (8.36)–(8.43) transcribed: a
+forward pass that stores <span class="math notranslate nohighlight">\(z^{l}\)</span> and <span class="math notranslate nohighlight">\(a^{l}\)</span>, the output error, the
+backpropagated error, and the products that give the gradients.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="k">def</span> <span class="nf">sigma</span><span class="p">(</span><span class="n">z</span><span class="p">):</span>  <span class="k">return</span> <span class="mf">1.0</span><span class="o">/</span><span class="p">(</span><span class="mf">1.0</span><span class="o">+</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">z</span><span class="p">))</span>
+<span class="k">def</span> <span class="nf">dsigma</span><span class="p">(</span><span class="n">z</span><span class="p">):</span> <span class="n">s</span> <span class="o">=</span> <span class="n">sigma</span><span class="p">(</span><span class="n">z</span><span class="p">);</span> <span class="k">return</span> <span class="n">s</span><span class="o">*</span><span class="p">(</span><span class="mf">1.0</span><span class="o">-</span><span class="n">s</span><span class="p">)</span>
+
+<span class="c1"># no hidden layer: x -&gt; z1 = w1 x + b1 -&gt; a1 = sigma(z1) -&gt; C = (a1-y)^2/2</span>
+<span class="k">def</span> <span class="nf">grad_one</span><span class="p">(</span><span class="n">w1</span><span class="p">,</span> <span class="n">b1</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+    <span class="n">z1</span> <span class="o">=</span> <span class="n">w1</span><span class="o">*</span><span class="n">x</span> <span class="o">+</span> <span class="n">b1</span><span class="p">;</span> <span class="n">a1</span> <span class="o">=</span> <span class="n">sigma</span><span class="p">(</span><span class="n">z1</span><span class="p">)</span>                 <span class="c1"># forward pass, store z1, a1</span>
+    <span class="c1"># error delta1 = (a1-y) sigma&#39;(z1)</span>
+    <span class="n">delta1</span> <span class="o">=</span> <span class="p">(</span><span class="n">a1</span> <span class="o">-</span> <span class="n">y</span><span class="p">)</span><span class="o">*</span><span class="n">dsigma</span><span class="p">(</span><span class="n">z1</span><span class="p">)</span>
+    <span class="k">return</span> <span class="mf">0.5</span><span class="o">*</span><span class="p">(</span><span class="n">a1</span><span class="o">-</span><span class="n">y</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">,</span> <span class="n">delta1</span><span class="o">*</span><span class="n">x</span><span class="p">,</span> <span class="n">delta1</span><span class="p">,</span> <span class="n">delta1</span> <span class="c1"># C, dC/dw1, dC/db1, delta1</span>
+
+<span class="c1"># one hidden layer: x -&gt; (w1,b1) -&gt; a1 -&gt; (w2,b2) -&gt; a2 -&gt; C = (a2-y)^2/2</span>
+<span class="k">def</span> <span class="nf">grad_two</span><span class="p">(</span><span class="n">w1</span><span class="p">,</span> <span class="n">b1</span><span class="p">,</span> <span class="n">w2</span><span class="p">,</span> <span class="n">b2</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+    <span class="n">z1</span> <span class="o">=</span> <span class="n">w1</span><span class="o">*</span><span class="n">x</span> <span class="o">+</span> <span class="n">b1</span><span class="p">;</span> <span class="n">a1</span> <span class="o">=</span> <span class="n">sigma</span><span class="p">(</span><span class="n">z1</span><span class="p">)</span>                 <span class="c1"># forward pass</span>
+    <span class="n">z2</span> <span class="o">=</span> <span class="n">w2</span><span class="o">*</span><span class="n">a1</span> <span class="o">+</span> <span class="n">b2</span><span class="p">;</span> <span class="n">a2</span> <span class="o">=</span> <span class="n">sigma</span><span class="p">(</span><span class="n">z2</span><span class="p">)</span>
+    <span class="n">delta2</span> <span class="o">=</span> <span class="p">(</span><span class="n">a2</span> <span class="o">-</span> <span class="n">y</span><span class="p">)</span><span class="o">*</span><span class="n">dsigma</span><span class="p">(</span><span class="n">z2</span><span class="p">)</span>                   <span class="c1"># output error</span>
+    <span class="c1"># delta1 = delta2 w2 sigma&#39;(z1)</span>
+    <span class="n">delta1</span> <span class="o">=</span> <span class="n">delta2</span><span class="o">*</span><span class="n">w2</span><span class="o">*</span><span class="n">dsigma</span><span class="p">(</span><span class="n">z1</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">(</span><span class="mf">0.5</span><span class="o">*</span><span class="p">(</span><span class="n">a2</span><span class="o">-</span><span class="n">y</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">,</span> <span class="n">delta1</span><span class="o">*</span><span class="n">x</span><span class="p">,</span> <span class="n">delta1</span><span class="p">,</span> <span class="n">delta2</span><span class="o">*</span><span class="n">a1</span><span class="p">,</span> <span class="n">delta2</span><span class="p">,</span> <span class="n">delta1</span><span class="p">,</span> <span class="n">delta2</span><span class="p">)</span>
+
+<span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="mf">2.0</span><span class="p">,</span> <span class="mf">1.0</span>
+<span class="n">C</span><span class="p">,</span> <span class="n">gw1</span><span class="p">,</span> <span class="n">gb1</span><span class="p">,</span> <span class="n">d1</span> <span class="o">=</span> <span class="n">grad_one</span><span class="p">(</span><span class="mf">0.25</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;no hidden layer : C = </span><span class="si">{</span><span class="n">C</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">  delta1 = </span><span class="si">{</span><span class="n">d1</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;   dC/dw1 = </span><span class="si">{</span><span class="n">gw1</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">  dC/db1 = </span><span class="si">{</span><span class="n">gb1</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="n">C</span><span class="p">,</span> <span class="n">gw1</span><span class="p">,</span> <span class="n">gb1</span><span class="p">,</span> <span class="n">gw2</span><span class="p">,</span> <span class="n">gb2</span><span class="p">,</span> <span class="n">d1</span><span class="p">,</span> <span class="n">d2</span> <span class="o">=</span> <span class="n">grad_two</span><span class="p">(</span><span class="mf">0.25</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;one hidden layer: C = </span><span class="si">{</span><span class="n">C</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">  delta2 = </span><span class="si">{</span><span class="n">d2</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">  delta1 = </span><span class="si">{</span><span class="n">d1</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;   dC/dw1 = </span><span class="si">{</span><span class="n">gw1</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">  dC/db1 = </span><span class="si">{</span><span class="n">gb1</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  dC/dw2 = </span><span class="si">{</span><span class="n">gw2</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">  dC/db2 = </span><span class="si">{</span><span class="n">gb2</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">no</span> <span class="n">hidden</span> <span class="n">layer</span> <span class="p">:</span> <span class="n">C</span> <span class="o">=</span> <span class="mf">0.0362</span>  <span class="n">delta1</span> <span class="o">=</span> <span class="o">-</span><span class="mf">0.0529</span>
+   <span class="n">dC</span><span class="o">/</span><span class="n">dw1</span> <span class="o">=</span> <span class="o">-</span><span class="mf">0.1058</span>  <span class="n">dC</span><span class="o">/</span><span class="n">db1</span> <span class="o">=</span> <span class="o">-</span><span class="mf">0.0529</span>
+<span class="n">one</span> <span class="n">hidden</span> <span class="n">layer</span><span class="p">:</span> <span class="n">C</span> <span class="o">=</span> <span class="mf">0.0979</span>  <span class="n">delta2</span> <span class="o">=</span> <span class="o">-</span><span class="mf">0.1092</span>  <span class="n">delta1</span> <span class="o">=</span> <span class="o">-</span><span class="mf">0.0215</span>
+   <span class="n">dC</span><span class="o">/</span><span class="n">dw1</span> <span class="o">=</span> <span class="o">-</span><span class="mf">0.0429</span>  <span class="n">dC</span><span class="o">/</span><span class="n">db1</span> <span class="o">=</span> <span class="o">-</span><span class="mf">0.0215</span>  <span class="n">dC</span><span class="o">/</span><span class="n">dw2</span> <span class="o">=</span> <span class="o">-</span><span class="mf">0.0798</span>  <span class="n">dC</span><span class="o">/</span><span class="n">db2</span> <span class="o">=</span> <span class="o">-</span><span class="mf">0.1092</span>
+</pre></div>
+</div>
+<p><strong>A first training program.</strong></p>
+<p>The same equations, written with arrays so that the code survives the
+transition to several inputs, several hidden nodes and several samples,
+give the first neural network we train in this chapter.  We follow the
+convention of Eq. (8.21): the samples are the rows of
+<code class="docutils literal notranslate"><span class="pre">x</span></code>, so that a single scalar observation is an array of shape
+<span class="math notranslate nohighlight">\((1,1)\)</span>, the weight arrays have shape (number of inputs, number of outputs)
+and the forward pass reads <code class="docutils literal notranslate"><span class="pre">x</span> <span class="pre">&#64;</span> <span class="pre">w_1</span> <span class="pre">+</span> <span class="pre">b_1</span></code>.  Two details differ
+from the derivation above and are worth noting.  The output node is
+<em>linear</em>, <span class="math notranslate nohighlight">\(a^{2}=z^{2}\)</span>, as befits a regression target that is not
+confined to <span class="math notranslate nohighlight">\((0,1)\)</span>; its error is then simply <span class="math notranslate nohighlight">\(\delta^{2}=a^{2}-y\)</span>, the
+collapse that Section <em>The four equations of backpropagation</em> will discuss for the natural
+pairings of output activation and loss.  And the backward pass is written
+with matrix products, <code class="docutils literal notranslate"><span class="pre">delta_2</span> <span class="pre">&#64;</span> <span class="pre">w_2.T</span></code> for the pull-back through
+the weight and <code class="docutils literal notranslate"><span class="pre">x.T</span> <span class="pre">&#64;</span> <span class="pre">delta_1</span></code> for the outer product of inputs and
+errors, which for scalars are just the multiplications of
+Eq. (8.43) but will be the general
+Eqs. (8.66) and (8.68) without any change to the code.
+The task is to make the network return <span class="math notranslate nohighlight">\(y=2x+1=9\)</span> at <span class="math notranslate nohighlight">\(x=4\)</span>, starting from
+random weights.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="k">def</span> <span class="nf">sigmoid</span><span class="p">(</span><span class="n">z</span><span class="p">):</span>
+    <span class="k">return</span> <span class="mf">1.0</span><span class="o">/</span><span class="p">(</span><span class="mf">1.0</span><span class="o">+</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">z</span><span class="p">))</span>
+
+<span class="k">def</span> <span class="nf">forwardpropagation</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="n">z_1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">w_1</span><span class="p">)</span> <span class="o">+</span> <span class="n">b_1</span>      <span class="c1"># pre-activation of the hidden layer</span>
+    <span class="n">a_1</span> <span class="o">=</span> <span class="n">sigmoid</span><span class="p">(</span><span class="n">z_1</span><span class="p">)</span>                 <span class="c1"># hidden activation</span>
+    <span class="n">z_2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">a_1</span><span class="p">,</span> <span class="n">w_2</span><span class="p">)</span> <span class="o">+</span> <span class="n">b_2</span>    <span class="c1"># pre-activation of the output layer</span>
+    <span class="n">a_2</span> <span class="o">=</span> <span class="n">z_2</span>                          <span class="c1"># linear output</span>
+    <span class="k">return</span> <span class="n">a_1</span><span class="p">,</span> <span class="n">a_2</span>
+
+<span class="k">def</span> <span class="nf">backpropagation</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+    <span class="n">a_1</span><span class="p">,</span> <span class="n">a_2</span> <span class="o">=</span> <span class="n">forwardpropagation</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+    <span class="n">delta_2</span> <span class="o">=</span> <span class="n">a_2</span> <span class="o">-</span> <span class="n">y</span>                  <span class="c1"># linear output: f&#39; = 1</span>
+    <span class="c1"># delta_2 w_2 sigma&#39;(z_1)</span>
+    <span class="n">delta_1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">delta_2</span><span class="p">,</span> <span class="n">w_2</span><span class="o">.</span><span class="n">T</span><span class="p">)</span> <span class="o">*</span> <span class="n">a_1</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">a_1</span><span class="p">)</span>
+    <span class="n">dW2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">a_1</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">delta_2</span><span class="p">);</span>  <span class="n">db2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">delta_2</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">dW1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">delta_1</span><span class="p">);</span>    <span class="n">db1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">delta_1</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">dW2</span><span class="p">,</span> <span class="n">db2</span><span class="p">,</span> <span class="n">dW1</span><span class="p">,</span> <span class="n">db1</span><span class="p">,</span> <span class="mf">0.5</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">((</span><span class="n">a_2</span> <span class="o">-</span> <span class="n">y</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+
+<span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">4.0</span><span class="p">]])</span>                  <span class="c1"># one sample, one feature: shape (1, 1)</span>
+<span class="n">y</span> <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="n">x</span> <span class="o">+</span> <span class="mf">1.0</span>                          <span class="c1"># target 9</span>
+<span class="n">n_features</span><span class="p">,</span> <span class="n">n_hidden</span><span class="p">,</span> <span class="n">n_outputs</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span>
+<span class="n">w_1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="n">n_features</span><span class="p">,</span> <span class="n">n_hidden</span><span class="p">);</span> <span class="n">b_1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n_hidden</span><span class="p">)</span> <span class="o">+</span> <span class="mf">0.01</span>
+<span class="n">w_2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="n">n_hidden</span><span class="p">,</span> <span class="n">n_outputs</span><span class="p">);</span> <span class="n">b_2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n_outputs</span><span class="p">)</span> <span class="o">+</span> <span class="mf">0.01</span>
+
+<span class="n">gamma</span> <span class="o">=</span> <span class="mf">0.1</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">50</span><span class="p">):</span>
+    <span class="n">dW2</span><span class="p">,</span> <span class="n">db2</span><span class="p">,</span> <span class="n">dW1</span><span class="p">,</span> <span class="n">db1</span><span class="p">,</span> <span class="n">cost</span> <span class="o">=</span> <span class="n">backpropagation</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">i</span> <span class="o">%</span> <span class="mi">10</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">49</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;iteration </span><span class="si">{</span><span class="n">i</span><span class="si">:</span><span class="s2">2d</span><span class="si">}</span><span class="s2">: cost = </span><span class="si">{</span><span class="n">cost</span><span class="si">:</span><span class="s2">.6f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">w_2</span> <span class="o">-=</span> <span class="n">gamma</span><span class="o">*</span><span class="n">dW2</span><span class="p">;</span>  <span class="n">b_2</span> <span class="o">-=</span> <span class="n">gamma</span><span class="o">*</span><span class="n">db2</span>
+    <span class="n">w_1</span> <span class="o">-=</span> <span class="n">gamma</span><span class="o">*</span><span class="n">dW1</span><span class="p">;</span>  <span class="n">b_1</span> <span class="o">-=</span> <span class="n">gamma</span><span class="o">*</span><span class="n">db1</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;w_1 =&quot;</span><span class="p">,</span> <span class="n">w_1</span><span class="o">.</span><span class="n">ravel</span><span class="p">(),</span> <span class="s2">&quot; b_1 =&quot;</span><span class="p">,</span> <span class="n">b_1</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;w_2 =&quot;</span><span class="p">,</span> <span class="n">w_2</span><span class="o">.</span><span class="n">ravel</span><span class="p">(),</span> <span class="s2">&quot; b_2 =&quot;</span><span class="p">,</span> <span class="n">b_2</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">iteration</span>  <span class="mi">0</span><span class="p">:</span> <span class="n">cost</span> <span class="o">=</span> <span class="mf">36.895631</span>
+<span class="n">iteration</span> <span class="mi">10</span><span class="p">:</span> <span class="n">cost</span> <span class="o">=</span> <span class="mf">0.426990</span>
+<span class="n">iteration</span> <span class="mi">20</span><span class="p">:</span> <span class="n">cost</span> <span class="o">=</span> <span class="mf">0.004939</span>
+<span class="n">iteration</span> <span class="mi">30</span><span class="p">:</span> <span class="n">cost</span> <span class="o">=</span> <span class="mf">0.000057</span>
+<span class="n">iteration</span> <span class="mi">40</span><span class="p">:</span> <span class="n">cost</span> <span class="o">=</span> <span class="mf">0.000001</span>
+<span class="n">iteration</span> <span class="mi">49</span><span class="p">:</span> <span class="n">cost</span> <span class="o">=</span> <span class="mf">0.000000</span>
+<span class="n">w_1</span> <span class="o">=</span> <span class="p">[</span><span class="mf">1.79581063</span><span class="p">]</span>  <span class="n">b_1</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.01793957</span><span class="p">]</span>
+<span class="n">w_2</span> <span class="o">=</span> <span class="p">[</span><span class="mf">4.69500507</span><span class="p">]</span>  <span class="n">b_2</span> <span class="o">=</span> <span class="p">[</span><span class="mf">4.30836978</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>The cost drops by seven orders of magnitude in fifty iterations.  This is
+not yet learning in any interesting sense – there is one observation and
+four parameters, and a single point can always be hit – but every line of
+the program will survive unchanged into Section <em>Two inputs, two hidden nodes, one output</em> and,
+with a loop over layers added, into the class of Section <em>A neural network from scratch</em>.
+The learning rate matters even here, and in an instructive way: with
+<span class="math notranslate nohighlight">\(\gamma=1\)</span> the first few steps drive the hidden weight to <span class="math notranslate nohighlight">\(w^{1}\approx3.9\)</span>,
+so that <span class="math notranslate nohighlight">\(z^{1}\approx15\)</span> and <span class="math notranslate nohighlight">\(\sigma'(z^{1})\approx10^{-7}\)</span>; the error
+<span class="math notranslate nohighlight">\(\delta^{1}\)</span> is then multiplied by that factor, the hidden neuron stops
+learning, and the cost stalls at <span class="math notranslate nohighlight">\(5.02\)</span> for the remaining iterations.  This is
+the saturation mechanism noted after Eq. (8.37), met in
+a program of twenty lines.</p>
+<p><strong>The same by automatic differentiation.</strong></p>
+<p>Everything in <code class="docutils literal notranslate"><span class="pre">backpropagation</span></code> above was derived by hand from the
+chain rule.  Section <em>The same algorithm by automatic differentiation</em> argued that this derivation is what
+reverse-mode automatic differentiation performs mechanically, and the
+scalar examples are the place to see it done by a machine.  The first
+listing hands <code class="docutils literal notranslate"><span class="pre">jax.grad</span></code> of Section <em>Automatic differentiation in Python: autograd and JAX</em> the
+<em>forward pass only</em> of the two networks, Eqs. (8.33)
+and (8.40), and asks for the gradient at the point used
+above; it also runs the forward mode, <code class="docutils literal notranslate"><span class="pre">jax.jvp</span></code> with the two unit
+seeds, to make the two-sweeps-against-one comparison of
+Eq. (8.39) concrete.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">jax</span><span class="o">,</span> <span class="nn">jax.numpy</span> <span class="k">as</span> <span class="nn">jnp</span>
+<span class="n">jax</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="s2">&quot;jax_enable_x64&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">C_one</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>                    <span class="c1"># forward pass of the single neuron ...</span>
+    <span class="k">return</span> <span class="mf">0.5</span><span class="o">*</span><span class="p">(</span><span class="n">jax</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">sigmoid</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">x</span> <span class="o">+</span> <span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">-</span> <span class="n">y</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span>
+<span class="k">def</span> <span class="nf">C_two</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>                    <span class="c1"># ... and with the hidden neuron</span>
+    <span class="n">a1</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">sigmoid</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">x</span> <span class="o">+</span> <span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+    <span class="k">return</span> <span class="mf">0.5</span><span class="o">*</span><span class="p">(</span><span class="n">jax</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">sigmoid</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">*</span><span class="n">a1</span> <span class="o">+</span> <span class="n">p</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span> <span class="o">-</span> <span class="n">y</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span>
+
+<span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="mf">2.0</span><span class="p">,</span> <span class="mf">1.0</span>
+<span class="n">p1</span><span class="p">,</span> <span class="n">p2</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.25</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">]),</span> <span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.25</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.5</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;no hidden layer,  jax.grad:&quot;</span><span class="p">,</span> <span class="n">jax</span><span class="o">.</span><span class="n">grad</span><span class="p">(</span><span class="n">C_one</span><span class="p">)(</span><span class="n">p1</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;one hidden layer, jax.grad:&quot;</span><span class="p">,</span> <span class="n">jax</span><span class="o">.</span><span class="n">grad</span><span class="p">(</span><span class="n">C_two</span><span class="p">)(</span><span class="n">p2</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">))</span>
+<span class="c1"># forward mode, one sweep per parameter, for comparison</span>
+<span class="n">seeds</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;no hidden layer,  jax.jvp: &quot;</span><span class="p">,</span>
+      <span class="p">[</span><span class="nb">float</span><span class="p">(</span><span class="n">jax</span><span class="o">.</span><span class="n">jvp</span><span class="p">(</span><span class="n">C_one</span><span class="p">,</span> <span class="p">(</span><span class="n">p1</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">),</span> <span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">))[</span><span class="mi">1</span><span class="p">])</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">seeds</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">no</span> <span class="n">hidden</span> <span class="n">layer</span><span class="p">,</span>  <span class="n">jax</span><span class="o">.</span><span class="n">grad</span><span class="p">:</span> <span class="p">[</span><span class="o">-</span><span class="mf">0.10575419</span> <span class="o">-</span><span class="mf">0.05287709</span><span class="p">]</span>
+<span class="n">one</span> <span class="n">hidden</span> <span class="n">layer</span><span class="p">,</span> <span class="n">jax</span><span class="o">.</span><span class="n">grad</span><span class="p">:</span> <span class="p">[</span><span class="o">-</span><span class="mf">0.04292404</span> <span class="o">-</span><span class="mf">0.02146202</span> <span class="o">-</span><span class="mf">0.07980184</span> <span class="o">-</span><span class="mf">0.1091593</span> <span class="p">]</span>
+<span class="n">no</span> <span class="n">hidden</span> <span class="n">layer</span><span class="p">,</span>  <span class="n">jax</span><span class="o">.</span><span class="n">jvp</span><span class="p">:</span>  <span class="p">[</span><span class="o">-</span><span class="mf">0.10575418556853343</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.052877092784266715</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>The four numbers agree with the hand-derived ones to every printed digit,
+and the forward sweeps return the same two numbers one at a time.  Nothing
+in the listing mentions <span class="math notranslate nohighlight">\(\delta\)</span>, <span class="math notranslate nohighlight">\(\sigma'\)</span> or the chain rule:
+<code class="docutils literal notranslate"><span class="pre">jax.grad</span></code> has traced the forward pass, recorded the tape
+<span class="math notranslate nohighlight">\((z^{1},a^{1},z^{2},a^{2})\)</span> and swept it in reverse, which is
+Eq. (8.39) continued through the hidden neuron.  The
+training program is now shorter than before, because the whole function
+<code class="docutils literal notranslate"><span class="pre">backpropagation</span></code> is replaced by one call:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">jax</span><span class="o">,</span> <span class="nn">jax.numpy</span> <span class="k">as</span> <span class="nn">jnp</span>
+<span class="n">jax</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="s2">&quot;jax_enable_x64&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">cost</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+    <span class="n">w_1</span><span class="p">,</span> <span class="n">b_1</span><span class="p">,</span> <span class="n">w_2</span><span class="p">,</span> <span class="n">b_2</span> <span class="o">=</span> <span class="n">params</span>
+    <span class="n">a_1</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">sigmoid</span><span class="p">(</span><span class="n">x</span> <span class="o">@</span> <span class="n">w_1</span> <span class="o">+</span> <span class="n">b_1</span><span class="p">)</span>        <span class="c1"># the forward pass, nothing else</span>
+    <span class="n">a_2</span> <span class="o">=</span> <span class="n">a_1</span> <span class="o">@</span> <span class="n">w_2</span> <span class="o">+</span> <span class="n">b_2</span>
+    <span class="k">return</span> <span class="mf">0.5</span><span class="o">*</span><span class="n">jnp</span><span class="o">.</span><span class="n">sum</span><span class="p">((</span><span class="n">a_2</span> <span class="o">-</span> <span class="n">y</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+
+<span class="n">grad</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">jit</span><span class="p">(</span><span class="n">jax</span><span class="o">.</span><span class="n">grad</span><span class="p">(</span><span class="n">cost</span><span class="p">))</span>                 <span class="c1"># the backward pass, generated</span>
+
+<span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">x</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">4.0</span><span class="p">]]);</span> <span class="n">y</span> <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="n">x</span> <span class="o">+</span> <span class="mf">1.0</span>
+<span class="n">params</span> <span class="o">=</span> <span class="p">[</span><span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)),</span> <span class="n">jnp</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="mf">0.01</span><span class="p">,</span>
+          <span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)),</span> <span class="n">jnp</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="mf">0.01</span><span class="p">]</span>
+
+<span class="n">gamma</span> <span class="o">=</span> <span class="mf">0.1</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">50</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">i</span> <span class="o">%</span> <span class="mi">10</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">49</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;iteration </span><span class="si">{</span><span class="n">i</span><span class="si">:</span><span class="s2">2d</span><span class="si">}</span><span class="s2">: cost = </span><span class="si">{</span><span class="n">cost</span><span class="p">(</span><span class="n">params</span><span class="p">,</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">y</span><span class="p">)</span><span class="si">:</span><span class="s2">.6f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">g</span> <span class="o">=</span> <span class="n">grad</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+    <span class="n">params</span> <span class="o">=</span> <span class="p">[</span><span class="n">p</span> <span class="o">-</span> <span class="n">gamma</span><span class="o">*</span><span class="n">gp</span> <span class="k">for</span> <span class="n">p</span><span class="p">,</span> <span class="n">gp</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">g</span><span class="p">)]</span>
+<span class="n">w_1</span><span class="p">,</span> <span class="n">b_1</span><span class="p">,</span> <span class="n">w_2</span><span class="p">,</span> <span class="n">b_2</span> <span class="o">=</span> <span class="n">params</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;w_1 =&quot;</span><span class="p">,</span> <span class="n">w_1</span><span class="o">.</span><span class="n">ravel</span><span class="p">(),</span> <span class="s2">&quot; b_1 =&quot;</span><span class="p">,</span> <span class="n">b_1</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;w_2 =&quot;</span><span class="p">,</span> <span class="n">w_2</span><span class="o">.</span><span class="n">ravel</span><span class="p">(),</span> <span class="s2">&quot; b_2 =&quot;</span><span class="p">,</span> <span class="n">b_2</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">iteration</span>  <span class="mi">0</span><span class="p">:</span> <span class="n">cost</span> <span class="o">=</span> <span class="mf">36.895631</span>
+<span class="n">iteration</span> <span class="mi">10</span><span class="p">:</span> <span class="n">cost</span> <span class="o">=</span> <span class="mf">0.426990</span>
+<span class="n">iteration</span> <span class="mi">20</span><span class="p">:</span> <span class="n">cost</span> <span class="o">=</span> <span class="mf">0.004939</span>
+<span class="n">iteration</span> <span class="mi">30</span><span class="p">:</span> <span class="n">cost</span> <span class="o">=</span> <span class="mf">0.000057</span>
+<span class="n">iteration</span> <span class="mi">40</span><span class="p">:</span> <span class="n">cost</span> <span class="o">=</span> <span class="mf">0.000001</span>
+<span class="n">iteration</span> <span class="mi">49</span><span class="p">:</span> <span class="n">cost</span> <span class="o">=</span> <span class="mf">0.000000</span>
+<span class="n">w_1</span> <span class="o">=</span> <span class="p">[</span><span class="mf">1.79581063</span><span class="p">]</span>  <span class="n">b_1</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.01793957</span><span class="p">]</span>
+<span class="n">w_2</span> <span class="o">=</span> <span class="p">[</span><span class="mf">4.69500507</span><span class="p">]</span>  <span class="n">b_2</span> <span class="o">=</span> <span class="p">[</span><span class="mf">4.30836978</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>The costs and the final parameters coincide with the hand-written version
+to all printed digits, as they must: the two programs evaluate the same
+gradient by the same algorithm, one of them written by us and the other
+generated from the forward pass.  This is the pattern every framework of
+Chapters 10 onwards relies on – the programmer writes the
+forward pass and the library supplies the backward one – and it is also
+why the hand-written backpropagation of Section <em>A neural network from scratch</em> is worth
+having: it is the only way to know what the library does, and the gradient
+check of Section <em>Finite differences against automatic differentiation</em> is how one verifies that the two agree.</p>
+<p><strong>Training the two networks.</strong>
+Figure 8.11 applies the updates (8.37)
+to both networks on a small scalar regression problem: <span class="math notranslate nohighlight">\(n=20\)</span> inputs equally
+spaced in <span class="math notranslate nohighlight">\([-2,2]\)</span> with targets <span class="math notranslate nohighlight">\(y_i=\sigma(2x_i-1)+\varepsilon_i\)</span>,
+<span class="math notranslate nohighlight">\(\varepsilon_i\sim N(0,0.1^{2})\)</span>, and the cost averaged over the sample as
+in Eq. (8.32), so that the errors <span class="math notranslate nohighlight">\(\delta^{l}\)</span> of each observation
+are simply summed.  Both networks start from the parameters used above and
+take <span class="math notranslate nohighlight">\(1000\)</span> steps of plain gradient descent with <span class="math notranslate nohighlight">\(\gamma=2\)</span>.  The left panel
+shows the cost surface of the single neuron, which is not convex – the
+sigmoid sees to that – but has one basin around <span class="math notranslate nohighlight">\((w^{1},b^{1})=(2,-1)\)</span>, and
+the descent path from <span class="math notranslate nohighlight">\((0.25,0.5)\)</span> that ends at <span class="math notranslate nohighlight">\((2.13,-0.78)\)</span> with
+<span class="math notranslate nohighlight">\(C=0.0053\)</span>.  The middle panel shows that the network with a hidden neuron,
+although it has four parameters and contains the single neuron as a special
+case, reaches only <span class="math notranslate nohighlight">\(C=0.0066\)</span> in the same number of steps, and the right panel
+shows why: the gradient that reaches <span class="math notranslate nohighlight">\(w^{1}\)</span> is <span class="math notranslate nohighlight">\(\delta^{1}x\)</span> in both cases,
+but in the deeper network <span class="math notranslate nohighlight">\(\delta^{1}\)</span> carries the extra factor
+<span class="math notranslate nohighlight">\(w^{2}\sigma'(z^{2})\)</span> of Eq. (8.43), which is initially
+about <span class="math notranslate nohighlight">\(0.25\)</span> and shrinks the first-layer gradient by that amount.  (The dip
+in the blue curve near iteration <span class="math notranslate nohighlight">\(250\)</span> is a change of sign of
+<span class="math notranslate nohighlight">\(\partial C/\partial w^{1}\)</span>, plotted in absolute value.)  Every gradient in
+the figure was again compared with <code class="docutils literal notranslate"><span class="pre">jax.grad</span></code> at every iteration; the
+largest discrepancy over the whole run was <span class="math notranslate nohighlight">\(3\times10^{-17}\)</span>.</p>
+<p><img alt="The two scalar networks of Figure 8.10 trained by plain gradient desce" src="_images/scalar_backprop.png" /></p>
+<p><em>Figure 8.11: The two scalar networks of Figure 8.10 trained by plain gradient descent, Eq. (8.37), on <span class="math notranslate nohighlight">\(n=20\)</span> scalar observations <span class="math notranslate nohighlight">\(y_i=\sigma(2x_i-1)+\varepsilon_i\)</span> with <span class="math notranslate nohighlight">\(\gamma=2\)</span> and <span class="math notranslate nohighlight">\(1000\)</span> iterations, starting from <span class="math notranslate nohighlight">\(w^{1}=0.25\)</span>, <span class="math notranslate nohighlight">\(b^{1}=0.5\)</span> (and <span class="math notranslate nohighlight">\(w^{2}=1\)</span>, <span class="math notranslate nohighlight">\(b^{2}=-0.5\)</span> for the hidden-layer network).  Left: the cost surface <span class="math notranslate nohighlight">\(C(w^{1},b^{1})\)</span> of the single neuron and the descent path from the starting point (circle) to its end (square); the cross marks the parameters used to generate the targets.  Middle: the cost against iteration for both networks. Right: the magnitude of the gradient reaching the first weight, <span class="math notranslate nohighlight">\(\delta^{1}x\)</span> in both cases, but with <span class="math notranslate nohighlight">\(\delta^{1}=\delta^{2}w^{2}\sigma'(z^{1})\)</span> in the deeper network, Eq. (8.43); the extra factor <span class="math notranslate nohighlight">\(w^{2}\sigma'(z^{2})\)</span> attenuates the signal that trains the hidden neuron, a first glimpse of Section <em>Vanishing and exploding gradients</em>.  Generated by <code class="docutils literal notranslate"><span class="pre">BookFigures/ch08_scalar_backprop_figures.py</span></code>.</em></p>
+<div class="tip admonition">
+<p class="admonition-title">What the general case adds</p>
+<p>The two examples contain the whole
+algorithm.  A layer with many nodes changes two things only.  A weight now
+carries two node indices, <span class="math notranslate nohighlight">\(w_{ij}^{l}\)</span>, and the gradient
+<span class="math notranslate nohighlight">\(\delta_j^{l}a_i^{l-1}\)</span> pairs the error of the node it arrives at with the
+activation of the node it leaves; and a hidden node feeds <em>several</em>
+nodes of the next layer, so the single term <span class="math notranslate nohighlight">\(\delta^{2}w^{2}\)</span> of
+Eq. (8.43) becomes a sum <span class="math notranslate nohighlight">\(\sum_k\delta_k^{l+1}w_{jk}^{l+1}\)</span>
+over everything it feeds – the fan-out rule of Section <em>Reverse mode: adjoints</em>,
+exactly as the two branches of Figure 5.5 were summed
+when the reverse sweep reached <span class="math notranslate nohighlight">\(v_2\)</span>.  Section <em>Two inputs, two hidden nodes, one output</em> works
+out the smallest network in which the first of these appears, and
+Section <em>The general case: dense layers</em> adds the second; Section <em>The four equations of backpropagation</em>
+then collects the result in four equations that the reader may already
+recognise.</p>
+</div>
+</section>
+<section id="two-inputs-two-hidden-nodes-one-output">
+<h3><span class="section-number">8.8.2. </span>Two inputs, two hidden nodes, one output<a class="headerlink" href="#two-inputs-two-hidden-nodes-one-output" title="Link to this heading">#</a></h3>
+<p>The scalar examples had one node per layer, so a weight needed one index and
+an error never had to be summed.  The smallest network in which both features
+of the general case appear has two inputs <span class="math notranslate nohighlight">\(x_1,x_2\)</span>, one hidden layer of two
+nodes and a single output node, Figure 8.12.  We now work it
+out completely, in the index convention of Section <em>Notation and the feed-forward pass</em>, and
+this is the last time the derivatives are written one by one.</p>
+<p><strong>The network.</strong>
+The input layer is <span class="math notranslate nohighlight">\(a_1^{0}=x_1\)</span>, <span class="math notranslate nohighlight">\(a_2^{0}=x_2\)</span>.  The hidden layer has
+weights <span class="math notranslate nohighlight">\(w_{ij}^{1}\)</span> from input <span class="math notranslate nohighlight">\(i\)</span> to hidden node <span class="math notranslate nohighlight">\(j\)</span> and biases
+<span class="math notranslate nohighlight">\(b_j^{1}\)</span>, so that by Eq. (8.18)</p>
+<div class="math notranslate nohighlight">
+\[
+z_j^{1} = w_{1j}^{1}x_1 + w_{2j}^{1}x_2 + b_j^{1},
+  \qquad
+  a_j^{1} = \sigma\!\left(z_j^{1}\right),
+  \qquad j=1,2,\tag{8.44}
+\]</div>
+<p>or in the matrix form of Eq. (8.20),</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{equation*}
+\begin{bmatrix} z_1^{1}\\ z_2^{1}\end{bmatrix}
+  = \begin{bmatrix} w_{11}^{1} &amp; w_{21}^{1}\\ w_{12}^{1} &amp; w_{22}^{1}\end{bmatrix}
+    \begin{bmatrix} x_1\\ x_2\end{bmatrix}
+  + \begin{bmatrix} b_1^{1}\\ b_2^{1}\end{bmatrix}
+  = \left(\bm{W}^{1}\right)^{T}\bm{x}+\bm{b}^{1} .\tag{8.45}
+\end{equation*}\]</div>
+<p>The output layer has one node, so its weights <span class="math notranslate nohighlight">\(w_{j1}^{2}\)</span> carry a trivial
+second index that we drop, <span class="math notranslate nohighlight">\(w_j^{2}\)</span>, and</p>
+<div class="math notranslate nohighlight">
+\[
+z^{2} = w_{1}^{2}a_1^{1} + w_{2}^{2}a_2^{1} + b^{2},
+  \qquad
+  a^{2} = \sigma\!\left(z^{2}\right),
+  \qquad
+  C = \tfrac12\left(a^{2}-y\right)^{2}.\tag{8.46}
+\]</div>
+<p>There are nine parameters,</p>
+<div class="math notranslate nohighlight">
+\[
+\bm{\Theta}=\left\{w_{11}^{1},w_{12}^{1},w_{21}^{1},w_{22}^{1},
+  b_1^{1},b_2^{1},w_1^{2},w_2^{2},b^{2}\right\},\tag{8.47}
+\]</div>
+<p>and the forward pass stores <span class="math notranslate nohighlight">\(z_1^{1},z_2^{1},a_1^{1},a_2^{1},z^{2},a^{2}\)</span>.</p>
+<p><img alt="The network of Section Two inputs, two hidden nodes, one output two in" src="_images/8-twotwo.png" /></p>
+<p><em>Figure 8.12: The network of Section <em>Two inputs, two hidden nodes, one output</em>: two inputs, one hidden layer of two sigmoid nodes and one output node, nine parameters in all.  The weight <span class="math notranslate nohighlight">\(w_{ij}^{1}\)</span> leaves input <span class="math notranslate nohighlight">\(i\)</span> and arrives at hidden node <span class="math notranslate nohighlight">\(j\)</span>, as in Fig. 8.6.  Red: the backward pass of Eqs. (8.48) and (8.52).  The output error <span class="math notranslate nohighlight">\(\delta^{2}\)</span> travels back along each of the two edges <span class="math notranslate nohighlight">\(w_j^{2}\)</span> separately, and each hidden node multiplies what arrives by its own <span class="math notranslate nohighlight">\(\sigma'(z_j^{1})\)</span>; the gradient of every weight is then the error at the node the weight arrives at times the signal at the node it leaves, Eq. (8.53).</em></p>
+<p><strong>The output layer.</strong>
+As in the scalar case, the cost depends on the output parameters only through
+<span class="math notranslate nohighlight">\(z^{2}\)</span>, and</p>
+<div class="math notranslate nohighlight">
+\[
+\delta^{2} = \frac{\partial C}{\partial z^{2}}
+             = \left(a^{2}-y\right)\sigma'\!\left(z^{2}\right),
+  \qquad
+  \frac{\partial C}{\partial w_j^{2}} = \delta^{2}a_j^{1},
+  \qquad
+  \frac{\partial C}{\partial b^{2}} = \delta^{2},\tag{8.48}
+\]</div>
+<p>for <span class="math notranslate nohighlight">\(j=1,2\)</span>: three of the nine derivatives, and the same three lines as
+Eq. (8.41) with the input activation <span class="math notranslate nohighlight">\(a_j^{1}\)</span> now
+carrying the index of the edge.</p>
+<p><strong>The hidden layer.</strong>
+Take <span class="math notranslate nohighlight">\(w_{11}^{1}\)</span>, the weight from <span class="math notranslate nohighlight">\(x_1\)</span> to the first hidden node.  It
+affects <span class="math notranslate nohighlight">\(z_1^{1}\)</span> only, <span class="math notranslate nohighlight">\(z_1^{1}\)</span> affects <span class="math notranslate nohighlight">\(a_1^{1}\)</span> only, and <span class="math notranslate nohighlight">\(a_1^{1}\)</span>
+reaches the cost only through <span class="math notranslate nohighlight">\(z^{2}\)</span>, along the edge <span class="math notranslate nohighlight">\(w_1^{2}\)</span>.  The chain
+is therefore the same five-factor product as
+Eq. (8.42),</p>
+<div class="math notranslate nohighlight">
+\[
+\frac{\partial C}{\partial w_{11}^{1}}
+   = \underbrace{\frac{\partial C}{\partial a^{2}}
+     \frac{\partial a^{2}}{\partial z^{2}}}_{\delta^{2}}
+     \frac{\partial z^{2}}{\partial a_1^{1}}
+     \frac{\partial a_1^{1}}{\partial z_1^{1}}
+     \frac{\partial z_1^{1}}{\partial w_{11}^{1}}
+   = \delta^{2}\,w_1^{2}\,\sigma'\!\left(z_1^{1}\right)x_1 ,\tag{8.49}
+\]</div>
+<p>using <span class="math notranslate nohighlight">\(\partial z^{2}/\partial a_1^{1}=w_1^{2}\)</span> and
+<span class="math notranslate nohighlight">\(\partial z_1^{1}/\partial w_{11}^{1}=x_1\)</span> from Eq. (8.57).
+The weight <span class="math notranslate nohighlight">\(w_{21}^{1}\)</span> from <span class="math notranslate nohighlight">\(x_2\)</span> to the same node has the identical chain
+with <span class="math notranslate nohighlight">\(x_2\)</span> as its last factor, and the bias <span class="math notranslate nohighlight">\(b_1^{1}\)</span> has the factor <span class="math notranslate nohighlight">\(1\)</span>.
+So the first hidden node has an error of its own,</p>
+<div class="math notranslate nohighlight">
+\[
+\delta_1^{1} = \delta^{2}\,w_1^{2}\,\sigma'\!\left(z_1^{1}\right),
+  \qquad
+  \frac{\partial C}{\partial w_{11}^{1}} = \delta_1^{1}x_1,
+  \qquad
+  \frac{\partial C}{\partial w_{21}^{1}} = \delta_1^{1}x_2,
+  \qquad
+  \frac{\partial C}{\partial b_1^{1}} = \delta_1^{1},\tag{8.50}
+\]</div>
+<p>and the second hidden node, reached from the output along the other edge
+<span class="math notranslate nohighlight">\(w_2^{2}\)</span>, has</p>
+<div class="math notranslate nohighlight">
+\[
+\delta_2^{1} = \delta^{2}\,w_2^{2}\,\sigma'\!\left(z_2^{1}\right),
+  \qquad
+  \frac{\partial C}{\partial w_{12}^{1}} = \delta_2^{1}x_1,
+  \qquad
+  \frac{\partial C}{\partial w_{22}^{1}} = \delta_2^{1}x_2,
+  \qquad
+  \frac{\partial C}{\partial b_2^{1}} = \delta_2^{1}.\tag{8.51}
+\]</div>
+<p>That completes the list of nine.  Collected, they read</p>
+<div class="math notranslate nohighlight">
+\[
+\delta_j^{1} = \delta^{2}\,w_j^{2}\,\sigma'\!\left(z_j^{1}\right),
+  \qquad
+  \frac{\partial C}{\partial w_{ij}^{1}} = \delta_j^{1}\,a_i^{0},
+  \qquad
+  \frac{\partial C}{\partial b_j^{1}} = \delta_j^{1},
+  \qquad i,j\in\{1,2\},\tag{8.52}
+\]</div>
+<p>and together with Eq. (8.48) the whole gradient is</p>
+<div class="math notranslate nohighlight">
+\[
+\frac{\partial C}{\partial w_{ij}^{l}} = \delta_j^{l}\,a_i^{l-1},
+  \qquad
+  \frac{\partial C}{\partial b_j^{l}} = \delta_j^{l},
+  \qquad l=1,2 .\tag{8.53}
+\]</div>
+<p>Equation (8.53) is the rule the scalar examples suggested,
+now with indices: <em>the gradient of a weight is the error at the node
+it arrives at, times the signal at the node it leaves</em>.  In matrix form the
+two hidden errors are a vector,</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{equation*}
+\bm{\delta}^{1}
+  = \begin{bmatrix}\delta_1^{1}\\ \delta_2^{1}\end{bmatrix}
+  = \left(\begin{bmatrix} w_1^{2}\\ w_2^{2}\end{bmatrix}\delta^{2}\right)
+    \circ
+    \begin{bmatrix}\sigma'(z_1^{1})\\ \sigma'(z_2^{1})\end{bmatrix}
+  = \left(\bm{W}^{2}\delta^{2}\right)\circ\sigma'\!\left(\bm{z}^{1}\right),\tag{8.54}
+\end{equation*}\]</div>
+<p>with <span class="math notranslate nohighlight">\(\bm{W}^{2}\in\mathbb{R}^{2\times1}\)</span>, and the four hidden weight
+gradients are the outer product</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{equation*}
+\frac{\partial C}{\partial\bm{W}^{1}}
+  = \bm{x}\left(\bm{\delta}^{1}\right)^{T}
+  = \begin{bmatrix} x_1\delta_1^{1} &amp; x_1\delta_2^{1}\\
+                    x_2\delta_1^{1} &amp; x_2\delta_2^{1}\end{bmatrix},\tag{8.55}
+\end{equation*}\]</div>
+<p>whose <span class="math notranslate nohighlight">\((i,j)\)</span> entry is <span class="math notranslate nohighlight">\(\partial C/\partial w_{ij}^{1}\)</span>, in the same
+position as <span class="math notranslate nohighlight">\(w_{ij}^{1}\)</span> in <span class="math notranslate nohighlight">\(\bm{W}^{1}\)</span>.  These are, for this network,
+the backpropagation equations (8.66) and (8.68) of
+the next sections, and the gradient-descent updates are</p>
+<div class="math notranslate nohighlight">
+\[
+w_{ij}^{l}\leftarrow w_{ij}^{l}-\gamma\,\delta_j^{l}a_i^{l-1},
+  \qquad
+  b_j^{l}\leftarrow b_j^{l}-\gamma\,\delta_j^{l},\tag{8.56}
+\]</div>
+<p>for all nine parameters at once.</p>
+<p><strong>What the reverse sweep did, and what it did not have to do.</strong></p>
+<p>Read as the reverse sweep of Section <em>Reverse mode: adjoints</em>, the computation
+has one new feature and one that is still missing.  New is that the adjoint
+<span class="math notranslate nohighlight">\(\delta^{2}\)</span> leaves the output node along <em>two</em> edges, <span class="math notranslate nohighlight">\(w_1^{2}\)</span> and
+<span class="math notranslate nohighlight">\(w_2^{2}\)</span>, one to each hidden node; that is a fan-in seen from the output,
+and it costs nothing, since each hidden node simply receives its own share.
+Still missing is the fan-out: each hidden node feeds only one node
+downstream, so its adjoint arrives in a single term and no sum is needed in
+Eq. (8.52).  Each <em>input</em> <span class="math notranslate nohighlight">\(x_i\)</span> does feed both hidden
+nodes, but the inputs are constants of the trace and we never need their
+adjoints.  Give the network a second output node and <span class="math notranslate nohighlight">\(z_j^{1}\)</span> would reach
+the cost along two paths, the adjoints from the two output nodes would have
+to be added at each hidden node, and Eq. (8.52) would
+acquire the sum <span class="math notranslate nohighlight">\(\sum_k\delta_k^{2}w_{jk}^{2}\)</span> – the fan-out rule of
+Section <em>Reverse mode: adjoints</em>, exactly as the two branches of
+Figure 5.5 were summed when the sweep reached <span class="math notranslate nohighlight">\(v_2\)</span>.
+That sum is the only thing Section <em>The general case: dense layers</em> adds.</p>
+<p><strong>The program.</strong>
+The program below is the training program of Section <em>Two scalar examples: no hidden layer and one hidden layer</em>
+with the array shapes changed and nothing else: the design matrix has <span class="math notranslate nohighlight">\(n\)</span>
+rows and two columns, <span class="math notranslate nohighlight">\(\bm{W}^{1}\)</span> is <span class="math notranslate nohighlight">\(2\times2\)</span>, <span class="math notranslate nohighlight">\(\bm{W}^{2}\)</span> is
+<span class="math notranslate nohighlight">\(2\times1\)</span>, and every line of <code class="docutils literal notranslate"><span class="pre">backward</span></code> is one of
+Eqs. (8.48), (8.54) and
+(8.55) applied to all samples at once, with
+<code class="docutils literal notranslate"><span class="pre">X.T</span> <span class="pre">&#64;</span> <span class="pre">delta1</span></code> summing the outer products <span class="math notranslate nohighlight">\(\bm{x}_i(\bm{\delta}^{1}_i)^T\)</span>
+over the sample.  The output node is linear, as in the scalar program, so
+that the network can fit the target
+<span class="math notranslate nohighlight">\(y=f(x_1,x_2)=x_1^{2}+3x_1x_2+x_2^{2}+5\)</span> on <span class="math notranslate nohighlight">\(n=100\)</span> points drawn uniformly
+from the unit square, a function that ranges over <span class="math notranslate nohighlight">\([5,10]\)</span>.  Before
+training, the nine hand-derived derivatives are compared with
+<code class="docutils literal notranslate"><span class="pre">jax.grad</span></code> of the same forward pass.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">jax</span><span class="o">,</span> <span class="nn">jax.numpy</span> <span class="k">as</span> <span class="nn">jnp</span>
+<span class="n">jax</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="s2">&quot;jax_enable_x64&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">sigmoid</span><span class="p">(</span><span class="n">z</span><span class="p">):</span> <span class="k">return</span> <span class="mf">1.0</span><span class="o">/</span><span class="p">(</span><span class="mf">1.0</span><span class="o">+</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">z</span><span class="p">))</span>
+
+<span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">W1</span><span class="p">,</span> <span class="n">b1</span><span class="p">,</span> <span class="n">W2</span><span class="p">,</span> <span class="n">b2</span><span class="p">):</span>
+    <span class="n">Z1</span> <span class="o">=</span> <span class="n">X</span> <span class="o">@</span> <span class="n">W1</span> <span class="o">+</span> <span class="n">b1</span><span class="p">;</span> <span class="n">A1</span> <span class="o">=</span> <span class="n">sigmoid</span><span class="p">(</span><span class="n">Z1</span><span class="p">)</span>         <span class="c1"># hidden layer, samples in rows</span>
+    <span class="n">Z2</span> <span class="o">=</span> <span class="n">A1</span> <span class="o">@</span> <span class="n">W2</span> <span class="o">+</span> <span class="n">b2</span><span class="p">;</span> <span class="n">A2</span> <span class="o">=</span> <span class="n">Z2</span>                  <span class="c1"># linear output node</span>
+    <span class="k">return</span> <span class="n">A1</span><span class="p">,</span> <span class="n">A2</span>
+
+<span class="k">def</span> <span class="nf">backward</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">W1</span><span class="p">,</span> <span class="n">b1</span><span class="p">,</span> <span class="n">W2</span><span class="p">,</span> <span class="n">b2</span><span class="p">):</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">A1</span><span class="p">,</span> <span class="n">A2</span> <span class="o">=</span> <span class="n">forward</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">W1</span><span class="p">,</span> <span class="n">b1</span><span class="p">,</span> <span class="n">W2</span><span class="p">,</span> <span class="n">b2</span><span class="p">)</span>
+    <span class="n">delta2</span> <span class="o">=</span> <span class="p">(</span><span class="n">A2</span> <span class="o">-</span> <span class="n">y</span><span class="p">)</span><span class="o">/</span><span class="n">n</span>                         <span class="c1"># output error, f&#39; = 1</span>
+    <span class="c1"># delta_j^1 = delta^2 w_j^2 sigma&#39;(z_j^1)</span>
+    <span class="n">delta1</span> <span class="o">=</span> <span class="p">(</span><span class="n">delta2</span> <span class="o">@</span> <span class="n">W2</span><span class="o">.</span><span class="n">T</span><span class="p">)</span> <span class="o">*</span> <span class="n">A1</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">A1</span><span class="p">)</span>
+    <span class="n">dW2</span> <span class="o">=</span> <span class="n">A1</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">delta2</span><span class="p">;</span>  <span class="n">db2</span> <span class="o">=</span> <span class="n">delta2</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">dW1</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">delta1</span><span class="p">;</span>   <span class="n">db1</span> <span class="o">=</span> <span class="n">delta1</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">dW1</span><span class="p">,</span> <span class="n">db1</span><span class="p">,</span> <span class="n">dW2</span><span class="p">,</span> <span class="n">db2</span><span class="p">,</span> <span class="mf">0.5</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">((</span><span class="n">A2</span> <span class="o">-</span> <span class="n">y</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">/</span><span class="n">n</span>
+
+<span class="k">def</span> <span class="nf">cost</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>                         <span class="c1"># the same model for jax.grad</span>
+    <span class="n">W1</span><span class="p">,</span> <span class="n">b1</span><span class="p">,</span> <span class="n">W2</span><span class="p">,</span> <span class="n">b2</span> <span class="o">=</span> <span class="n">params</span>
+    <span class="n">A1</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">sigmoid</span><span class="p">(</span><span class="n">X</span> <span class="o">@</span> <span class="n">W1</span> <span class="o">+</span> <span class="n">b1</span><span class="p">)</span>
+    <span class="k">return</span> <span class="mf">0.5</span><span class="o">*</span><span class="n">jnp</span><span class="o">.</span><span class="n">mean</span><span class="p">((</span><span class="n">A1</span> <span class="o">@</span> <span class="n">W2</span> <span class="o">+</span> <span class="n">b2</span> <span class="o">-</span> <span class="n">y</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+
+<span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="mi">41</span><span class="p">)</span>
+<span class="n">n</span> <span class="o">=</span> <span class="mi">100</span>
+<span class="n">X</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+<span class="n">y</span> <span class="o">=</span> <span class="p">(</span><span class="n">X</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="mi">3</span><span class="o">*</span><span class="n">X</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">X</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">X</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="mi">5</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+<span class="c1"># w_{ij}^1, i input, j hidden</span>
+<span class="n">W1</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">standard_normal</span><span class="p">((</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">));</span> <span class="n">b1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="mf">0.01</span>
+<span class="n">W2</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">standard_normal</span><span class="p">((</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">));</span> <span class="n">b2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="mf">0.01</span>   <span class="c1"># w_{j}^2</span>
+
+<span class="n">g_hand</span> <span class="o">=</span> <span class="n">backward</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">W1</span><span class="p">,</span> <span class="n">b1</span><span class="p">,</span> <span class="n">W2</span><span class="p">,</span> <span class="n">b2</span><span class="p">)[:</span><span class="mi">4</span><span class="p">]</span>
+<span class="n">params</span> <span class="o">=</span> <span class="p">[</span><span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="p">(</span><span class="n">W1</span><span class="p">,</span> <span class="n">b1</span><span class="p">,</span> <span class="n">W2</span><span class="p">,</span> <span class="n">b2</span><span class="p">)]</span>
+<span class="n">g_jax</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">grad</span><span class="p">(</span><span class="n">cost</span><span class="p">)(</span><span class="n">params</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;max |hand - jax.grad| over the nine derivatives:&quot;</span><span class="p">,</span>
+      <span class="nb">max</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">jnp</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">jnp</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">h</span> <span class="o">-</span> <span class="n">j</span><span class="p">)))</span> <span class="k">for</span> <span class="n">h</span><span class="p">,</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">g_hand</span><span class="p">,</span> <span class="n">g_jax</span><span class="p">)))</span>
+
+<span class="n">gamma</span> <span class="o">=</span> <span class="mf">0.5</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">5001</span><span class="p">):</span>
+    <span class="n">dW1</span><span class="p">,</span> <span class="n">db1</span><span class="p">,</span> <span class="n">dW2</span><span class="p">,</span> <span class="n">db2</span><span class="p">,</span> <span class="n">C</span> <span class="o">=</span> <span class="n">backward</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">W1</span><span class="p">,</span> <span class="n">b1</span><span class="p">,</span> <span class="n">W2</span><span class="p">,</span> <span class="n">b2</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">i</span> <span class="o">%</span> <span class="mi">1000</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;iteration </span><span class="si">{</span><span class="n">i</span><span class="si">:</span><span class="s2">4d</span><span class="si">}</span><span class="s2">: cost = </span><span class="si">{</span><span class="n">C</span><span class="si">:</span><span class="s2">.5f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">W1</span> <span class="o">-=</span> <span class="n">gamma</span><span class="o">*</span><span class="n">dW1</span><span class="p">;</span> <span class="n">b1</span> <span class="o">-=</span> <span class="n">gamma</span><span class="o">*</span><span class="n">db1</span><span class="p">;</span> <span class="n">W2</span> <span class="o">-=</span> <span class="n">gamma</span><span class="o">*</span><span class="n">dW2</span><span class="p">;</span> <span class="n">b2</span> <span class="o">-=</span> <span class="n">gamma</span><span class="o">*</span><span class="n">db2</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;W1 =</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">W1</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">b1 =&quot;</span><span class="p">,</span> <span class="n">b1</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">3</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;W2 =&quot;</span><span class="p">,</span> <span class="n">W2</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span> <span class="s2">&quot; b2 =&quot;</span><span class="p">,</span> <span class="n">b2</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">3</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">max</span> <span class="o">|</span><span class="n">hand</span> <span class="o">-</span> <span class="n">jax</span><span class="o">.</span><span class="n">grad</span><span class="o">|</span> <span class="n">over</span> <span class="n">the</span> <span class="n">nine</span> <span class="n">derivatives</span><span class="p">:</span> <span class="mf">1.7763568394002505e-15</span>
+<span class="n">iteration</span>    <span class="mi">0</span><span class="p">:</span> <span class="n">cost</span> <span class="o">=</span> <span class="mf">22.76355</span>
+<span class="n">iteration</span> <span class="mi">1000</span><span class="p">:</span> <span class="n">cost</span> <span class="o">=</span> <span class="mf">0.00113</span>
+<span class="n">iteration</span> <span class="mi">2000</span><span class="p">:</span> <span class="n">cost</span> <span class="o">=</span> <span class="mf">0.00082</span>
+<span class="n">iteration</span> <span class="mi">3000</span><span class="p">:</span> <span class="n">cost</span> <span class="o">=</span> <span class="mf">0.00082</span>
+<span class="n">iteration</span> <span class="mi">4000</span><span class="p">:</span> <span class="n">cost</span> <span class="o">=</span> <span class="mf">0.00082</span>
+<span class="n">iteration</span> <span class="mi">5000</span><span class="p">:</span> <span class="n">cost</span> <span class="o">=</span> <span class="mf">0.00081</span>
+<span class="n">W1</span> <span class="o">=</span>
+ <span class="p">[[</span><span class="mf">2.524</span> <span class="mf">1.048</span><span class="p">]</span>
+ <span class="p">[</span><span class="mf">2.558</span> <span class="mf">1.052</span><span class="p">]]</span> 
+<span class="n">b1</span> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="mf">4.123</span> <span class="o">-</span><span class="mf">1.965</span><span class="p">]</span>
+<span class="n">W2</span> <span class="o">=</span> <span class="p">[</span><span class="mf">5.084</span> <span class="mf">2.981</span><span class="p">]</span>  <span class="n">b2</span> <span class="o">=</span> <span class="p">[</span><span class="mf">4.454</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>The nine derivatives agree with reverse-mode automatic differentiation to
+<span class="math notranslate nohighlight">\(2\times10^{-15}\)</span>, and two hidden nodes bring the mean squared error of
+the fit down to <span class="math notranslate nohighlight">\(1.6\times10^{-3}\)</span>, a root-mean-square error of <span class="math notranslate nohighlight">\(0.04\)</span> on
+targets between <span class="math notranslate nohighlight">\(5\)</span> and <span class="math notranslate nohighlight">\(10\)</span>.  The reader who compares this listing with
+the class of Section <em>A neural network from scratch</em> will find the same five lines in
+its <code class="docutils literal notranslate"><span class="pre">_backward</span></code> method, inside a loop over layers.</p>
+<div class="tip admonition">
+<p class="admonition-title">Machine learning connection</p>
+<p>The three examples of this section
+are the whole of backpropagation in miniature, and the order in which they
+were presented is the order in which the general equations are usually
+misunderstood.  The scalar neuron establishes that the error
+<span class="math notranslate nohighlight">\(\delta=\partial C/\partial z\)</span> is the natural intermediate quantity and
+that a weight’s gradient is that error times the weight’s input.  The
+scalar chain establishes the recursion <span class="math notranslate nohighlight">\(\delta^{l}=\delta^{l+1}w^{l+1}f'(z^{l})\)</span>
+and that nothing is recomputed.  The <span class="math notranslate nohighlight">\(2\)</span>–<span class="math notranslate nohighlight">\(2\)</span>–<span class="math notranslate nohighlight">\(1\)</span> network establishes
+which index goes where: the error carries the index of the receiving node,
+the input activation the index of the sending node, and the weight
+gradient has the shape of the weight matrix.  What remains is the sum over
+receiving nodes when a node feeds several, and that is
+Eq. (8.64).</p>
+</div>
+</section>
+<section id="the-general-case-dense-layers">
+<h3><span class="section-number">8.8.3. </span>The general case: dense layers<a class="headerlink" href="#the-general-case-dense-layers" title="Link to this heading">#</a></h3>
+<p>Everything follows from the chain
 rule (1.51) and from two elementary derivatives of
 Eq. (8.18),</p>
 <div class="math notranslate nohighlight">
 \[
 \frac{\partial z_j^{l}}{\partial w_{ij}^{l}} = a_i^{l-1},
   \qquad
-  \frac{\partial z_j^{l}}{\partial a_i^{l-1}} = w_{ij}^{l},\tag{8.33}
+  \frac{\partial z_j^{l}}{\partial a_i^{l-1}} = w_{ij}^{l},\tag{8.57}
 \]</div>
 <p>together with the derivative of the activation,
 <span class="math notranslate nohighlight">\(\partial a_j^{l}/\partial z_j^{l}=f'(z_j^{l})\)</span>, which for the sigmoid is
@@ -1585,7 +2334,7 @@ Differentiating with respect to a weight in the last layer,</p>
    = \left(a_j^{L}-y_j\right)
      \frac{\partial a_j^{L}}{\partial z_j^{L}}
      \frac{\partial z_j^{L}}{\partial w_{ij}^{L}}
-   = \left(a_j^{L}-y_j\right)f'\!\left(z_j^{L}\right)a_i^{L-1}.\tag{8.34}
+   = \left(a_j^{L}-y_j\right)f'\!\left(z_j^{L}\right)a_i^{L-1}.\tag{8.58}
 \]</div>
 <p>The structure of the result invites a definition.  Introduce the <em>error</em>
 of node <span class="math notranslate nohighlight">\(j\)</span> in the output layer,</p>
@@ -1595,15 +2344,15 @@ of node <span class="math notranslate nohighlight">\(j\)</span> in the output la
    = f'\!\left(z_j^{L}\right)\frac{\partial C}{\partial a_j^{L}},
   \qquad\text{or in vector form}\qquad
   \bm{\delta}^{L} = f'\!\left(\bm{z}^{L}\right)\circ
-    \frac{\partial C}{\partial \bm{a}^{L}},\tag{8.35}
+    \frac{\partial C}{\partial \bm{a}^{L}},\tag{8.59}
 \]</div>
 <p>where <span class="math notranslate nohighlight">\(\circ\)</span> is the Hadamard product of Section <em>Vectors</em>.  With it,
-Eq. (8.34) becomes simply</p>
+Eq. (8.58) becomes simply</p>
 <div class="math notranslate nohighlight">
 \[
-\frac{\partial C}{\partial w_{ij}^{L}} = \delta_j^{L}a_i^{L-1}.\tag{8.36}
+\frac{\partial C}{\partial w_{ij}^{L}} = \delta_j^{L}a_i^{L-1}.\tag{8.60}
 \]</div>
-<p>Equation (8.35) is worth reading rather than merely recording.
+<p>Equation (8.59) is worth reading rather than merely recording.
 The second factor measures how fast the cost changes with the <span class="math notranslate nohighlight">\(j\)</span>th output: if
 the cost hardly depends on output <span class="math notranslate nohighlight">\(j\)</span>, then <span class="math notranslate nohighlight">\(\delta_j^{L}\)</span> is small, which is
 what one would want.  The first factor measures how fast the activation
@@ -1615,12 +2364,12 @@ Note that <span class="math notranslate nohighlight">\(\delta_j^{L}\)</span> can
 <div class="math notranslate nohighlight">
 \[
 \delta_j^{L} = \frac{\partial C}{\partial z_j^{L}}
-   = \frac{\partial C}{\partial a_j^{L}}\frac{\partial a_j^{L}}{\partial z_j^{L}},\tag{8.37}
+   = \frac{\partial C}{\partial a_j^{L}}\frac{\partial a_j^{L}}{\partial z_j^{L}},\tag{8.61}
 \]</div>
 <p>and since <span class="math notranslate nohighlight">\(\partial z_j^{L}/\partial b_j^{L}=1\)</span> from Eq. (8.18),</p>
 <div class="math notranslate nohighlight">
 \[
-\delta_j^{L} = \frac{\partial C}{\partial b_j^{L}} .\tag{8.38}
+\delta_j^{L} = \frac{\partial C}{\partial b_j^{L}} .\tag{8.62}
 \]</div>
 <p>The error of a node <em>is</em> the derivative of the cost with respect to that
 node’s bias.  This is not a coincidence but a consequence of the bias entering
@@ -1635,7 +2384,7 @@ the layer above.  Since <span class="math notranslate nohighlight">\(C\)</span> 
 \delta_j^{l}
    = \sum_k \frac{\partial C}{\partial z_k^{l+1}}
             \frac{\partial z_k^{l+1}}{\partial z_j^{l}}
-   = \sum_k \delta_k^{l+1}\frac{\partial z_k^{l+1}}{\partial z_j^{l}} .\tag{8.39}
+   = \sum_k \delta_k^{l+1}\frac{\partial z_k^{l+1}}{\partial z_j^{l}} .\tag{8.63}
 \]</div>
 <p>From <span class="math notranslate nohighlight">\(z_k^{l+1}=\sum_i w_{ik}^{l+1}a_i^{l}+b_k^{l+1}\)</span> and
 <span class="math notranslate nohighlight">\(a_i^{l}=f(z_i^{l})\)</span> we obtain
@@ -1647,17 +2396,18 @@ the layer above.  Since <span class="math notranslate nohighlight">\(C\)</span> 
                  f'\!\left(z_j^{l}\right),
   \qquad
   \bm{\delta}^{l} = \left(\bm{W}^{l+1}\bm{\delta}^{l+1}\right)
-                    \circ f'\!\left(\bm{z}^{l}\right). \;}\tag{8.40}
+                    \circ f'\!\left(\bm{z}^{l}\right). \;}\tag{8.64}
 \]</div>
 <p>This is the backpropagation equation.  The error at a layer is the error at the
 layer above, pulled back through the transpose of the weights and modulated by
-the local derivative of the activation.  Figure 8.10 draws it
+the local derivative of the activation.  Figure 8.13 draws it
 next to the forward pass of Figure 8.6: the same graph, the same
 weights, the arrows reversed.</p>
-<p><img alt="The backward pass of Eq. 8.40, drawn on the same network as Fig. 8.6 b" src="../BookML/BookFigures/chapter08_neural_networks/8-backprop.png" /></p>
-<p><em>Figure 8.10: The backward pass of Eq. (8.40), drawn on the same network as Fig. 8.6 but with the arrows reversed.  The error <span class="math notranslate nohighlight">\(\delta_j^{l}\)</span> of node <span class="math notranslate nohighlight">\(j\)</span> in layer <span class="math notranslate nohighlight">\(l\)</span> receives a contribution from <em>every</em> node <span class="math notranslate nohighlight">\(k\)</span> of layer <span class="math notranslate nohighlight">\(l+1\)</span>, weighted by the same <span class="math notranslate nohighlight">\(w_{jk}^{l+1}\)</span> that carried <span class="math notranslate nohighlight">\(a_j^{l}\)</span> forward, and the sum is then modulated by the local derivative <span class="math notranslate nohighlight">\(f'(z_j^{l})\)</span>.  Comparing with Fig. 8.6 shows what backpropagation is: the identical graph traversed in the opposite direction, with the transpose of each weight matrix in place of the matrix itself.  A saturated node, one with <span class="math notranslate nohighlight">\(f'(z_j^{l})\approx0\)</span>, blocks the flow entirely, which is the mechanism of Section <em>Vanishing and exploding gradients</em>.</em></p>
+<p><img alt="The backward pass of Eq. 8.64, drawn on the same network as Fig. 8.6 b" src="_images/8-backprop.png" /></p>
+<p><em>Figure 8.13: The backward pass of Eq. (8.64), drawn on the same network as Fig. 8.6 but with the arrows reversed.  The error <span class="math notranslate nohighlight">\(\delta_j^{l}\)</span> of node <span class="math notranslate nohighlight">\(j\)</span> in layer <span class="math notranslate nohighlight">\(l\)</span> receives a contribution from <em>every</em> node <span class="math notranslate nohighlight">\(k\)</span> of layer <span class="math notranslate nohighlight">\(l+1\)</span>, weighted by the same <span class="math notranslate nohighlight">\(w_{jk}^{l+1}\)</span> that carried <span class="math notranslate nohighlight">\(a_j^{l}\)</span> forward, and the sum is then modulated by the local derivative <span class="math notranslate nohighlight">\(f'(z_j^{l})\)</span>.  Comparing with Fig. 8.6 shows what backpropagation is: the identical graph traversed in the opposite direction, with the transpose of each weight matrix in place of the matrix itself.  A saturated node, one with <span class="math notranslate nohighlight">\(f'(z_j^{l})\approx0\)</span>, blocks the flow entirely, which is the mechanism of Section <em>Vanishing and exploding gradients</em>.</em></p>
+</section>
 <section id="the-four-equations-of-backpropagation">
-<h3><span class="section-number">8.8.1. </span>The four equations of backpropagation<a class="headerlink" href="#the-four-equations-of-backpropagation" title="Link to this heading">#</a></h3>
+<h3><span class="section-number">8.8.4. </span>The four equations of backpropagation<a class="headerlink" href="#the-four-equations-of-backpropagation" title="Link to this heading">#</a></h3>
 <p>Collecting the results gives the four equations on which everything rests:</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}
@@ -1673,9 +2423,9 @@ weights, the arrows reversed.</p>
   \frac{\partial C}{\partial w_{ij}^{l}} &amp;= \delta_j^{l}a_i^{l-1}.
 \end{align}
 \end{split}\]</div>
-<p>Equation (8.41) starts the recursion at the output, (8.42)
-carries it backwards through the network, and (8.43) and
-(8.44) convert the errors into the gradients we actually want.  Every
+<p>Equation (8.65) starts the recursion at the output, (8.66)
+carries it backwards through the network, and (8.67) and
+(8.68) convert the errors into the gradients we actually want.  Every
 quantity on the right is already available: the <span class="math notranslate nohighlight">\(\bm{z}^{l}\)</span> and <span class="math notranslate nohighlight">\(\bm{a}^{l}\)</span>
 were computed during the forward pass and need only be stored, and <span class="math notranslate nohighlight">\(f'\)</span> is a
 cheap element-wise function.</p>
@@ -1686,29 +2436,29 @@ error (8.32), <span class="math notranslate nohighlight">\(f'=1\)</span> and <sp
 so</p>
 <div class="math notranslate nohighlight">
 \[
-\bm{\delta}^{L} = \bm{a}^{L}-\bm{y}.\tag{8.45}
+\bm{\delta}^{L} = \bm{a}^{L}-\bm{y}.\tag{8.69}
 \]</div>
 <p>With a softmax output and the multiclass cross
 entropy (5.28), the derivative of the softmax and the
 derivative of the logarithm cancel – the same cancellation met in the notebox
-of Section <em>Maximum likelihood and the cross-entropy</em> – and Eq. (8.45) holds
+of Section <em>Maximum likelihood and the cross-entropy</em> – and Eq. (8.69) holds
 again.  In both cases the output error is simply prediction minus target, with
 no factor of <span class="math notranslate nohighlight">\(f'\)</span> to shrink it.  This is the deeper reason for pairing the
 softmax with the cross entropy, and it is why the implementation of
 Section <em>A neural network from scratch</em> treats both heads with one line of code.</p>
 <p><strong>Cost.</strong></p>
-<p>Counting operations, Eq. (8.42) costs one matrix-vector product per
+<p>Counting operations, Eq. (8.66) costs one matrix-vector product per
 layer, exactly as the forward pass does.  The whole gradient with respect to
 <em>all</em> parameters therefore costs about twice a forward pass, independently
 of the number of parameters.  This is precisely the claim made for reverse-mode
 automatic differentiation in Section <em>Automatic differentiation</em>, and backpropagation is
 that algorithm specialised to a layered network.  Computing the same gradient
-by finite differences, Eq. (4.68), would require one forward
+by finite differences, Eq. (4.102), would require one forward
 pass per parameter; for a network with <span class="math notranslate nohighlight">\(10^{6}\)</span> weights the difference is
 between a second and a fortnight.</p>
 </section>
 <section id="the-algorithm">
-<h3><span class="section-number">8.8.2. </span>The algorithm<a class="headerlink" href="#the-algorithm" title="Link to this heading">#</a></h3>
+<h3><span class="section-number">8.8.5. </span>The algorithm<a class="headerlink" href="#the-algorithm" title="Link to this heading">#</a></h3>
 <p>Putting it together, training a feed-forward network proceeds as follows.</p>
 <p><strong>Set-up.</strong></p>
 <ol class="arabic simple">
@@ -1729,10 +2479,10 @@ Section <em>Weight initialisation</em>.</p></li>
 <span class="math notranslate nohighlight">\(\bm{z}^{l}\)</span> and <span class="math notranslate nohighlight">\(\bm{a}^{l}=f(\bm{z}^{l})\)</span> for <span class="math notranslate nohighlight">\(l=1,2,\dots,L\)</span> by
 Eq. (8.20), storing every <span class="math notranslate nohighlight">\(\bm{z}^{l}\)</span> and <span class="math notranslate nohighlight">\(\bm{a}^{l}\)</span>.</p></li>
 <li><p><em>Output error.</em>  Compute <span class="math notranslate nohighlight">\(\bm{\delta}^{L}\)</span> from
-Eq. (8.41), or from Eq. (8.45) for the
+Eq. (8.65), or from Eq. (8.69) for the
 natural pairings.</p></li>
 <li><p><em>Backward pass.</em>  For <span class="math notranslate nohighlight">\(l=L-1,L-2,\dots,1\)</span> compute
-<span class="math notranslate nohighlight">\(\bm{\delta}^{l}\)</span> from Eq. (8.42).</p></li>
+<span class="math notranslate nohighlight">\(\bm{\delta}^{l}\)</span> from Eq. (8.66).</p></li>
 <li><p><em>Gradients.</em>  Form
 <span class="math notranslate nohighlight">\(\partial C/\partial w_{ij}^{l}=\delta_j^{l}a_i^{l-1}\)</span> and
 <span class="math notranslate nohighlight">\(\partial C/\partial b_j^{l}=\delta_j^{l}\)</span>.</p></li>
@@ -1741,7 +2491,7 @@ natural pairings.</p></li>
 \[
    w_{ij}^{l}\leftarrow w_{ij}^{l}-\gamma\,\delta_j^{l}a_i^{l-1},
    \qquad
-   b_j^{l}\leftarrow b_j^{l}-\gamma\,\delta_j^{l},\tag{8.46}
+   b_j^{l}\leftarrow b_j^{l}-\gamma\,\delta_j^{l},\tag{8.70}
    \]</div>
 <p>or substitute any of the schemes of Chapter 4.</p>
 </li>
@@ -1753,7 +2503,7 @@ as in Section <em>Stochastic gradient descent</em>, and one pass over all miniba
 <p>Always verify a hand-written
 backpropagation implementation against finite differences before trusting it.
 Perturb one weight by <span class="math notranslate nohighlight">\(h\approx10^{-6}\)</span>, evaluate the cost twice, and compare
-the central difference (4.68) with the analytical gradient; the
+the central difference (4.102) with the analytical gradient; the
 relative discrepancy should be around <span class="math notranslate nohighlight">\(10^{-6}\)</span> or smaller.  A wrong gradient
 does not usually announce itself – the network still trains, just to the wrong
 place, or trains slightly worse than it should – and this check takes minutes
@@ -1768,13 +2518,13 @@ something to compare against.</p>
 <h2><span class="section-number">8.9. </span>Vanishing and exploding gradients<a class="headerlink" href="#vanishing-and-exploding-gradients" title="Link to this heading">#</a></h2>
 <p>Backpropagation as derived above is correct, and for deep networks it does not
 work.  Understanding why occupied the field for two decades and the explanation
-is contained in Eq. (8.42).</p>
+is contained in Eq. (8.66).</p>
 <p>Unrolling the recursion from the output down to layer <span class="math notranslate nohighlight">\(l\)</span>,</p>
 <div class="math notranslate nohighlight">
 \[
 \bm{\delta}^{l} = \left[\prod_{k=l}^{L-1}
     \bm{W}^{k+1}\,\mathrm{diag}\left(f'(\bm{z}^{k})\right)\right]
-    \bm{\delta}^{L},\tag{8.47}
+    \bm{\delta}^{L},\tag{8.71}
 \]</div>
 <p>so the gradient reaching layer <span class="math notranslate nohighlight">\(l\)</span> is a product of <span class="math notranslate nohighlight">\(L-l\)</span> factors.  A product of
 many numbers each smaller than one shrinks geometrically; a product of many
@@ -1789,7 +2539,7 @@ networks where the same weight matrix is applied at every time step.  More
 generally, deep networks suffer from <em>unstable</em> gradients, with different
 layers learning at widely different speeds.</p>
 <p><strong>The sigmoid is the principal culprit.</strong>
-Consider the factors in Eq. (8.47) for the logistic
+Consider the factors in Eq. (8.71) for the logistic
 activation.  By Eq. (8.22) the derivative <span class="math notranslate nohighlight">\(\sigma'\)</span> never exceeds
 <span class="math notranslate nohighlight">\(\tfrac14\)</span>, and it approaches zero rapidly once <span class="math notranslate nohighlight">\(|z|\)</span> is large, so a saturated
 unit contributes almost nothing.  Even in the best case, with every unit at its
@@ -1808,21 +2558,21 @@ behaves noticeably better in deep networks.</p>
 <p><strong>The two repairs.</strong>
 The first is the activation function.  ReLU does not saturate for positive
 arguments and its derivative is exactly <span class="math notranslate nohighlight">\(1\)</span> there, so the factors in
-Eq. (8.47) do not shrink the gradient at all along the active
+Eq. (8.71) do not shrink the gradient at all along the active
 path.  This single change is most of the reason deep networks became trainable,
 and the ReLU family of Section <em>Activation functions</em> is the standard choice for
 that reason rather than for any biological one.</p>
 <p>The second is initialisation, and it is the subject of the next section.</p>
-<p>Figure 8.11 measures the effect directly.  For each network the
+<p>Figure 8.14 measures the effect directly.  For each network the
 Frobenius norm of the weight gradient is plotted layer by layer after a single
 backward pass.  With sigmoid activations the norm falls by orders of magnitude
 from the output towards the input, and the deeper the network the more severe
 the attenuation – at eight hidden layers the first layer receives a gradient
 several orders of magnitude smaller than the last, so it is effectively frozen.
 With ReLU the profile is far flatter and the early layers continue to receive a
-usable signal.  This is Eq. (8.47) made visible.</p>
+usable signal.  This is Eq. (8.71) made visible.</p>
 <p><img alt="Norm of the weight gradient at each layer after one backward pass, for" src="_images/vanishing_gradients.png" /></p>
-<p><em>Figure 8.11: Norm of the weight gradient at each layer after one backward pass, for networks of <span class="math notranslate nohighlight">\(1\)</span>, <span class="math notranslate nohighlight">\(2\)</span>, <span class="math notranslate nohighlight">\(4\)</span> and <span class="math notranslate nohighlight">\(8\)</span> hidden layers of <span class="math notranslate nohighlight">\(30\)</span> units on the digits data.  Left: sigmoid activations, showing severe attenuation towards the input.  Right: ReLU, which preserves the gradient far better.</em></p>
+<p><em>Figure 8.14: Norm of the weight gradient at each layer after one backward pass, for networks of <span class="math notranslate nohighlight">\(1\)</span>, <span class="math notranslate nohighlight">\(2\)</span>, <span class="math notranslate nohighlight">\(4\)</span> and <span class="math notranslate nohighlight">\(8\)</span> hidden layers of <span class="math notranslate nohighlight">\(30\)</span> units on the digits data.  Left: sigmoid activations, showing severe attenuation towards the input.  Right: ReLU, which preserves the gradient far better.</em></p>
 </section>
 <section id="weight-initialisation">
 <h2><span class="section-number">8.10. </span>Weight initialisation<a class="headerlink" href="#weight-initialisation" title="Link to this heading">#</a></h2>
@@ -1836,16 +2586,16 @@ by the rules of Section <em>Expectation values and moments</em>, the activation
 <span class="math notranslate nohighlight">\(z_j=\sum_i w_{ij}a_i\)</span> has variance</p>
 <div class="math notranslate nohighlight">
 \[
-\var(z) = M_{l-1}\var(w)\var(a),\tag{8.48}
+\var(z) = M_{l-1}\var(w)\var(a),\tag{8.72}
 \]</div>
 <p>so <span class="math notranslate nohighlight">\(\var(z)=\var(a)\)</span> requires <span class="math notranslate nohighlight">\(\var(w)=1/M_{l-1}\)</span>.  Repeating the argument for
-the backward pass, where Eq. (8.42) sums over the <span class="math notranslate nohighlight">\(M_l\)</span> nodes of the
+the backward pass, where Eq. (8.66) sums over the <span class="math notranslate nohighlight">\(M_l\)</span> nodes of the
 next layer, gives <span class="math notranslate nohighlight">\(\var(w)=1/M_l\)</span>.  The two conditions cannot both hold unless
 the layers have equal width, and <em>Xavier</em> or <em>Glorot</em>
 initialisation compromises between them,</p>
 <div class="math notranslate nohighlight">
 \[
-\var(w) = \frac{2}{M_{l-1}+M_l},\tag{8.49}
+\var(w) = \frac{2}{M_{l-1}+M_l},\tag{8.73}
 \]</div>
 <p>drawing the weights from a Gaussian or a uniform distribution with this
 variance.</p>
@@ -1854,18 +2604,18 @@ inputs on average, it halves the variance, and compensating for this gives
 <em>He</em> initialisation,</p>
 <div class="math notranslate nohighlight">
 \[
-\var(w) = \frac{2}{M_{l-1}},\tag{8.50}
+\var(w) = \frac{2}{M_{l-1}},\tag{8.74}
 \]</div>
 <p>which is the appropriate choice for the whole ReLU family.  Biases are
 initialised to zero, or to a small positive constant such as <span class="math notranslate nohighlight">\(0.01\)</span> when using
 ReLU, so that units start on the active side of the kink.</p>
-<p>It is worth appreciating how much rests on Eq. (8.48).  Initialising
+<p>It is worth appreciating how much rests on Eq. (8.72).  Initialising
 all weights to zero would make every unit in a layer compute the same thing and
 receive the same gradient, so they would remain identical forever – the
 symmetry of Section <em>The cost function and the optimisation problem</em> must be broken by the initialisation.
 Initialising them too large saturates the activations; too small and the signal
-dies out. The permissible window is narrow, and Eqs. (8.49) and
-(8.50) locate it.</p>
+dies out. The permissible window is narrow, and Eqs. (8.73) and
+(8.74) locate it.</p>
 </section>
 <section id="classification-with-neural-networks">
 <h2><span class="section-number">8.11. </span>Classification with neural networks<a class="headerlink" href="#classification-with-neural-networks" title="Link to this heading">#</a></h2>
@@ -1876,14 +2626,14 @@ activation (5.27),</p>
 <div class="math notranslate nohighlight">
 \[
 a_k^{L} = \frac{\exp\left(z_k^{L}\right)}
-                 {\sum_{l=0}^{K-1}\exp\left(z_l^{L}\right)},\tag{8.51}
+                 {\sum_{l=0}^{K-1}\exp\left(z_l^{L}\right)},\tag{8.75}
 \]</div>
 <p>so that the outputs are non-negative and sum to one and may be read as class
 probabilities.  As in Section <em>More than two classes: the softmax</em> the exponentials must be
 computed after subtracting the largest score, Eq. (5.30),
 or they overflow.  The loss is the multiclass cross
 entropy (5.28) with one-hot targets, and by the
-cancellation noted after Eq. (8.45) the output error is
+cancellation noted after Eq. (8.69) the output error is
 simply <span class="math notranslate nohighlight">\(\bm{\delta}^{L}=\bm{a}^{L}-\bm{y}\)</span>.</p>
 <p>The whole apparatus therefore reduces to multinomial logistic regression
 applied to the <em>learned</em> features <span class="math notranslate nohighlight">\(\bm{a}^{L-1}\)</span> rather than to the raw
@@ -2016,7 +2766,7 @@ and handles both regression and classification.</p>
 </div>
 </div>
 <p>The network itself is short.  Note in particular <code class="docutils literal notranslate"><span class="pre">_backward</span></code>, which is
-Eqs. (8.41)–(8.44) transcribed.</p>
+Eqs. (8.65)–(8.68) transcribed.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">NeuralNetwork</span><span class="p">:</span>
@@ -2158,7 +2908,7 @@ regression as well as classification heads, the worst relative discrepancy is</p
 </pre></div>
 </div>
 <p>which is the accuracy of the difference scheme itself.  The implementation of
-Eqs. (8.41)–(8.44) is correct.</p>
+Eqs. (8.65)–(8.68) is correct.</p>
 </section>
 <section id="examples">
 <h2><span class="section-number">8.14. </span>Examples<a class="headerlink" href="#examples" title="Link to this heading">#</a></h2>
@@ -2205,7 +2955,7 @@ Section <em>The bias-variance tradeoff</em> in a network.  With only one hidden 
 vanishing-gradient argument of Section <em>Vanishing and exploding gradients</em> has little room to
 operate; its consequences appear when the depth grows, which is the subject of
 one of the exercises.</p>
-<p>Figure 8.12 shows the training curves and the effect of capacity.
+<p>Figure 8.15 shows the training curves and the effect of capacity.
 On the left, ReLU drives the training cross entropy roughly an order of
 magnitude below the sigmoid within sixty epochs, and <span class="math notranslate nohighlight">\(\tanh\)</span> falls between
 them – the ordering the derivatives of Figure 8.9 predict.
@@ -2216,7 +2966,7 @@ familiar shape: rapid improvement up to about twenty units, then a plateau on
 the test set while the training accuracy continues to unity.  The gap between
 the two curves is the variance term of Eq. (2.52).</p>
 <p><img alt="Left training cross entropy against epoch for three hidden activations" src="_images/digits_training.png" /></p>
-<p><em>Figure 8.12: Left: training cross entropy against epoch for three hidden activations on the digits data, with the resulting test accuracies.  Right: training and test accuracy against the width of the single hidden layer.</em></p>
+<p><em>Figure 8.15: Left: training cross entropy against epoch for three hidden activations on the digits data, with the resulting test accuracies.  Right: training and test accuracy against the width of the single hidden layer.</em></p>
 <p><strong>Using established libraries.</strong>
 For anything beyond a teaching example one uses a framework, which supplies
 automatic differentiation, GPU execution and a large catalogue of layers.  In
@@ -2298,11 +3048,11 @@ Section <em>The Lasso</em>, given features a physicist chose, reaches
 <div class="math notranslate nohighlight">
 \[
 H(\bm{s}) \;=\; -J\sum_{j=1}^{L}s_j s_{j+1},
-  \qquad s_j\in\{-1,+1\},\quad s_{L+1}\equiv s_1,\tag{8.52}
+  \qquad s_j\in\{-1,+1\},\quad s_{L+1}\equiv s_1,\tag{8.76}
 \]</div>
 <p>by linear regression, and the Lasso recovered it almost exactly.  It did so
 because someone had first replaced the <span class="math notranslate nohighlight">\(L\)</span> spins by the <span class="math notranslate nohighlight">\(L^{2}\)</span> products
-<span class="math notranslate nohighlight">\(s_js_k\)</span>, at which point Eq. (8.52) became a linear function of
+<span class="math notranslate nohighlight">\(s_js_k\)</span>, at which point Eq. (8.76) became a linear function of
 the inputs and the whole apparatus of Chapter 3 applied.  The
 products were the physics.  The regression only had to find which of them
 mattered.</p>
@@ -2320,7 +3070,7 @@ compared against, and the answer is unusually clean.</p>
 <div class="important admonition">
 <p class="admonition-title">Proposition 8.7 (The energy is uncorrelated with every spin)</p>
 <p>Let the spins <span class="math notranslate nohighlight">\(s_1,\dots,s_L\)</span> be independent and uniform on <span class="math notranslate nohighlight">\(\{-1,+1\}\)</span> and
-let <span class="math notranslate nohighlight">\(H\)</span> be given by Eq. (8.52).  Then
+let <span class="math notranslate nohighlight">\(H\)</span> be given by Eq. (8.76).  Then
 <span class="math notranslate nohighlight">\(\mathbb{E}\left[H\,s_j\right]=0\)</span> for every <span class="math notranslate nohighlight">\(j\)</span>, and the best linear
 predictor of <span class="math notranslate nohighlight">\(H\)</span> from <span class="math notranslate nohighlight">\((s_1,\dots,s_L)\)</span> is the constant <span class="math notranslate nohighlight">\(\mathbb{E}[H]=0\)</span>.</p>
 </div>
@@ -2335,7 +3085,7 @@ write <span class="math notranslate nohighlight">\(H=A+B\)</span> where <span cl
 <div class="math notranslate nohighlight">
 \[
 \mathbb{E}\left[Hs_j\right]
-  = \mathbb{E}\left[As_j\right] + \mathbb{E}\left[Bs_j\right].\tag{8.53}
+  = \mathbb{E}\left[As_j\right] + \mathbb{E}\left[Bs_j\right].\tag{8.77}
 \]</div>
 <p>In the first term <span class="math notranslate nohighlight">\(A\)</span> and <span class="math notranslate nohighlight">\(s_j\)</span> are independent and <span class="math notranslate nohighlight">\(\mathbb{E}[s_j]=0\)</span>, so it
 vanishes.  In the second, <span class="math notranslate nohighlight">\(Bs_j=-J(s_{j-1}+s_{j+1})\)</span> after using
@@ -2374,14 +3124,14 @@ enough to write down.</p>
 <p class="admonition-title">Proposition 8.8 (An exact ReLU representation of the Ising energy)</p>
 <p>For every <span class="math notranslate nohighlight">\(L\)</span> and every <span class="math notranslate nohighlight">\(J\)</span> there is a one-hidden-layer ReLU network with
 <span class="math notranslate nohighlight">\(2L\)</span> hidden units, all first-layer weights in <span class="math notranslate nohighlight">\(\{-1,0,+1\}\)</span> and all
-first-layer biases zero, that equals <span class="math notranslate nohighlight">\(H(\bm{s})\)</span> of Eq. (8.52)
+first-layer biases zero, that equals <span class="math notranslate nohighlight">\(H(\bm{s})\)</span> of Eq. (8.76)
 at every one of the <span class="math notranslate nohighlight">\(2^{L}\)</span> spin configurations.  Explicitly,</p>
 <div class="math notranslate nohighlight">
 \[
 H(\bm{s}) \;=\; JL \;-\; J\sum_{j=1}^{L}
     \Big[\,\sigma\!\left(s_j+s_{j+1}\right)
         + \sigma\!\left(-s_j-s_{j+1}\right)\Big],
-  \qquad \sigma(z)=\max(0,z).\tag{8.54}
+  \qquad \sigma(z)=\max(0,z).\tag{8.78}
 \]</div>
 </div>
 <div class="note admonition">
@@ -2392,10 +3142,10 @@ second, which is exactly <span class="math notranslate nohighlight">\(st\)</span
 <div class="math notranslate nohighlight">
 \[
 H(\bm{s}) = -J\sum_{j=1}^{L}\left(\left|s_j+s_{j+1}\right|-1\right)
-            = JL - J\sum_{j=1}^{L}\left|s_j+s_{j+1}\right| .\tag{8.55}
+            = JL - J\sum_{j=1}^{L}\left|s_j+s_{j+1}\right| .\tag{8.79}
 \]</div>
 <p>Finally <span class="math notranslate nohighlight">\(|z|=\sigma(z)+\sigma(-z)\)</span>, which turns each absolute value into two
-ReLU units, giving Eq. (8.54) with <span class="math notranslate nohighlight">\(2L\)</span> of them.  The
+ReLU units, giving Eq. (8.78) with <span class="math notranslate nohighlight">\(2L\)</span> of them.  The
 first-layer weight matrix has entries <span class="math notranslate nohighlight">\(\pm1\)</span> in two positions of each column
 and zero elsewhere; the output weights are all <span class="math notranslate nohighlight">\(-J\)</span> and the output bias is
 <span class="math notranslate nohighlight">\(JL\)</span>.
@@ -2404,14 +3154,14 @@ and zero elsewhere; the output weights are all <span class="math notranslate noh
 <p>This is worth comparing with Section <em>The universal approximation theorem</em> in three ways.  The
 representation is exact rather than approximate, because the input set is
 finite – the network need only agree with <span class="math notranslate nohighlight">\(H\)</span> on the corners of the
-hypercube, and Eq. (8.55) happens to be a piecewise-linear
+hypercube, and Eq. (8.79) happens to be a piecewise-linear
 function that agrees everywhere in between as well.  The width <span class="math notranslate nohighlight">\(2L\)</span> grows
 linearly in the input dimension rather than exponentially, because the target
 is a sum of terms each involving two coordinates; this is the same reason the
 Barron class of Theorem 8.3 escapes the curse of dimensionality,
 and <span class="math notranslate nohighlight">\(H\)</span> is a textbook member of it.  And the ridge directions <span class="math notranslate nohighlight">\(\pm(e_j+e_{j+1})\)</span>
 are precisely the interactions we are trying to discover: reading the
-first-layer weights of Eq. (8.54) recovers the topology of the
+first-layer weights of Eq. (8.78) recovers the topology of the
 chain.  Evaluating the hand-built network on all ten thousand configurations:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>    <span class="n">hidden</span> <span class="n">units</span>                                <span class="p">:</span> <span class="mi">80</span>
     <span class="n">distinct</span> <span class="n">first</span><span class="o">-</span><span class="n">layer</span> <span class="n">weights</span>                <span class="p">:</span> <span class="p">[</span><span class="o">-</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">]</span>
@@ -2483,9 +3233,9 @@ truth.  Given <span class="math notranslate nohighlight">\(8000\)</span> configu
     <span class="n">RMS</span> <span class="n">error</span> <span class="ow">in</span> <span class="n">units</span> <span class="n">of</span> <span class="n">the</span> <span class="n">energy</span> <span class="n">quantum</span> <span class="mi">2</span><span class="n">J</span> <span class="p">:</span> <span class="mf">0.4516</span>
 </pre></div>
 </div>
-<p>Figure 8.13 collects the three studies.</p>
-<p><img alt="Learning the Ising energy with a one-hidden-layer network.  a Test R2 " src="../BookML/BookFigures/chapter08_neural_networks/ising_network.png" /></p>
-<p><em>Figure 8.13: Learning the Ising energy with a one-hidden-layer network.  (a) Test <span class="math notranslate nohighlight">\(R^{2}\)</span> against epoch for the <span class="math notranslate nohighlight">\(L=40\)</span> raw spins and for the <span class="math notranslate nohighlight">\(L^{2}=1600\)</span> products of Section <em>A second example: the one-dimensional Ising model</em>, both from <span class="math notranslate nohighlight">\(400\)</span> training configurations. (b) Width study on the raw spins; the dashed line marks the <span class="math notranslate nohighlight">\(2L\)</span> units that suffice for the exact representation of Proposition 8.8.  (c) Test <span class="math notranslate nohighlight">\(R^{2}\)</span> against the number of training configurations: the limitation is data, not capacity.</em></p>
+<p>Figure 8.16 collects the three studies.</p>
+<p><img alt="Learning the Ising energy with a one-hidden-layer network.  a Test R2 " src="_images/ising_network.png" /></p>
+<p><em>Figure 8.16: Learning the Ising energy with a one-hidden-layer network.  (a) Test <span class="math notranslate nohighlight">\(R^{2}\)</span> against epoch for the <span class="math notranslate nohighlight">\(L=40\)</span> raw spins and for the <span class="math notranslate nohighlight">\(L^{2}=1600\)</span> products of Section <em>A second example: the one-dimensional Ising model</em>, both from <span class="math notranslate nohighlight">\(400\)</span> training configurations. (b) Width study on the raw spins; the dashed line marks the <span class="math notranslate nohighlight">\(2L\)</span> units that suffice for the exact representation of Proposition 8.8.  (c) Test <span class="math notranslate nohighlight">\(R^{2}\)</span> against the number of training configurations: the limitation is data, not capacity.</em></p>
 <p>The gap between <span class="math notranslate nohighlight">\(R^{2}=1\)</span>, which a network of <span class="math notranslate nohighlight">\(80\)</span> units achieves with the
 right weights, and <span class="math notranslate nohighlight">\(R^{2}=0.28\)</span>, which a network of <span class="math notranslate nohighlight">\(200\)</span> units achieves after
 being trained on <span class="math notranslate nohighlight">\(400\)</span> examples, is the whole distance between approximation
@@ -2527,11 +3277,11 @@ the regime <span class="math notranslate nohighlight">\(n=400\)</span>, <span cl
 penalised linear model is the right tool, and the penalty
 of Section <em>The Lasso</em> encodes knowledge – <em>most interactions are
 absent</em> – that a network trained from scratch has to buy with data.
-Figure 8.14 shows the same numbers, together with the
+Figure 8.17 shows the same numbers, together with the
 network’s score once it is given <span class="math notranslate nohighlight">\(8000\)</span> configurations instead of <span class="math notranslate nohighlight">\(400\)</span>,
 which is where the ordering starts to reverse.</p>
-<p><img alt="Every model of Section A second example the one-dimensional Ising mode" src="../BookML/BookFigures/chapter08_neural_networks/ising_comparison.png" /></p>
-<p><em>Figure 8.14: Every model of Section <em>A second example: the one-dimensional Ising model</em> and this section on the same problem.  Blue: linear models.  Orange: trained networks.  Green: the exact network of Proposition 8.8.  All bars use <span class="math notranslate nohighlight">\(400\)</span> training configurations and the same <span class="math notranslate nohighlight">\(9600\)</span> test configurations except the hatched one, which uses <span class="math notranslate nohighlight">\(8000\)</span> training configurations and a separate held-out set of <span class="math notranslate nohighlight">\(2000\)</span>.  Negative scores are drawn as zero and labelled.</em></p>
+<p><img alt="Every model of Section A second example the one-dimensional Ising mode" src="_images/ising_comparison.png" /></p>
+<p><em>Figure 8.17: Every model of Section <em>A second example: the one-dimensional Ising model</em> and this section on the same problem.  Blue: linear models.  Orange: trained networks.  Green: the exact network of Proposition 8.8.  All bars use <span class="math notranslate nohighlight">\(400\)</span> training configurations and the same <span class="math notranslate nohighlight">\(9600\)</span> test configurations except the hatched one, which uses <span class="math notranslate nohighlight">\(8000\)</span> training configurations and a separate held-out set of <span class="math notranslate nohighlight">\(2000\)</span>.  Negative scores are drawn as zero and labelled.</em></p>
 <p>The same experiment in PyTorch, with an independent initialisation and an
 independent shuffle, agrees:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>   <span class="n">framework</span>      <span class="n">R</span><span class="o">^</span><span class="mi">2</span> <span class="n">train</span>    <span class="n">R</span><span class="o">^</span><span class="mi">2</span> <span class="n">test</span>
@@ -2572,7 +3322,7 @@ expensive, a fitted surrogate is cheap, and the surrogate is only useful if it
 generalises to configurations never computed.  Two features of the successful
 architectures are visible in miniature in
 Proposition 8.8.  They are built from local terms – each
-hidden unit in Eq. (8.54) reads two neighbouring sites, not all
+hidden unit in Eq. (8.78) reads two neighbouring sites, not all
 forty – so the parameter count grows with the range of the interaction rather
 than the size of the system.  And they enforce the symmetries of the problem
 by construction rather than learning them, which is exactly the data saving
@@ -2599,10 +3349,14 @@ element-wise non-linearity; stacking layers gives the feed-forward pass, and
 the universal approximation theorem guarantees that one hidden layer suffices
 to represent any continuous function – while saying nothing about how many
 units are needed or whether gradient descent will find them.</p>
-<p>The gradient follows from the chain rule alone.  Defining the error
+<p>The gradient follows from the chain rule alone, and
+Sections <em>Two scalar examples: no hidden layer and one hidden layer</em> and <em>Two inputs, two hidden nodes, one output</em> worked it out
+first on two scalar networks, by hand and with <code class="docutils literal notranslate"><span class="pre">jax.grad</span></code>, and on a
+<span class="math notranslate nohighlight">\(2\)</span>–<span class="math notranslate nohighlight">\(2\)</span>–<span class="math notranslate nohighlight">\(1\)</span> network, where the reverse sweep of Section <em>The same algorithm by automatic differentiation</em>
+continues through the hidden nodes.  Defining the error
 <span class="math notranslate nohighlight">\(\delta_j^{l}=\partial C/\partial z_j^{l}\)</span> gives the four
-equations (8.41)–(8.44): the output error starts the
-recursion, Eq. (8.42) pulls it backwards through the transposed
+equations (8.65)–(8.68): the output error starts the
+recursion, Eq. (8.66) pulls it backwards through the transposed
 weights modulated by <span class="math notranslate nohighlight">\(f'\)</span>, and the weight and bias gradients follow
 immediately.  The whole gradient costs about two forward passes regardless of
 the number of parameters, which is reverse-mode automatic differentiation from
@@ -2611,12 +3365,12 @@ pairings of output activation and loss – linear with squared error, softmax
 with cross entropy – the output error collapses to
 <span class="math notranslate nohighlight">\(\bm{\delta}^{L}=\bm{a}^{L}-\bm{y}\)</span>.</p>
 <p>Two practical problems then had to be solved before any of this worked in
-depth.  Equation (8.47) shows the gradient reaching layer
+depth.  Equation (8.71) shows the gradient reaching layer
 <span class="math notranslate nohighlight">\(l\)</span> to be a product of <span class="math notranslate nohighlight">\(L-l\)</span> factors, which shrinks or grows geometrically;
 since <span class="math notranslate nohighlight">\(\sigma'\le\tfrac14\)</span>, a ten-layer sigmoid network attenuates the gradient
 by <span class="math notranslate nohighlight">\(10^{-6}\)</span> before it reaches the first layer.  The repairs were the ReLU
 family, which does not saturate, and the variance-preserving initialisations of
-Eqs. (8.49) and (8.50).</p>
+Eqs. (8.73) and (8.74).</p>
 <p>The implementation of Section <em>A neural network from scratch</em> is those equations transcribed,
 and it was verified against finite differences to between <span class="math notranslate nohighlight">\(10^{-6}\)</span> and
 <span class="math notranslate nohighlight">\(10^{-8}\)</span> for every activation function and both output heads before being used
@@ -2668,10 +3422,10 @@ training samples in the digits and MNIST data sets respectively.</p></li>
 (c) Plot <span class="math notranslate nohighlight">\(\sigma'\)</span>, <span class="math notranslate nohighlight">\(\tanh'\)</span>, <span class="math notranslate nohighlight">\(\mathrm{ReLU}'\)</span> and <span class="math notranslate nohighlight">\(\mathrm{ELU}'\)</span> together
 and comment on which of them can attenuate a gradient.</p></li>
 <li><p><strong>Deriving the four equations.</strong>
-(a) Derive Eq. (8.35) from the squared-error cost.
+(a) Derive Eq. (8.59) from the squared-error cost.
 (b) Show that <span class="math notranslate nohighlight">\(\delta_j^{l}=\partial C/\partial b_j^{l}\)</span>,
-Eq. (8.43).
-(c) Derive the recursion (8.42) using the chain rule, being explicit
+Eq. (8.67).
+(c) Derive the recursion (8.66) using the chain rule, being explicit
 about why the sum over <span class="math notranslate nohighlight">\(k\)</span> appears.
 (d) Show that for a softmax output with the cross entropy the output error
 reduces to <span class="math notranslate nohighlight">\(\bm{\delta}^{L}=\bm{a}^{L}-\bm{y}\)</span>.</p></li>
@@ -2687,7 +3441,7 @@ Implement the network of Section <em>A neural network from scratch</em> and repr
 check.
 (a) Confirm a relative error around <span class="math notranslate nohighlight">\(10^{-6}\)</span> or smaller.
 (b) Deliberately introduce a bug – omit the <span class="math notranslate nohighlight">\(f'(\bm{z}^{l})\)</span> factor in
-Eq. (8.42) – and report what the check gives, and whether the
+Eq. (8.66) – and report what the check gives, and whether the
 network still trains.
 (c) Vary <span class="math notranslate nohighlight">\(h\)</span> from <span class="math notranslate nohighlight">\(10^{-1}\)</span> to <span class="math notranslate nohighlight">\(10^{-12}\)</span> and plot the discrepancy; explain
 the shape of the curve using the round-off discussion of
@@ -2698,16 +3452,16 @@ digits data, once with the sigmoid and once with ReLU.
 (a) For each, record the norm of the gradient at the first and the last
 hidden layer after one epoch.
 (b) Plot the ratio against depth and compare with the bound
-<span class="math notranslate nohighlight">\(4^{-(L-1)}\)</span> implied by Eq. (8.47).
+<span class="math notranslate nohighlight">\(4^{-(L-1)}\)</span> implied by Eq. (8.71).
 (c) Which activation permits training at depth eight?</p></li>
 <li><p><strong>Initialisation (numerical).</strong>
 (a) Initialise all weights to zero and explain, and then verify, what
 happens.
-(b) Compare <span class="math notranslate nohighlight">\(\mathcal{N}(0,1)\)</span>, Xavier (8.49) and
-He (8.50) initialisation on a five-layer ReLU network, plotting
+(b) Compare <span class="math notranslate nohighlight">\(\mathcal{N}(0,1)\)</span>, Xavier (8.73) and
+He (8.74) initialisation on a five-layer ReLU network, plotting
 the variance of the activations against layer index after one forward
 pass.
-(c) Relate what you see to Eq. (8.48).</p></li>
+(c) Relate what you see to Eq. (8.72).</p></li>
 <li><p><strong>Architecture and regularisation (numerical).</strong>
 On the digits data, sweep the number of hidden units from <span class="math notranslate nohighlight">\(5\)</span> to <span class="math notranslate nohighlight">\(200\)</span> and
 plot training and test accuracy.
@@ -2745,7 +3499,7 @@ Chapter 6 and the ensembles of Chapter 7.</p>
 <p><strong>Part e: optimisers and depth.</strong>
 Replace plain gradient descent by momentum, RMSProp and Adam from
 Chapter 4, sweeping the learning rate for each, and present the
-results as a table like Table 4.1.  Then increase the depth
+results as a table like Table 4.4.  Then increase the depth
 and study the vanishing-gradient effect directly, comparing the sigmoid with
 ReLU.</p>
 <p><strong>Part f: regularisation.</strong>
@@ -2842,8 +3596,11 @@ and how much from the tuning.</p>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-cost-function-and-the-optimisation-problem">8.7. The cost function and the optimisation problem</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#backpropagation">8.8. Backpropagation</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-four-equations-of-backpropagation">8.8.1. The four equations of backpropagation</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-algorithm">8.8.2. The algorithm</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#two-scalar-examples-no-hidden-layer-and-one-hidden-layer">8.8.1. Two scalar examples: no hidden layer and one hidden layer</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#two-inputs-two-hidden-nodes-one-output">8.8.2. Two inputs, two hidden nodes, one output</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-general-case-dense-layers">8.8.3. The general case: dense layers</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-four-equations-of-backpropagation">8.8.4. The four equations of backpropagation</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-algorithm">8.8.5. The algorithm</a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#vanishing-and-exploding-gradients">8.9. Vanishing and exploding gradients</a></li>

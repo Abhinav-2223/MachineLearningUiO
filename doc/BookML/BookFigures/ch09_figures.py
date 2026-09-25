@@ -8,21 +8,21 @@ from nn_de import *
 # 1. ODE solutions vs exact
 fig,axes=plt.subplots(1,3,figsize=(11.0,3.2))
 # exponential decay
-gamma,g0=2.0,10.0; X=_np.linspace(0,1,50).reshape(-1,1)
+kappa,g0=2.0,10.0; X=_np.linspace(0,1,50).reshape(-1,1)
 def r1(P,Xa):
     N,dN=network_derivs(P,Xa,"tanh",order=1); x=Xa[:,0]
-    return (N+x*dN)+gamma*(g0+x*N)
-P,_=solve_de(r1,[1,40,40,1],X,"tanh",n_iter=3000,eta=2e-2,rng=_np.random.default_rng(1))
+    return (N+x*dN)+kappa*(g0+x*N)
+P,_=solve_de(r1,[1,40,40,1],X,"tanh",n_iter=3000,gamma=2e-2,rng=_np.random.default_rng(1))
 N,_=network_derivs(P,X,"tanh",order=1); g=g0+X[:,0]*N
-axes[0].plot(X[:,0],g0*_np.exp(-gamma*X[:,0]),"k-",lw=2,label="exact")
+axes[0].plot(X[:,0],g0*_np.exp(-kappa*X[:,0]),"k-",lw=2,label="exact")
 axes[0].plot(X[:,0],g,"o",ms=3,label="network")
-axes[0].set_title(r"$g'=-\gamma g$, $g(0)=10$",fontsize=10)
+axes[0].set_title(r"$g'=-\kappa g$, $g(0)=10$",fontsize=10)
 # logistic
 alpha,A,g0b=2.0,1.0,1.2; T=_np.linspace(0,1,50).reshape(-1,1)
 def r2(P,Xa):
     N,dN=network_derivs(P,Xa,"tanh",order=1); t=Xa[:,0]
     gt=g0b+t*N; return (N+t*dN)-alpha*gt*(A-gt)
-P2,_=solve_de(r2,[1,40,40,1],T,"tanh",n_iter=3000,eta=2e-2,rng=_np.random.default_rng(1))
+P2,_=solve_de(r2,[1,40,40,1],T,"tanh",n_iter=3000,gamma=2e-2,rng=_np.random.default_rng(1))
 N,_=network_derivs(P2,T,"tanh",order=1); g2=g0b+T[:,0]*N
 ex2=A*g0b/(g0b+(A-g0b)*_np.exp(-alpha*A*T[:,0]))
 tE=_np.linspace(0,1,11); dt=tE[1]-tE[0]; gE=_np.zeros(11); gE[0]=g0b
@@ -36,7 +36,7 @@ f=lambda x:(3*x+x**2)*_np.exp(x); Xp=_np.linspace(0,1,60).reshape(-1,1)
 def r3(P,Xa):
     N,dN,d2N=network_derivs(P,Xa,"tanh",order=2); x=Xa[:,0]
     return -(-2*N+2*(1-2*x)*dN+x*(1-x)*d2N)-f(x)
-P3,_=solve_de(r3,[1,30,30,1],Xp,"tanh",n_iter=4000,eta=1e-2,rng=_np.random.default_rng(2))
+P3,_=solve_de(r3,[1,30,30,1],Xp,"tanh",n_iter=4000,gamma=1e-2,rng=_np.random.default_rng(2))
 N,dN,d2N=network_derivs(P3,Xp,"tanh",order=2); g3=Xp[:,0]*(1-Xp[:,0])*N
 axes[2].plot(Xp[:,0],Xp[:,0]*(1-Xp[:,0])*_np.exp(Xp[:,0]),"k-",lw=2,label="exact")
 axes[2].plot(Xp[:,0],g3,"o",ms=3,label="network")
@@ -70,13 +70,13 @@ def trial_diff(P,Xa):
     x,t=Xa[:,0],Xa[:,1]
     return (1-t)*anp.sin(anp.pi*x)+x*(1-x)*t*network(P,Xa,"tanh")
 ut=d_dxk(trial_diff,1); ux=d_dxk(trial_diff,0); uxx=d_dxk(ux,0)
-Pd,_=solve_de(lambda P,Xa: ut(P,Xa)-uxx(P,Xa),[2,30,30,1],Xp2,"tanh",n_iter=800,eta=1e-2,rng=_np.random.default_rng(1))
+Pd,_=solve_de(lambda P,Xa: ut(P,Xa)-uxx(P,Xa),[2,30,30,1],Xp2,"tanh",n_iter=800,gamma=1e-2,rng=_np.random.default_rng(1))
 u=trial_diff(Pd,Xp2); ex=_np.exp(-_np.pi**2*Xp2[:,1])*_np.sin(_np.pi*Xp2[:,0])
 def trial_wave(P,Xa):
     x,t=Xa[:,0],Xa[:,1]
     return (1-t**2)*anp.sin(anp.pi*x)+x*(1-x)*t**2*network(P,Xa,"tanh")
 wt=d_dxk(trial_wave,1); wtt=d_dxk(wt,1); wx=d_dxk(trial_wave,0); wxx=d_dxk(wx,0)
-Pw,_=solve_de(lambda P,Xa: wtt(P,Xa)-wxx(P,Xa),[2,30,30,1],Xp2,"tanh",n_iter=800,eta=1e-2,rng=_np.random.default_rng(1))
+Pw,_=solve_de(lambda P,Xa: wtt(P,Xa)-wxx(P,Xa),[2,30,30,1],Xp2,"tanh",n_iter=800,gamma=1e-2,rng=_np.random.default_rng(1))
 w=trial_wave(Pw,Xp2); exw=_np.cos(_np.pi*Xp2[:,1])*_np.sin(_np.pi*Xp2[:,0])
 fig,axes=plt.subplots(1,3,figsize=(11.0,3.2))
 for j,tv in enumerate([0.0,0.05,0.16]):

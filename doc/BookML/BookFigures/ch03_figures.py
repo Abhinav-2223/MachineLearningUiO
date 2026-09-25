@@ -81,3 +81,44 @@ for l in [0.001,0.01,0.1,1.0]:
 ax.set_xlabel(r"singular value $\sigma_i$"); ax.set_ylabel(r"shrinkage $\sigma_i^2/(\sigma_i^2+\lambda)$")
 ax.legend(); ax.set_ylim(-0.03,1.03)
 save(fig,3,"ridge_shrinkage")
+
+# 5. the constraint geometry in two dimensions: circle vs rhombus
+H=np.array([[3.0,1.2],[1.2,1.0]]); th_ols=np.array([2.0,0.5]); t=1.0
+def cost2(a,b):
+    d1,d2=a-th_ols[0],b-th_ols[1]
+    return H[0,0]*d1*d1+2*H[0,1]*d1*d2+H[1,1]*d2*d2
+phi=np.linspace(0,2*np.pi,400001)
+circ=np.array([t*np.cos(phi),t*np.sin(phi)])
+r_sol=circ[:,np.argmin(cost2(circ[0],circ[1]))]
+u=np.linspace(-1,1,400001)
+edg=np.concatenate([np.array([t*u,t*(1-np.abs(u))]),np.array([t*u,-t*(1-np.abs(u))])],axis=1)
+l_sol=edg[:,np.argmin(cost2(edg[0],edg[1]))]
+print(f"  geometry: ridge solution {np.round(r_sol,4)}, lasso solution {np.round(l_sol,4)}")
+g1,g2=np.meshgrid(np.linspace(-1.6,3.2,480),np.linspace(-1.6,2.4,480))
+C=cost2(g1,g2)
+fig,axes=plt.subplots(1,2,figsize=(9.4,4.1),sharex=True,sharey=True)
+for ax,sol,nm in ((axes[0],r_sol,"Ridge"),(axes[1],l_sol,"Lasso")):
+    col="C0" if nm=="Ridge" else "C3"
+    lv=sorted({cost2(*sol)}|set(cost2(*sol)+np.array([1.2,3.0,5.6])))
+    ax.contour(g1,g2,C,levels=lv,colors="C1",linewidths=1.0,alpha=0.8)
+    ax.contour(g1,g2,C,levels=[cost2(*sol)],colors="C1",linewidths=1.8)
+    if nm=="Ridge":
+        ang=np.linspace(0,2*np.pi,400)
+        ax.fill(t*np.cos(ang),t*np.sin(ang),color=col,alpha=0.15)
+        ax.plot(t*np.cos(ang),t*np.sin(ang),color=col,lw=2)
+        ax.set_title(r"Ridge: $\theta_1^2+\theta_2^2\leq t$",fontsize=10)
+    else:
+        ax.fill([t,0,-t,0,t],[0,t,0,-t,0],color=col,alpha=0.15)
+        ax.plot([t,0,-t,0,t],[0,t,0,-t,0],color=col,lw=2)
+        ax.set_title(r"Lasso: $|\theta_1|+|\theta_2|\leq t$",fontsize=10)
+    ax.plot(*th_ols,"ko",ms=6)
+    ax.annotate(r"$\hat{\theta}_{\mathrm{OLS}}$",th_ols,textcoords="offset points",xytext=(8,4))
+    ax.plot(*sol,"o",color=col,ms=8)
+    ax.annotate(rf"$\hat{{\theta}}_{{\mathrm{{{nm}}}}}$",sol,textcoords="offset points",
+                xytext=(-14,14),color=col)
+    ax.axhline(0,color="gray",lw=0.6); ax.axvline(0,color="gray",lw=0.6)
+    ax.set_xlabel(r"$\theta_1$"); ax.set_aspect("equal")
+axes[0].set_ylabel(r"$\theta_2$")
+axes[1].annotate(r"corner: $\theta_2=0$",l_sol,textcoords="offset points",xytext=(22,-34),
+                 color="C3",arrowprops=dict(arrowstyle="->",color="C3",lw=1))
+save(fig,3,"ridge_lasso_geometry")
